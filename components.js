@@ -10,12 +10,6 @@
   /* ── UI translations ── */
   var translations = {
     de: {
-      nav_about:          'Über uns',
-      nav_scope:          'Themen',
-      nav_team:           'Team',
-      nav_collaborations: 'Kooperationen',
-      nav_contact:        'Kontakt',
-      nav_blog:           'Blog',
       blog_label:         'Blog',
       blog_title:         'Forschung &amp; Einblicke',
       blog_subtitle:      'Aktuelles aus unseren Projekten, Methoden und Ergebnissen.',
@@ -28,12 +22,6 @@
       tag_company:        'Unternehmen',
     },
     en: {
-      nav_about:          'About',
-      nav_scope:          'Scope',
-      nav_team:           'Team',
-      nav_collaborations: 'Collaborations',
-      nav_contact:        'Contact',
-      nav_blog:           'Blog',
       blog_label:         'Blog',
       blog_title:         'Research &amp; Insights',
       blog_subtitle:      'Updates from our projects, methods, and findings.',
@@ -81,12 +69,12 @@
           '<img src="' + staticBase + 'brand/LOGO_DLH_header.svg" alt="Data Lab Hell">' +
         '</a>' +
         '<nav id="main-nav">' +
-          '<a href="' + MAIN_SITE + '/#about" data-i18n="nav_about">About</a>' +
-          '<a href="' + MAIN_SITE + '/#research" data-i18n="nav_scope">Scope</a>' +
-          '<a href="' + MAIN_SITE + '/#team" data-i18n="nav_team">Team</a>' +
-          '<a href="' + MAIN_SITE + '/#kooperationen" data-i18n="nav_collaborations">Collaborations</a>' +
-          '<a href="' + MAIN_SITE + '/#contact" data-i18n="nav_contact">Contact</a>' +
-          '<a href="' + blogRoot + 'index.html" aria-current="page" data-i18n="nav_blog">Blog</a>' +
+          '<a href="' + MAIN_SITE + '/#about">About</a>' +
+          '<a href="' + MAIN_SITE + '/#research">Scope</a>' +
+          '<a href="' + MAIN_SITE + '/#team">Team</a>' +
+          '<a href="' + MAIN_SITE + '/#kooperationen">Collaborations</a>' +
+          '<a href="' + MAIN_SITE + '/#contact">Contact</a>' +
+          '<a href="' + blogRoot + 'index.html" aria-current="page">Blog</a>' +
         '</nav>' +
         '<div class="header-right">' +
           '<button id="lang-toggle" class="lang-toggle">' + (currentLang === 'de' ? 'EN' : 'DE') + '</button>' +
