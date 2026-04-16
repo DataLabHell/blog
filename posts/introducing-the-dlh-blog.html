@@ -5,59 +5,95 @@
   <title>Introducing the Data Lab Hell Blog — Data Lab Hell</title>
   <meta name="description" content="We are an extra-university R&D Incubator and Innovation Lab based in Austria. Here is why we are starting to write publicly about our work." />
   <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
-  <link rel="stylesheet" href="https://datalabhell.at/style.css" />
+  <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="../blog.css" />
+  <script>
+    window.POST_TRANSLATIONS = {
+      de: {
+        intro1: 'Das Data Lab Hell (DLH) ist eine außeruniversitäre Forschungseinrichtung und R&amp;D Incubator &amp; Innovation Lab mit Sitz in Zirl, Österreich. Wir sind nicht gewinnorientiert — wir reinvestieren unsere Erlöse vollständig in Forschung und Entwicklung — und arbeiten konsequent als Kooperationspartner mit Unternehmen und Forschungseinrichtungen.',
+        intro2: 'Das meiste, was wir tun, bleibt in Projektberichten, vertraulichen Lieferungen und internen Notizbüchern verborgen. Das schien uns eine verpasste Chance. Dieser Blog ist unser Versuch, das zu ändern.',
+        h_work: 'Was wir tun',
+        work_intro: 'Unsere Arbeit liegt an der Schnittstelle von Wissenschaft und Industrie — mit der Tiefe einer Forschungseinrichtung und der Agilität eines Startups, ohne eines zu sein. Konkret bedeutet das:',
+        work_list: '<li><strong>Datenbasierte Methoden</strong> für industrielle Anwendungen</li><li><strong>Dezentrale und adaptive Algorithmen</strong> für komplexe reale Systeme</li><li><strong>Mathematische und physikalische Modelle</strong> für neue Problemstellungen</li><li><strong>Experimentelle Plattformen</strong>, die Theorie und Anwendung verbinden</li>',
+        work_team: 'Das Team ist bewusst interdisziplinär aufgestellt: Mathematiker:innen, Statistiker:innen, Informatiker:innen und Physiker:innen arbeiten gemeinsam an Problemen, die sich keiner einzelnen Disziplin zuordnen lassen.',
+        h_why: 'Warum wir öffentlich schreiben',
+        why1: 'Angewandte Forschung produziert viel Wissen, das nie über den unmittelbaren Projektkontext hinausgelangt. Methoden, die funktioniert haben, Ansätze, die es nicht getan haben, Erkenntnisse, die wirklich interessant sind, aber nicht in ein Paper passen — all das bleibt tendenziell intern.',
+        why2: 'Wir wollen mehr davon teilen. Keine polierten Whitepapers, sondern ehrliche Beiträge über Probleme, die wir interessant finden, die Werkzeuge und Methoden, die wir einsetzen, und das, was wir unterwegs lernen.',
+        h_expect: 'Was Sie erwartet',
+        expect_intro: 'Beiträge werden drei Bereiche abdecken:',
+        expect_list: '<li><strong>Forschung</strong> — Methoden, Modelle und Ergebnisse aus unseren Projekten</li><li><strong>Technik</strong> — wie wir die Datenpipelines, APIs und Werkzeuge entwickeln, die unsere Arbeit unterstützen</li><li><strong>Unternehmen</strong> — Team-Updates, neue Kooperationen und Kontext zu unserer Arbeit</li>',
+        closing: 'Wenn Sie Kontakt aufnehmen oder eine Zusammenarbeit erkunden möchten, erreichen Sie uns auf <a href="https://datalabhell.at/#contact">datalabhell.at</a>.',
+      },
+      en: {
+        intro1: 'Data Lab Hell (DLH) is an extra-university research institution and R&amp;D Incubator &amp; Innovation Lab based in Zirl, Austria. We are not profit-oriented — we reinvest our earnings entirely into research and development — and we work consistently as a cooperation partner with companies and research institutions.',
+        intro2: 'Most of what we do lives inside project reports, confidential deliverables, and internal notebooks. That felt like a missed opportunity. This blog is our attempt to change that.',
+        h_work: 'What we work on',
+        work_intro: 'Our work sits at the interface of science and industry — with the depth of a research institution and the agility of a startup, without being either. Concretely, that means:',
+        work_list: '<li><strong>Data-based methods</strong> for industrial applications</li><li><strong>Decentralised and adaptive algorithms</strong> for complex real-world systems</li><li><strong>Mathematical and physical models</strong> for new problem domains</li><li><strong>Experimental platforms</strong> that bridge theory and applied use</li>',
+        work_team: 'The team is deliberately interdisciplinary: mathematicians, statisticians, computer scientists and physicists working together on problems that don\'t fit neatly into one discipline.',
+        h_why: 'Why we are writing publicly',
+        why1: 'Applied research produces a lot of knowledge that never reaches anyone outside the immediate project. Methods that worked, approaches that didn\'t, findings that are genuinely interesting but don\'t fit into a paper — all of it tends to stay internal.',
+        why2: 'We want to share more of that. Not polished whitepapers, but honest writeups about the problems we find interesting, the tools and methods we use, and what we learn along the way.',
+        h_expect: 'What to expect',
+        expect_intro: 'Posts will cover three areas:',
+        expect_list: '<li><strong>Research</strong> — methods, models, and findings from our projects</li><li><strong>Engineering</strong> — how we build the data pipelines, APIs, and tools that support our work</li><li><strong>Company</strong> — team updates, new collaborations, and broader context on what we are doing</li>',
+        closing: 'If you want to get in touch or explore a collaboration, reach us at <a href="https://datalabhell.at/#contact">datalabhell.at</a>.',
+      }
+    };
+  </script>
   <script src="../components.js" defer></script>
 </head>
-<body class="inner-page"
+<body
   data-post-title="Introducing the Data Lab Hell Blog"
+  data-post-title-de="Einführung in den Data Lab Hell Blog"
   data-post-date="April 2026"
   data-post-tag="Company"
   data-post-author="Daniel Baldauf"
-  data-post-image="../static/brand/LOGO_DLH.svg">
+  data-post-image="../static/brand/LOGO_DLH.svg"
+  data-post-desc-de="Wir sind eine außeruniversitäre Forschungseinrichtung und R&amp;D Incubator &amp; Innovation Lab in Österreich. Hier erklären wir, warum wir beginnen, öffentlich über unsere Arbeit zu schreiben.">
   <header></header>
   <main>
-    <p>
+    <p data-i18n-html="intro1">
       Data Lab Hell (DLH) is an extra-university research institution and R&amp;D Incubator &amp;
       Innovation Lab based in Zirl, Austria. We are not profit-oriented — we reinvest our earnings
       entirely into research and development — and we work consistently as a cooperation partner
       with companies and research institutions.
     </p>
-    <p>
+    <p data-i18n="intro2">
       Most of what we do lives inside project reports, confidential deliverables, and internal
       notebooks. That felt like a missed opportunity. This blog is our attempt to change that.
     </p>
 
-    <h2>What we work on</h2>
-    <p>
+    <h2 data-i18n="h_work">What we work on</h2>
+    <p data-i18n="work_intro">
       Our work sits at the interface of science and industry — with the depth of a research
       institution and the agility of a startup, without being either. Concretely, that means:
     </p>
-    <ul>
+    <ul data-i18n-html="work_list">
       <li><strong>Data-based methods</strong> for industrial applications</li>
       <li><strong>Decentralised and adaptive algorithms</strong> for complex real-world systems</li>
       <li><strong>Mathematical and physical models</strong> for new problem domains</li>
       <li><strong>Experimental platforms</strong> that bridge theory and applied use</li>
     </ul>
-    <p>
+    <p data-i18n="work_team">
       The team is deliberately interdisciplinary: mathematicians, statisticians, computer scientists
       and physicists working together on problems that don't fit neatly into one discipline.
     </p>
 
-    <h2>Why we are writing publicly</h2>
-    <p>
+    <h2 data-i18n="h_why">Why we are writing publicly</h2>
+    <p data-i18n="why1">
       Applied research produces a lot of knowledge that never reaches anyone outside the immediate
       project. Methods that worked, approaches that didn't, findings that are genuinely interesting
       but don't fit into a paper — all of it tends to stay internal.
     </p>
-    <p>
+    <p data-i18n="why2">
       We want to share more of that. Not polished whitepapers, but honest writeups about the
       problems we find interesting, the tools and methods we use, and what we learn along the way.
     </p>
 
-    <h2>What to expect</h2>
-    <p>Posts will cover three areas:</p>
-    <ul>
+    <h2 data-i18n="h_expect">What to expect</h2>
+    <p data-i18n="expect_intro">Posts will cover three areas:</p>
+    <ul data-i18n-html="expect_list">
       <li><strong>Research</strong> — methods, models, and findings from our projects</li>
       <li><strong>Engineering</strong> — how we build the data pipelines, APIs, and tools that support our work</li>
       <li><strong>Company</strong> — team updates, new collaborations, and broader context on what we are doing</li>
@@ -65,7 +101,7 @@
 
     <hr />
 
-    <p>
+    <p data-i18n-html="closing">
       If you want to get in touch or explore a collaboration, reach us at
       <a href="https://datalabhell.at/#contact">datalabhell.at</a>.
     </p>

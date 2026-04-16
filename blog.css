@@ -1,8 +1,20 @@
 /* Blog-specific styles — base styles loaded from datalabhell.at/style.css */
 
+/* ── HEADER ──────────────────────────────── */
+/* Blog has no transparent-hero phase — header is always dark */
+header {
+  background: var(--dark);
+}
+
+
+/* ── PAGE HERO (blog override) ───────────── */
+.page-hero {
+  padding: 6rem 0 2rem;
+}
+
 /* ── POST LIST ───────────────────────────── */
 .post-list-section {
-  padding: 4rem 0 6rem;
+  padding: 2rem 0 6rem;
 }
 
 .post-grid {
@@ -10,7 +22,7 @@
   grid-template-columns: 1fr;
   gap: 2px;
   background: var(--light-gray);
-  margin-top: 2.5rem;
+  margin-top: 1.5rem;
 }
 
 .post-card {
@@ -91,10 +103,6 @@
 /* ── POST HERO ───────────────────────────── */
 .post-hero {
   background: var(--dark);
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(45, 111, 245, 0.1) 0%, transparent 70%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 28px 28px;
   color: var(--white);
   padding: 9rem 0 4rem;
 }
@@ -234,8 +242,8 @@
 
 /* ── PAGE TRANSITIONS ────────────────────── */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 body.page-enter {

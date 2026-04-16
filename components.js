@@ -10,22 +10,40 @@
   /* ── UI translations ── */
   var translations = {
     de: {
-      blog_label:      'Blog',
-      blog_title:      'Forschung &amp; Einblicke',
-      blog_subtitle:   'Aktuelles aus unseren Projekten, Methoden und Ergebnissen.',
-      read_more:       'Weiterlesen →',
-      back_to_posts:   '← Alle Beiträge',
-      footer_legal:    'Impressum',
-      footer_privacy:  'Datenschutz',
+      nav_about:          'Über uns',
+      nav_scope:          'Themen',
+      nav_team:           'Team',
+      nav_collaborations: 'Kooperationen',
+      nav_contact:        'Kontakt',
+      nav_blog:           'Blog',
+      blog_label:         'Blog',
+      blog_title:         'Forschung &amp; Einblicke',
+      blog_subtitle:      'Aktuelles aus unseren Projekten, Methoden und Ergebnissen.',
+      read_more:          'Weiterlesen →',
+      back_to_posts:      '← Alle Beiträge',
+      footer_legal:       'Impressum',
+      footer_privacy:     'Datenschutz',
+      tag_research:       'Forschung',
+      tag_engineering:    'Technik',
+      tag_company:        'Unternehmen',
     },
     en: {
-      blog_label:      'Blog',
-      blog_title:      'Research &amp; Insights',
-      blog_subtitle:   'Updates from our projects, methods, and findings.',
-      read_more:       'Read more →',
-      back_to_posts:   '← All Posts',
-      footer_legal:    'Legal Notice',
-      footer_privacy:  'Privacy Policy',
+      nav_about:          'About',
+      nav_scope:          'Scope',
+      nav_team:           'Team',
+      nav_collaborations: 'Collaborations',
+      nav_contact:        'Contact',
+      nav_blog:           'Blog',
+      blog_label:         'Blog',
+      blog_title:         'Research &amp; Insights',
+      blog_subtitle:      'Updates from our projects, methods, and findings.',
+      read_more:          'Read more →',
+      back_to_posts:      '← All Posts',
+      footer_legal:       'Legal Notice',
+      footer_privacy:     'Privacy Policy',
+      tag_research:       'Research',
+      tag_engineering:    'Engineering',
+      tag_company:        'Company',
     }
   };
 
@@ -63,12 +81,12 @@
           '<img src="' + staticBase + 'brand/LOGO_DLH_header.svg" alt="Data Lab Hell">' +
         '</a>' +
         '<nav id="main-nav">' +
-          '<a href="' + MAIN_SITE + '/#about">About</a>' +
-          '<a href="' + MAIN_SITE + '/#research">Scope</a>' +
-          '<a href="' + MAIN_SITE + '/#team">Team</a>' +
-          '<a href="' + MAIN_SITE + '/#kooperationen">Collaborations</a>' +
-          '<a href="' + MAIN_SITE + '/#contact">Contact</a>' +
-          '<a href="' + blogRoot + 'index.html" aria-current="page">Blog</a>' +
+          '<a href="' + MAIN_SITE + '/#about" data-i18n="nav_about">About</a>' +
+          '<a href="' + MAIN_SITE + '/#research" data-i18n="nav_scope">Scope</a>' +
+          '<a href="' + MAIN_SITE + '/#team" data-i18n="nav_team">Team</a>' +
+          '<a href="' + MAIN_SITE + '/#kooperationen" data-i18n="nav_collaborations">Collaborations</a>' +
+          '<a href="' + MAIN_SITE + '/#contact" data-i18n="nav_contact">Contact</a>' +
+          '<a href="' + blogRoot + 'index.html" aria-current="page" data-i18n="nav_blog">Blog</a>' +
         '</nav>' +
         '<div class="header-right">' +
           '<button id="lang-toggle" class="lang-toggle">' + (currentLang === 'de' ? 'EN' : 'DE') + '</button>' +
@@ -117,6 +135,9 @@
     btt.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
 
+  // trigger once on load
+  if (header) header.classList.toggle('scrolled', window.scrollY > 20);
+
   /* ── Burger menu ── */
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('#burger-btn');
@@ -141,35 +162,47 @@
               var body   = doc.body;
               var descEl = doc.querySelector('meta[name="description"]');
               return {
-                path:  path,
-                title: body.getAttribute('data-post-title')  || '',
-                date:  body.getAttribute('data-post-date')   || '',
-                tag:   body.getAttribute('data-post-tag')    || '',
-                image: body.getAttribute('data-post-image')  || '',
-                desc:  descEl ? descEl.getAttribute('content') : '',
+                path:    path,
+                title:   body.getAttribute('data-post-title')    || '',
+                titleDe: body.getAttribute('data-post-title-de') || '',
+                date:    body.getAttribute('data-post-date')     || '',
+                tag:     body.getAttribute('data-post-tag')      || '',
+                image:   body.getAttribute('data-post-image')    || '',
+                desc:    descEl ? descEl.getAttribute('content') : '',
+                descDe:  body.getAttribute('data-post-desc-de')  || '',
               };
             });
         }));
       })
       .then(function (posts) {
-        var t = translations[currentLang] || translations['en'];
         posts.forEach(function (p) {
+          var tagKey = p.tag ? 'tag_' + p.tag.toLowerCase() : '';
+          var slug = p.path.split('/').pop().replace(/\.html$/, '').replace(/-/g, '_');
+          var titleKey = 'post_title_' + slug;
+          var descKey  = 'post_desc_'  + slug;
+
+          translations.en[titleKey] = p.title;
+          translations.de[titleKey] = p.titleDe || p.title;
+          translations.en[descKey]  = p.desc;
+          translations.de[descKey]  = p.descDe  || p.desc;
+
           var card = document.createElement('a');
           card.className = 'post-card';
           card.href = p.path;
           card.innerHTML =
             '<div class="post-card-body">' +
               '<div class="post-card-meta">' +
-                (p.tag  ? '<span class="post-tag">'  + p.tag  + '</span>' : '') +
+                (p.tag  ? '<span class="post-tag"'  + (tagKey ? ' data-i18n="' + tagKey + '"' : '') + '>'  + p.tag  + '</span>' : '') +
                 (p.date ? '<span class="post-date">' + p.date + '</span>' : '') +
               '</div>' +
-              '<h2>' + p.title + '</h2>' +
-              (p.desc ? '<p>' + p.desc + '</p>' : '') +
-              '<span class="post-read-more">' + t.read_more + '</span>' +
+              '<h2 data-i18n="' + titleKey + '">' + p.title + '</h2>' +
+              (p.desc ? '<p data-i18n="' + descKey + '">' + p.desc + '</p>' : '') +
+              '<span class="post-read-more" data-i18n="read_more">Read more →</span>' +
             '</div>' +
             (p.image ? '<img class="post-card-image' + (p.image.indexOf('/brand/') !== -1 ? ' post-card-image--brand' : '') + '" src="' + p.image + '" alt="">' : '');
           grid.appendChild(card);
         });
+        applyLang(currentLang);
       });
   }
 
