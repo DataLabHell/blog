@@ -1,3 +1,16 @@
 [
-  "posts/introducing-the-dlh-blog.html"
+  {
+    "path": "posts/introducing-the-dlh-blog.html",
+    "title": "Introducing the Data Lab Hell Blog",
+    "titleDe": "Einführung in den Data Lab Hell Blog",
+    "date": "2026-04-17",
+    "tags": [
+      "Company",
+      "AI"
+    ],
+    "author": "Daniel Baldauf",
+    "image": "static/brand/LOGO_DLH.svg",
+    "desc": "We are an extra-university R&D Incubator and Innovation Lab based in Austria. Here is why we are starting to write publicly about our work.",
+    "descDe": "Wir sind eine außeruniversitäre Forschungseinrichtung und R&D Incubator & Innovation Lab in Österreich. Hier erklären wir, warum wir beginnen, öffentlich über unsere Arbeit zu schreiben."
+  }
 ]

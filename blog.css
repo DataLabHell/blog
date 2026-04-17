@@ -12,9 +12,58 @@ header {
   padding: 6rem 0 2rem;
 }
 
+/* ── TAG FILTER ──────────────────────────── */
+.tag-filter {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  background: var(--white);
+  border-bottom: 2px solid var(--light-gray);
+  margin-bottom: 0;
+}
+
+.tag-filter-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--mid-gray);
+  padding: 0.75rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.tag-filter-btn:hover {
+  color: var(--dark);
+}
+
+.tag-filter-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tag-filter-count {
+  font-weight: 400;
+  letter-spacing: 0;
+  opacity: 0.55;
+  font-size: 0.9em;
+}
+
 /* ── POST LIST ───────────────────────────── */
 .post-list-section {
   padding: 2rem 0 6rem;
+}
+
+.post-grid-wrap {
+  margin-top: 1.5rem;
 }
 
 .post-grid {
@@ -22,7 +71,7 @@ header {
   grid-template-columns: 1fr;
   gap: 2px;
   background: var(--light-gray);
-  margin-top: 1.5rem;
+  margin-top: 0;
 }
 
 .post-card {
@@ -31,31 +80,43 @@ header {
   text-decoration: none;
   display: flex;
   align-items: stretch;
-  transition: background 0.15s;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .post-card:hover {
   background: var(--off-white);
+  border-left-color: var(--accent);
 }
 
 .post-card-body {
   flex: 1;
-  padding: 2.5rem;
+  padding: 1.75rem 2.5rem;
 }
 
 .post-card-image {
   display: block;
-  width: 220px;
+  width: 200px;
+  min-height: 160px;
   flex-shrink: 0;
+  align-self: stretch;
   object-fit: cover;
 }
 
 .post-card-image--brand {
-  object-fit: contain;
-  background: var(--dark);
-  padding: 2rem;
-  filter: brightness(0) invert(1);
-  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--off-white);
+  border-left: 2px solid var(--light-gray);
+  padding: 2rem 1.5rem;
+  object-fit: initial;
+}
+
+.post-card-image--brand img {
+  width: 80%;
+  height: auto;
+  opacity: 0.75;
 }
 
 .post-card-meta {
@@ -71,6 +132,23 @@ header {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--accent);
+}
+
+.post-card-tags .post-tag::before,
+.post-hero-tags .post-tag::before {
+  content: '#';
+}
+
+.post-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.post-date--card {
+  display: block;
+  margin-bottom: 1rem;
 }
 
 .post-date {
@@ -107,7 +185,14 @@ header {
   padding: 9rem 0 4rem;
 }
 
-.post-hero .section-label {
+.post-hero-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.post-hero-tags .post-tag {
   color: var(--accent);
 }
 
@@ -137,18 +222,18 @@ header {
 .article-wrap {
   max-width: 740px;
   margin: 0 auto;
-  padding: 4rem 2rem 6rem;
+  padding: 2rem 2rem 6rem;
 }
 
 .article-back {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: var(--mid-gray);
+  color: var(--accent);
   text-decoration: none;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   transition: color 0.15s;
 }
 
@@ -240,16 +325,78 @@ header {
   margin: 2.5rem 0;
 }
 
-/* ── PAGE TRANSITIONS ────────────────────── */
-@keyframes page-enter {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+
+/* ── COOKIE BANNER ───────────────────────── */
+#cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: var(--dark);
+  color: var(--white);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 1.25rem 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
-body.page-enter {
-  animation: page-enter 0.25s ease forwards;
+#cookie-banner.cc-hidden {
+  transform: translateY(100%);
+  opacity: 0;
 }
 
+.cc-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.cc-text {
+  flex: 1;
+  min-width: 260px;
+}
+
+.cc-text strong {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 0.25rem;
+}
+
+.cc-text p {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+}
+
+.cc-text a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: underline;
+}
+
+.cc-actions {
+  flex-shrink: 0;
+}
+
+#cc-accept {
+  background: var(--white);
+  color: var(--dark);
+  border: none;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 2px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+#cc-accept:hover {
+  background: var(--off-white);
+}
 
 /* ── RESPONSIVE ──────────────────────────── */
 @media (max-width: 700px) {
@@ -257,12 +404,13 @@ body.page-enter {
     flex-direction: column-reverse;
   }
 
-  .post-card-image {
+  .post-card-image,
+  .post-card-image--brand {
     width: 100%;
     height: 180px;
   }
 
   .article-wrap {
-    padding: 2.5rem 1.5rem 4rem;
+    padding: 1.5rem 1.5rem 4rem;
   }
 }

@@ -10,35 +10,51 @@
   /* ── UI translations ── */
   var translations = {
     de: {
-      blog_label:         'Blog',
-      blog_title:         'Forschung &amp; Einblicke',
-      blog_subtitle:      'Aktuelles aus unseren Projekten, Methoden und Ergebnissen.',
-      read_more:          'Weiterlesen →',
-      back_to_posts:      '← Alle Beiträge',
-      footer_legal:       'Impressum',
-      footer_privacy:     'Datenschutz',
-      tag_research:       'Forschung',
-      tag_engineering:    'Technik',
-      tag_company:        'Unternehmen',
+      blog_label:    'Blog',
+      blog_title:    'Forschung &amp; Einblicke',
+      blog_subtitle: 'Aktuelles aus unseren Projekten, Methoden und Ergebnissen.',
+      read_more:     'Weiterlesen →',
+      back_to_posts: '← Alle Beiträge',
+      footer_legal:  'Impressum',
+      footer_privacy:'Datenschutz',
+      footer_revoke: 'Einwilligungen widerrufen',
+      filter_all:    'Alle',
     },
     en: {
-      blog_label:         'Blog',
-      blog_title:         'Research &amp; Insights',
-      blog_subtitle:      'Updates from our projects, methods, and findings.',
-      read_more:          'Read more →',
-      back_to_posts:      '← All Posts',
-      footer_legal:       'Legal Notice',
-      footer_privacy:     'Privacy Policy',
-      tag_research:       'Research',
-      tag_engineering:    'Engineering',
-      tag_company:        'Company',
+      blog_label:    'Blog',
+      blog_title:    'Research &amp; Insights',
+      blog_subtitle: 'Updates from our projects, methods, and findings.',
+      read_more:     'Read more →',
+      back_to_posts: '← All Posts',
+      footer_legal:  'Legal Notice',
+      footer_privacy:'Privacy Policy',
+      footer_revoke: 'Revoke consent',
+      filter_all:    'All',
     }
   };
 
   /* ── Language: same key as main site so they stay in sync ── */
-  var savedLang  = localStorage.getItem('dlh_lang');
+  function getLang() {
+    var m = document.cookie.match(/(?:^|;\s*)dlh_lang=([^;]+)/);
+    return m ? m[1] : localStorage.getItem('dlh_lang');
+  }
+  function setLang(lang) {
+    document.cookie = 'dlh_lang=' + lang + '; path=/; domain=.datalabhell.at; max-age=31536000; SameSite=Lax';
+    localStorage.setItem('dlh_lang', lang);
+  }
+
+  var savedLang  = getLang();
   var browserLang = (navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
   var currentLang = savedLang || browserLang;
+
+  /* ── Date formatting ── */
+  function formatDate(iso, lang) {
+    var p = iso.split('-');
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    return d.toLocaleDateString(lang === 'de' ? 'de-AT' : 'en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+  }
 
   /* ── applyLang: UI strings + optional per-post strings ── */
   function applyLang(lang) {
@@ -54,9 +70,18 @@
       var key = el.getAttribute('data-i18n-html');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
+    document.querySelectorAll('[data-date]').forEach(function (el) {
+      el.textContent = formatDate(el.getAttribute('data-date'), lang);
+    });
     document.documentElement.lang = lang;
     var langBtn = document.getElementById('lang-toggle');
     if (langBtn) langBtn.textContent = lang === 'de' ? 'EN' : 'DE';
+    // Update <title> and <meta description> on post pages
+    if (t['post_hero_title']) {
+      document.title = t['post_hero_title'] + ' — Data Lab Hell';
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && t['post_hero_desc']) metaDesc.setAttribute('content', t['post_hero_desc']);
+    }
     return t;
   }
 
@@ -86,7 +111,7 @@
 
     document.getElementById('lang-toggle').addEventListener('click', function () {
       currentLang = currentLang === 'de' ? 'en' : 'de';
-      localStorage.setItem('dlh_lang', currentLang);
+      setLang(currentLang);
       applyLang(currentLang);
     });
   }
@@ -95,14 +120,13 @@
   var footerEl = document.querySelector('footer');
   if (footerEl) {
     footerEl.innerHTML =
-      '<div class="container">' +
-        '<div class="footer-bottom-inner">' +
-          '<span class="copy">&copy; ' + new Date().getFullYear() + ' Data Lab Hell GmbH</span>' +
-          '<div class="footer-legal">' +
-            '<a href="' + MAIN_SITE + '/impressum.html" data-i18n="footer_legal">Legal Notice</a>' +
-            '<a href="' + MAIN_SITE + '/datenschutz.html" data-i18n="footer_privacy">Privacy Policy</a>' +
-          '</div>' +
-        '</div>' +
+      '<div class="container footer-bottom-inner">' +
+        '<span class="copy">&copy; ' + new Date().getFullYear() + ' Data Lab Hell GmbH &middot; Zirl, Austria</span>' +
+        '<nav class="footer-legal">' +
+          '<a href="#" data-cc-revoke data-i18n="footer_revoke">Revoke consent</a>' +
+          '<a href="' + MAIN_SITE + '/datenschutz.html" data-i18n="footer_privacy">Privacy Policy</a>' +
+          '<a href="' + MAIN_SITE + '/impressum.html" data-i18n="footer_legal">Legal Notice</a>' +
+        '</nav>' +
       '</div>';
   }
 
@@ -136,36 +160,68 @@
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 
+  /* ── posts.json fetch (browser HTTP cache handles repeated requests) ── */
+  async function fetchPosts() {
+    const r = await fetch(blogRoot + 'posts.json');
+    return r.json();
+  }
+
   /* ── Blog index: render cards from post metadata ── */
   var grid = document.getElementById('post-grid');
   if (grid) {
-    fetch(blogRoot + 'posts.json')
-      .then(function (r) { return r.json(); })
-      .then(function (paths) {
-        return Promise.all(paths.map(function (path) {
-          return fetch(path)
-            .then(function (r) { return r.text(); })
-            .then(function (html) {
-              var doc    = new DOMParser().parseFromString(html, 'text/html');
-              var body   = doc.body;
-              var descEl = doc.querySelector('meta[name="description"]');
-              return {
-                path:    path,
-                title:   body.getAttribute('data-post-title')    || '',
-                titleDe: body.getAttribute('data-post-title-de') || '',
-                date:    body.getAttribute('data-post-date')     || '',
-                tag:     body.getAttribute('data-post-tag')      || '',
-                image:   body.getAttribute('data-post-image')    || '',
-                desc:    descEl ? descEl.getAttribute('content') : '',
-                descDe:  body.getAttribute('data-post-desc-de')  || '',
-              };
-            });
-        }));
-      })
+    fetchPosts()
+      .then(function (posts) { return posts; })
       .then(function (posts) {
+        // Newest first
+        posts.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
+
+        // Count tag frequencies and sort by count desc
+        var tagCounts = {};
         posts.forEach(function (p) {
-          var tagKey = p.tag ? 'tag_' + p.tag.toLowerCase() : '';
-          var slug = p.path.split('/').pop().replace(/\.html$/, '').replace(/-/g, '_');
+          (p.tags || []).forEach(function (tag) {
+            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+          });
+        });
+        var allTags = Object.keys(tagCounts).sort(function (a, b) {
+          return tagCounts[b] - tagCounts[a];
+        });
+
+        // Build tag filter UI
+        if (allTags.length > 0) {
+          var totalPosts = posts.length;
+          var filterEl = document.createElement('div');
+          filterEl.className = 'tag-filter';
+          filterEl.innerHTML =
+            '<button class="tag-filter-btn active" data-tag=""><span data-i18n="filter_all">All</span><span class="tag-filter-count" data-total="' + totalPosts + '">(' + totalPosts + ')</span></button>' +
+            allTags.map(function (tag) {
+              return '<button class="tag-filter-btn" data-tag="' + tag + '">' + tag + '<span class="tag-filter-count">(' + tagCounts[tag] + ')</span></button>';
+            }).join('');
+          var wrap = grid.closest('.post-grid-wrap') || grid.parentNode;
+          wrap.insertBefore(filterEl, wrap.firstChild);
+
+          filterEl.addEventListener('click', function (e) {
+            var btn = e.target.closest('.tag-filter-btn');
+            if (!btn) return;
+            var active = btn.getAttribute('data-tag');
+            filterEl.querySelectorAll('.tag-filter-btn').forEach(function (b) {
+              b.classList.toggle('active', b === btn);
+            });
+            var visible = 0;
+            grid.querySelectorAll('.post-card').forEach(function (card) {
+              var cardTags = (card.getAttribute('data-tags') || '').split(',');
+              var show = !active || cardTags.indexOf(active) !== -1;
+              card.style.display = show ? '' : 'none';
+              if (show) visible++;
+            });
+            // Update the "All" button count to reflect current filter
+            var countEl = filterEl.querySelector('.tag-filter-count[data-total]');
+            if (countEl) countEl.textContent = '(' + (active ? visible : totalPosts) + ')';
+          });
+        }
+
+        // Render cards
+        posts.forEach(function (p) {
+          var slug     = p.path.split('/').pop().replace(/\.html$/, '').replace(/-/g, '_');
           var titleKey = 'post_title_' + slug;
           var descKey  = 'post_desc_'  + slug;
 
@@ -174,59 +230,88 @@
           translations.en[descKey]  = p.desc;
           translations.de[descKey]  = p.descDe  || p.desc;
 
+          var tags     = p.tags || [];
+          var tagsHtml = tags.map(function (t) { return '<span class="post-tag">' + t + '</span>'; }).join('');
+
           var card = document.createElement('a');
           card.className = 'post-card';
           card.href = p.path;
+          if (tags.length) card.setAttribute('data-tags', tags.join(','));
           card.innerHTML =
             '<div class="post-card-body">' +
-              '<div class="post-card-meta">' +
-                (p.tag  ? '<span class="post-tag"'  + (tagKey ? ' data-i18n="' + tagKey + '"' : '') + '>'  + p.tag  + '</span>' : '') +
-                (p.date ? '<span class="post-date">' + p.date + '</span>' : '') +
-              '</div>' +
+              (tagsHtml ? '<div class="post-card-tags">' + tagsHtml + '</div>' : '') +
               '<h2 data-i18n="' + titleKey + '">' + p.title + '</h2>' +
               (p.desc ? '<p data-i18n="' + descKey + '">' + p.desc + '</p>' : '') +
+              (p.date ? '<span class="post-date post-date--card" data-date="' + p.date + '">' + formatDate(p.date, currentLang) + '</span>' : '') +
               '<span class="post-read-more" data-i18n="read_more">Read more →</span>' +
             '</div>' +
-            (p.image ? '<img class="post-card-image' + (p.image.indexOf('/brand/') !== -1 ? ' post-card-image--brand' : '') + '" src="' + p.image + '" alt="">' : '');
+            (p.image && p.image.indexOf('/brand/') === -1
+              ? '<img class="post-card-image" src="' + p.image + '" alt="">'
+              : '');
           grid.appendChild(card);
         });
+
         applyLang(currentLang);
       });
   }
 
   /* ── Post layout injection ── */
-  var postTitle = document.body.getAttribute('data-post-title');
-  if (postTitle) {
-    var postTag    = document.body.getAttribute('data-post-tag')    || '';
-    var postDate   = document.body.getAttribute('data-post-date')   || '';
-    var postAuthor = document.body.getAttribute('data-post-author') || '';
-
+  if (document.body.hasAttribute('data-post')) {
+    var currentPath = window.location.pathname.replace(/^\//, '');
     var mainEl = document.querySelector('main');
-    if (mainEl) {
-      var hero = document.createElement('div');
-      hero.className = 'post-hero';
-      hero.innerHTML =
-        '<div class="container">' +
-          (postTag   ? '<p class="section-label">' + postTag + '</p>' : '') +
-          '<h1>' + postTitle + '</h1>' +
-          '<div class="post-hero-meta">' +
-            (postDate   ? '<span class="post-date">'   + postDate   + '</span>' : '') +
-            (postAuthor ? '<span class="post-author">' + postAuthor + '</span>' : '') +
-          '</div>' +
-        '</div>';
-      mainEl.parentNode.insertBefore(hero, mainEl);
 
+    if (mainEl) {
+      // Wrap content immediately so layout doesn't jump
       var content = mainEl.innerHTML;
       mainEl.innerHTML =
         '<div class="article-wrap">' +
           '<a class="article-back" href="' + blogRoot + 'index.html" data-i18n="back_to_posts">&larr; All Posts</a>' +
           '<article class="article-content">' + content + '</article>' +
         '</div>';
+
+      // Build hero from posts.json (single source of truth; cached after first visit)
+      fetchPosts()
+        .then(function (posts) {
+          var match = posts.filter(function (p) {
+            return p.path === currentPath || p.path.split('/').pop() === currentPath.split('/').pop();
+          })[0];
+          if (!match) return;
+
+          var postDate = match.date   || '';
+          var author   = match.author || '';
+          var tags     = match.tags   || [];
+          var isIso    = /^\d{4}-\d{2}-\d{2}$/.test(postDate);
+          var tagsHtml = tags.map(function (t) { return '<span class="post-tag">' + t + '</span>'; }).join('');
+
+          // Register translations so applyLang keeps title/desc in sync on language switch
+          translations.en['post_hero_title'] = match.title;
+          translations.de['post_hero_title'] = match.titleDe || match.title;
+          translations.en['post_hero_desc']  = match.desc    || '';
+          translations.de['post_hero_desc']  = match.descDe  || match.desc || '';
+
+          // Create <meta description> if missing
+          if (!document.querySelector('meta[name="description"]')) {
+            var metaDesc = document.createElement('meta');
+            metaDesc.name = 'description';
+            document.head.appendChild(metaDesc);
+          }
+
+          var hero = document.createElement('div');
+          hero.className = 'post-hero';
+          hero.innerHTML =
+            '<div class="container">' +
+              (tagsHtml ? '<div class="post-hero-tags">' + tagsHtml + '</div>' : '') +
+              '<h1 data-i18n="post_hero_title">' + match.title + '</h1>' +
+              '<div class="post-hero-meta">' +
+                (postDate ? '<span class="post-date"' + (isIso ? ' data-date="' + postDate + '"' : '') + '>' + (isIso ? formatDate(postDate, currentLang) : postDate) + '</span>' : '') +
+                (author ? '<span class="post-author">' + author + '</span>' : '') +
+              '</div>' +
+            '</div>';
+          mainEl.parentNode.insertBefore(hero, mainEl);
+          applyLang(currentLang);
+        });
     }
   }
-
-  /* ── Page transitions ── */
-  document.body.classList.add('page-enter');
 
   /* ── Apply language (runs after all DOM injection above) ── */
   applyLang(currentLang);
