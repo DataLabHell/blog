@@ -426,8 +426,20 @@ header {
   background: var(--off-white);
 }
 
+.nav-blog-mobile {
+  display: none;
+}
+
 /* ── RESPONSIVE ──────────────────────────── */
 @media (max-width: 700px) {
+  .nav-blog {
+    display: none;
+  }
+
+  .nav-blog-mobile {
+    display: block;
+  }
+
   .post-card {
     flex-direction: column-reverse;
   }

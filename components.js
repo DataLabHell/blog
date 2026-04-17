@@ -99,6 +99,7 @@
           '<a href="' + MAIN_SITE + '/#team">Team</a>' +
           '<a href="' + MAIN_SITE + '/#kooperationen">Collaborations</a>' +
           '<a href="' + MAIN_SITE + '/#contact">Contact</a>' +
+          '<a href="' + blogRoot + 'index.html" class="nav-blog-mobile" aria-current="page">Blog</a>' +
         '</nav>' +
         '<div class="header-right">' +
           '<a href="' + blogRoot + 'index.html" class="nav-blog" aria-current="page">Blog</a>' +
