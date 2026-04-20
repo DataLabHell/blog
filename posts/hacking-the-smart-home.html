@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../blog.css" />
+    <script>
+      window.POST_TRANSLATIONS = {
+        de: {
+          opening:
+            "Im Jahr 2023 bin ich in ein Haus eingezogen, das ab Werk mit KNX-Bussystem verkabelt war. Anfangs dachte ich, das reicht. KNX funktioniert zuverlässig — Licht, Rollläden, Heizung — und braucht keinen Server. Aber schon nach wenigen Monaten wurde klar: statische Logik, die in der Engineering Tool Software ETS eingebrannt ist, kann keine externen Daten nutzen. Kein Wetter, keine Strompreise, keine geräteübergreifende Optimierung. Das war der Startschuss.",
+          h_problem: 'Das Problem mit „smarten" Geräten',
+          problem:
+            "Der Smart-Home-Markt verspricht einfache Einrichtung: kaufen, App installieren, fertig. Hinter dieser Einfachheit verbirgt sich eine Falle. Jeder Hersteller bringt seine eigene App mit. Geräteübergreifende Automationen sind mühsam oder gar nicht möglich. Und wenn der Cloud-Server abgeschaltet wird — wie es bei Ikeas Tradfri-Gateway oder Winks Abo-Pflicht passiert ist — funktioniert plötzlich nichts mehr. Daten verlassen das Haus, Geräte werden zu Elektroschrott, Abos tauchen auf. Das ist kein Smart Home, das ist Vendor Lock-in mit Glühbirnen.",
+          h_goal: "Das Ziel: lokale Kontrolle, keine Abhängigkeiten",
+          goal_body:
+            "Die Alternative: volle lokale Kontrolle, geräteübergreifende Automationen, energiebewusste Entscheidungen, kein Abo.",
+          goal_quote:
+            "Smart bedeutet nicht cloud-verbunden — es bedeutet lokal kontrolliert, interoperabel und ausfallsicher.",
+          h_arch: "Systemarchitektur: vier Schichten",
+          arch_intro:
+            "Das System gliedert sich in vier sauber getrennte Schichten:",
+          arch_list:
+            "<li><strong>Field Layer</strong> &#x1F9B4; — KNX-Bus mit MDT-Aktoren, Berker-Tastern und Gira-Gateway. Zuverlässig, deterministisch, funktioniert ohne Server.</li><li><strong>Integration Layer</strong> &#x1F9E0; — Home Assistant im Docker-Container auf einem NAS. Logik, Orchestrierung, Schnittstelle zu allem anderen.</li><li><strong>Messaging Layer</strong> &#x2709; — MQTT-Broker (Mosquitto), ebenfalls in Docker. Alle Nicht-KNX-Geräte kommunizieren darüber mit HA.</li><li><strong>Energy Layer</strong> &#x26A1; — PV-Anlage, E-Fahrzeug, Wärmepumpe und EPEX-Spot-Strompreise, vereint als HA-Sensoren.</li>",
+          arch_idea:
+            "Die Kernidee: Hardware und Logik entkoppeln. KNX kümmert sich zuverlässig um die physische Schicht. Home Assistant übernimmt den Rest.",
+          h_knx: "KNX: das zuverlässige Rückgrat",
+          knx_body:
+            "KNX ist ein 30 Jahre alter offener Standard für Gebäudeautomation, der aus drei früheren Protokollen entstanden ist: EHS, BatiBUS und EIB. Er ist nicht glamourös, aber felsenfest. Telegramme reisen über ein dediziertes verdrilltes Adernpaar — unabhängig vom Stromnetz. Die Reaktionszeit liegt bei etwa 50 ms. Das System funktioniert ohne jeden Server: ein Lichtschalter bleibt ein Lichtschalter, auch wenn der NAS gerade einen Update-Neustart macht.",
+          knx_limits:
+            "Die Grenzen von KNX allein: Logik ist statisch in ETS eingebrannt. Keine externen Daten, keine raumübergreifende Optimierung, keine dynamischen Reaktionen auf Wetter oder Strompreise. Genau hier kommt Home Assistant ins Spiel.",
+          h_ha: "Home Assistant: das Gehirn",
+          ha_body:
+            "Home Assistant ist Open Source, priorisiert lokale Kontrolle und Datenschutz, hat über 3.000 Integrationen und eine aktive DIY-Community. Die Entscheidung gegen Alternativen wie OpenHAB oder ioBroker war schnell gefallen: die Qualität der offiziellen Integrationen — von Miele bis Reolink — war ausschlaggebend.",
+          ha_setup:
+            "Setup: Docker-Container auf einem NAS, persistentes Volume für triviale Backups, Fernzugriff über Tailscale ohne Port-Forwarding. KNX ist über ein IP-Gateway eingebunden — HA liest und schreibt Telegramme und nutzt die in ETS definierten Gruppenadressen direkt als Entitäten.",
+          h_mqtt: "MQTT und serielle Brücken: der universelle Klebstoff",
+          mqtt_body:
+            "Nicht alle Geräte sprechen KNX. Für alles andere dient MQTT als universelles Publish/Subscribe-Protokoll. Der Mosquitto-Broker läuft ebenfalls in Docker auf dem NAS. Geräte publizieren auf thematisch gegliederten Topics; HA abonniert und verarbeitet alles zentral.",
+          ew11: "Die Geheimwaffe dabei ist der Elfin EW11: ein ~25-Euro-Modul, das RS485/UART-Geräte über WLAN erreichbar macht — ohne Löten, ohne proprietäre Gateways, ohne Custom-Firmware. Jedes Industriegerät, das seriell kommuniziert, lässt sich so einbinden. In diesem Fall: Wechselrichter und Smartmeter.",
+          h_inverter: "Wechselrichter und Smartmeter lokal auslesen",
+          inverter_body:
+            "Der PV-Wechselrichter bringt eine proprietäre Cloud-App mit, betrieben auf chinesischen Servern. Die Alternative: EW11 am RS485-Port, Modbus-RTU-Polling alle 10 Sekunden, Daten landen direkt in HA. PV-Erzeugung in Echtzeit, keine Cloud benötigt.",
+          meter_body:
+            "Der Smartmeter hat eine sogenannte Kundenschnittstelle — einen standardisierten RJ-12-Port. Den Entschlüsselungsschlüssel liefert der Netzbetreiber auf Anfrage per E-Mail. Ein Raspberry Pi liest die verschlüsselten Daten aus, entschlüsselt sie und publiziert sie via MQTT. Ergebnis: Netzbezug und Einspeisung in Echtzeit, Spannungen und Ströme pro Phase — vollständig lokal.",
+          h_energy: "Dynamische Strompreise als Steuerungssignal",
+          energy_body:
+            "Der variable Stromtarif koppelt den Strompreis direkt an EPEX-Spot-Preise (AT) plus Aufschlag. Day-Ahead-Preise werden täglich um ca. 13:00 Uhr veröffentlicht und landen über die Nord-Pool-Integration als Zeitreihensensor in HA. Daraus ergeben sich vier Preiszonen:",
+          energy_zones:
+            "<li><strong>Peak (&gt; 20 ct/kWh)</strong> — alles Verschiebbare wird aufgeschoben</li><li><strong>Normal (11,76–20 ct/kWh)</strong> — Standardverhalten</li><li><strong>Günstig (&lt; 11,76 ct/kWh)</strong> — laden, waschen, Warmwasser aufheizen</li><li><strong>Negativ (&lt; 0 ct/kWh)</strong> — alle verfügbaren Verbraucher einschalten</li>",
+          h_ev: "E-Auto intelligent laden",
+          ev_body:
+            "Ein E-Auto ist die größte flexible Last im Haus — bis zu 11 kW. Die HA-Automation evaluiert alle fünf Minuten neu: Bei PV-Überschuss wird der Ladestrom dynamisch an die verfügbare Leistung angepasst. Im günstigen Preisfenster (typischerweise 1–5 Uhr) wird mit voller Leistung geladen. Sonst wird pausiert. Eine Ladesitzung zum richtigen Zeitpunkt spart 5–10 Euro.",
+          h_meters_ai: "Legacy-Zähler mit KI ablesen",
+          meters_ai_body:
+            'Gas- und Wasserzähler haben keine elektrische Schnittstelle und dürfen rechtlich nicht modifiziert werden. Die Lösung: ein ESP32-CAM mit der Open-Source-Firmware „AI on the Edge Device". Die Kamera zeigt auf das Zählerdisplay, ein TensorFlow-Lite-Modell erkennt die Ziffern direkt auf dem Mikrocontroller, die Ablesung wird per MQTT publiziert. Gesamtkosten: ca. 15 Euro pro Zähler.',
+          h_automation: "Automationsphilosophie: fünf Stufen",
+          automation_intro:
+            "Die meisten Smart-Home-Setups bleiben bei Stufe 2 stehen. Das wirklich Interessante beginnt bei Stufe 3:",
+          automation_levels:
+            "<li><strong>Stufe 1 – Reaktiv:</strong> Schalter gedrückt → Licht an (geht mit KNX allein)</li><li><strong>Stufe 2 – Zeitgesteuert:</strong> Licht bei Sonnenuntergang</li><li><strong>Stufe 3 – Kontextbewusst:</strong> Licht bei Sonnenuntergang, aber nur wenn jemand zuhause ist und die Helligkeit unter 50 lx liegt</li><li><strong>Stufe 4 – Vorausschauend:</strong> Raum vor Ankunft vorheizen — mit günstigem Nachtstrom</li><li><strong>Stufe 5 – Optimierend:</strong> E-Auto laden und dabei PV-Eigenverbrauch gegen Spotpreis-Delta abwägen</li>",
+          automation_key:
+            'Der entscheidende Faktor für die höheren Stufen: eine <strong>einheitliche Datenbasis</strong>. Wenn PV-Produktion, Smartmeter, Strompreis, EV-Ladestand und Anwesenheit alle als HA-Sensoren verfügbar sind, ist eine Automation wie „wenn Preis &lt; 5 ct/kWh UND PV &gt; 2 kW UND EV &lt; 80 %" trivial zu schreiben.',
+          h_principles: "Designprinzipien",
+          principles_list:
+            "<li><strong>Kritische Systeme lokal halten</strong> — KNX funktioniert, wenn der NAS neu startet</li><li><strong>Offene Protokolle verwenden</strong> — MQTT, Modbus, KNX: dokumentiert, kein SDK nötig</li><li><strong>Cloud-Abhängigkeiten vermeiden</strong> — jeder Cloud-Dienst ist ein potenzieller Single Point of Failure</li><li><strong>Modular bauen</strong> — ein Integrationsausfall darf nicht alles lahmlegen</li><li><strong>Observability sicherstellen</strong> — alles in HA loggen; was man nicht messen kann, kann man nicht optimieren</li><li><strong>Nicht überautomatisieren</strong> — manuelles Override muss immer und zuverlässig funktionieren</li>",
+          h_challenges: "Herausforderungen (der ehrliche Teil)",
+          challenges_body:
+            "Systemkomplexität steigt schneller als erwartet. HA-Updates können Integrationen brechen. Wichtigster Stabilitätsfaktor: wenn das Haus unzuverlässig wird, werden Features schnell zurückgenommen. Die Lösung: alles KNX-Kritische ist in ETS als Fallback konfiguriert. HA ist Erweiterung, nicht Abhängigkeit — die Schalter funktionieren immer.",
+          closing:
+            "Wer mit so einem Setup anfangen möchte: man muss nicht alles auf einmal bauen. Ein einzelner MQTT-Temperatursensor ist ein valider Einstieg. Jede Schicht fügt für sich Wert hinzu — und die Kombination wird mit der Zeit wirklich interessant.",
+        },
+        en: {
+          opening:
+            "In 2023, I moved into a house pre-wired with KNX from day one. At first, I thought that was enough. KNX is reliable — lights, blinds, heating — and it needs no server. But within a few months it became clear: static logic baked into ETS can't use external data. No weather, no electricity prices, no cross-device optimisation. That was the starting point.",
+          h_problem: 'The problem with "smart" devices',
+          problem:
+            "The smart home market promises easy setup: buy a device, install the app, done. But behind that simplicity hides a trap. Every vendor ships their own app. Cross-device automation is difficult or impossible. And when the cloud server shuts down — as happened with Ikea's Tradfri gateway or Wink's forced subscription model — things simply stop working. Data leaves your home, devices become bricks, subscriptions appear. That's not a smart home, it's vendor lock-in with light bulbs.",
+          h_goal: "The goal: local control, no dependencies",
+          goal_body:
+            "The alternative approach: full local control, cross-system automation, energy-aware decisions, no subscription.",
+          goal_quote:
+            "Smart isn't cloud-connected — it's locally controlled, interoperable, and failure-resistant.",
+          h_arch: "System architecture: four layers",
+          arch_intro:
+            "The system is structured in four cleanly separated layers:",
+          arch_list:
+            "<li><strong>Field Layer</strong> &#x1F9B4; — KNX bus with MDT actuators, Berker switches, and a Gira gateway. Reliable, deterministic, works without any server.</li><li><strong>Integration Layer</strong> &#x1F9E0; — Home Assistant in a Docker container on a NAS. Logic, orchestration, and the interface to everything else.</li><li><strong>Messaging Layer</strong> &#x2709; — MQTT broker (Mosquitto), also in Docker. All non-KNX devices talk to HA through it.</li><li><strong>Energy Layer</strong> &#x26A1; — PV system, EV, heat pump, and EPEX Spot electricity prices, unified as HA sensors.</li>",
+          arch_idea:
+            "The core idea: decouple hardware from logic. KNX handles the physical layer reliably. Home Assistant handles everything else.",
+          h_knx: "KNX: the reliable backbone",
+          knx_body:
+            "KNX is a 30-year-old open standard for building automation, evolved from three earlier protocols: EHS, BatiBUS, and EIB. It's not flashy, but it's rock-solid. Telegrams travel over a dedicated twisted-pair cable, separate from power lines. Response time is around 50 ms. The system works without any server — a light switch stays a light switch, even if the NAS is rebooting for an update.",
+          knx_limits:
+            "The limits of KNX on its own: logic is static, baked into ETS at configuration time. No external data, no cross-room optimisation, no dynamic reactions to weather or electricity prices. That's exactly where Home Assistant comes in.",
+          h_ha: "Home Assistant: the brain",
+          ha_body:
+            "Home Assistant is open source, puts local control and privacy first, has over 3,000 integrations, and an active DIY community. My decision against alternatives like OpenHAB or ioBroker was quick: the quality of official integrations — from Miele to Reolink — was the deciding factor.",
+          ha_setup:
+            "Setup: a Docker container on a NAS, a persistent volume for trivial backups, and remote access via Tailscale without port-forwarding. KNX is connected through an IP gateway — HA reads and writes telegrams and uses the group addresses defined in ETS directly as entities.",
+          h_mqtt: "MQTT and serial bridges: the universal glue",
+          mqtt_body:
+            "Not every device speaks KNX. For everything else, MQTT serves as the universal publish/subscribe protocol. The Mosquitto broker also runs in Docker on the NAS. Devices publish to topic-namespaced channels; HA subscribes and processes everything centrally.",
+          ew11: "The secret weapon here is the Elfin EW11: a ~€25 module that makes RS485/UART devices accessible over Wi-Fi — no soldering, no proprietary gateways, no custom firmware needed. Any industrial device that speaks serial can be integrated this way. In my case: the solar inverter and the smart meter.",
+          h_inverter: "Reading the inverter and smart meter locally",
+          inverter_body:
+            "The solar inverter comes with a proprietary cloud app, running on Chinese servers. The alternative: an EW11 connected to the RS485 port, Modbus RTU polling every 10 seconds, data lands directly in HA. Real-time PV generation, no cloud required.",
+          meter_body:
+            'The smart meter has a "Kundenschnittstelle" — a standardised RJ-12 customer port. The grid operator provides the decryption key by email on request. A Raspberry Pi reads the encrypted data, decrypts it, and publishes it via MQTT. Result: real-time grid draw and feed-in, voltages and currents per phase — fully local.',
+          h_energy: "Dynamic electricity prices as a control signal",
+          energy_body:
+            "The variable electricity rate ties electricity prices directly to EPEX Spot (AT) prices plus a markup. Day-ahead prices are published daily around 13:00 and arrive in HA as a time-series sensor via the Nord Pool integration. Four price zones emerge from this:",
+          energy_zones:
+            "<li><strong>Peak (&gt; 20 ct/kWh)</strong> — defer everything shiftable</li><li><strong>Normal (11.76–20 ct/kWh)</strong> — standard behaviour</li><li><strong>Cheap (&lt; 11.76 ct/kWh)</strong> — charge, run the washing machine, heat water</li><li><strong>Negative (&lt; 0 ct/kWh)</strong> — turn on every available load</li>",
+          h_ev: "Smart EV charging",
+          ev_body:
+            "An EV is the largest flexible load in the house — up to 11 kW. The HA automation re-evaluates every five minutes: if there's a PV surplus, charge current is dynamically set to match it. If the electricity price is in the cheap zone (typically 1–5 am), full-speed charging kicks in. Otherwise, charging is paused. Timing one charge session correctly saves €5–10.",
+          h_meters_ai: "Reading legacy meters with AI",
+          meters_ai_body:
+            'Gas and water meters have no electrical interface and cannot be legally modified. The solution: an ESP32-CAM running the open-source firmware "AI on the Edge Device". The camera points at the meter display, a TensorFlow Lite model recognises the digits directly on the microcontroller, and the reading is published via MQTT. Total cost: around €15 per meter.',
+          h_automation: "Automation philosophy: five levels",
+          automation_intro:
+            "Most smart home setups stop at level 2. The genuinely interesting part starts at level 3:",
+          automation_levels:
+            "<li><strong>Level 1 – Reactive:</strong> switch pressed → light on (achievable with KNX alone)</li><li><strong>Level 2 – Scheduled:</strong> turn on at sunset</li><li><strong>Level 3 – Context-aware:</strong> turn on at sunset, but only if someone is home and lux is below 50</li><li><strong>Level 4 – Predictive:</strong> pre-heat a room before arrival using cheap overnight electricity</li><li><strong>Level 5 – Optimising:</strong> charge the EV while balancing PV self-consumption against the spot price delta</li>",
+          automation_key:
+            'The key enabler for the higher levels: a <strong>unified data foundation</strong>. Once PV production, smart meter, electricity price, EV state of charge, and presence are all available as HA sensors, an automation like "if price &lt; 5 ct/kWh AND solar &gt; 2 kW AND EV &lt; 80%" is trivial to write.',
+          h_principles: "Design principles",
+          principles_list:
+            "<li><strong>Keep critical systems local</strong> — KNX keeps working when the NAS reboots</li><li><strong>Use open protocols</strong> — MQTT, Modbus, KNX: documented, no SDK needed</li><li><strong>Avoid cloud dependencies</strong> — every cloud service is a future single point of failure</li><li><strong>Build modular</strong> — one integration failure must not bring down others</li><li><strong>Ensure observability</strong> — log everything to HA; if you can't measure it, you can't optimise it</li><li><strong>Don't over-automate</strong> — manual override must always work, first-class</li>",
+          h_challenges: "Challenges (the honest part)",
+          challenges_body:
+            "System complexity creeps up faster than expected. HA updates can break integrations. The most important stability metric: if the house becomes unreliable, features get rolled back fast. The solution: anything KNX-critical is configured in ETS as a fallback. HA is enhancement, not dependency — the switches always work.",
+          closing:
+            "If you want to start this kind of setup: you don't have to build everything at once. A single MQTT temperature sensor is a valid starting point. Each layer adds value on its own — and the combination becomes genuinely interesting over time.",
+        },
+      };
+    </script>
+    <script src="../components.js" defer></script>
+    <script src="https://datalabhell.at/cookie-consent.js" defer></script>
+  </head>
+  <body data-post>
+    <header></header>
+    <main>
+      <p data-i18n="opening">
+        In 2023, I moved into a house pre-wired with KNX from day one. At first,
+        I thought that was enough. KNX is reliable — lights, blinds, heating —
+        and it needs no server. But within a few months it became clear: static
+        logic baked into ETS can't use external data. No weather, no electricity
+        prices, no cross-device optimisation. That was the starting point.
+      </p>
+
+      <h2 data-i18n="h_problem">The problem with "smart" devices</h2>
+      <p data-i18n="problem">
+        The smart home market promises easy setup: buy a device, install the
+        app, done. But behind that simplicity hides a trap. Every vendor ships
+        their own app. Cross-device automation is difficult or impossible. And
+        when the cloud server shuts down — as happened with Ikea's Tradfri
+        gateway or Wink's forced subscription model — things simply stop
+        working. Data leaves your home, devices become bricks, subscriptions
+        appear. That's not a smart home, it's vendor lock-in with light bulbs.
+      </p>
+
+      <h2 data-i18n="h_goal">The goal: local control, no dependencies</h2>
+      <p data-i18n="goal_body">
+        The alternative approach: full local control, cross-system automation,
+        energy-aware decisions, no subscription.
+      </p>
+      <blockquote>
+        <p data-i18n="goal_quote">
+          Smart isn't cloud-connected — it's locally controlled, interoperable,
+          and failure-resistant.
+        </p>
+      </blockquote>
+
+      <h2 data-i18n="h_arch">System architecture: four layers</h2>
+      <p data-i18n="arch_intro">
+        The system is structured in four cleanly separated layers:
+      </p>
+      <ul data-i18n-html="arch_list">
+        <li>
+          <strong>Field Layer</strong> &#x1F9B4; — KNX bus with MDT actuators,
+          Berker switches, and a Gira gateway. Reliable, deterministic, works
+          without any server.
+        </li>
+        <li>
+          <strong>Integration Layer</strong> &#x1F9E0; — Home Assistant in a
+          Docker container on a NAS. Logic, orchestration, and the interface to
+          everything else.
+        </li>
+        <li>
+          <strong>Messaging Layer</strong> &#x2709; — MQTT broker (Mosquitto),
+          also in Docker. All non-KNX devices talk to HA through it.
+        </li>
+        <li>
+          <strong>Energy Layer</strong> &#x26A1; — PV system, EV, heat pump, and
+          EPEX Spot electricity prices, unified as HA sensors.
+        </li>
+      </ul>
+      <p data-i18n="arch_idea">
+        The core idea: decouple hardware from logic. KNX handles the physical
+        layer reliably. Home Assistant handles everything else.
+      </p>
+
+      <h2 data-i18n="h_knx">KNX: the reliable backbone</h2>
+      <p data-i18n="knx_body">
+        KNX is a 30-year-old open standard for building automation, evolved from
+        three earlier protocols: EHS, BatiBUS, and EIB. It's not flashy, but
+        it's rock-solid. Telegrams travel over a dedicated twisted-pair cable,
+        separate from power lines. Response time is around 50 ms. The system
+        works without any server — a light switch stays a light switch, even if
+        the NAS is rebooting for an update.
+      </p>
+      <p data-i18n="knx_limits">
+        The limits of KNX on its own: logic is static, baked into ETS at
+        configuration time. No external data, no cross-room optimisation, no
+        dynamic reactions to weather or electricity prices. That's exactly where
+        Home Assistant comes in.
+      </p>
+
+      <h2 data-i18n="h_ha">Home Assistant: the brain</h2>
+      <p data-i18n="ha_body">
+        Home Assistant is open source, puts local control and privacy first, has
+        over 3,000 integrations, and an active DIY community. My decision
+        against alternatives like OpenHAB or ioBroker was quick: the quality of
+        official integrations — from Miele to Reolink — was the deciding factor.
+      </p>
+      <p data-i18n="ha_setup">
+        Setup: a Docker container on a NAS, a persistent volume for trivial
+        backups, and remote access via Tailscale without port-forwarding. KNX is
+        connected through an IP gateway — HA reads and writes telegrams and uses
+        the group addresses defined in ETS directly as entities.
+      </p>
+      <pre><code>services:
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant:latest
+    network_mode: host
+    volumes:
+      - /share/docker/homeassistant/config:/config
+    restart: unless-stopped
+    depends_on:
+      - mosquitto</code></pre>
+
+      <h2 data-i18n="h_mqtt">MQTT and serial bridges: the universal glue</h2>
+      <p data-i18n="mqtt_body">
+        Not every device speaks KNX. For everything else, MQTT serves as the
+        universal publish/subscribe protocol. The Mosquitto broker also runs in
+        Docker on the NAS. Devices publish to topic-namespaced channels; HA
+        subscribes and processes everything centrally.
+      </p>
+      <p data-i18n="ew11">
+        The secret weapon here is the Elfin EW11: a ~€25 module that makes
+        RS485/UART devices accessible over Wi-Fi — no soldering, no proprietary
+        gateways, no custom firmware needed. Any industrial device that speaks
+        serial can be integrated this way. In my case: the solar inverter and
+        the smart meter.
+      </p>
+
+      <h2 data-i18n="h_inverter">
+        Reading the inverter and smart meter locally
+      </h2>
+      <p data-i18n="inverter_body">
+        The solar inverter comes with a proprietary cloud app, running on
+        Chinese servers. The alternative: an EW11 connected to the RS485 port,
+        Modbus RTU polling every 10 seconds, data lands directly in HA.
+        Real-time PV generation, no cloud required.
+      </p>
+      <p data-i18n="meter_body">
+        The smart meter has a "Kundenschnittstelle" — a standardised RJ-12
+        customer port. The grid operator provides the decryption key by email on
+        request. A Raspberry Pi reads the encrypted data, decrypts it, and
+        publishes it via MQTT. Result: real-time grid draw and feed-in, voltages
+        and currents per phase — fully local.
+      </p>
+
+      <h2 data-i18n="h_energy">
+        Dynamic electricity prices as a control signal
+      </h2>
+      <p data-i18n="energy_body">
+        The variable electricity rate ties electricity prices directly to EPEX
+        Spot (AT) prices plus a markup. Day-ahead prices are published daily
+        around 13:00 and arrive in HA as a time-series sensor via the Nord Pool
+        integration. Four price zones emerge from this:
+      </p>
+      <ul data-i18n-html="energy_zones">
+        <li>
+          <strong>Peak (&gt; 20 ct/kWh)</strong> — defer everything shiftable
+        </li>
+        <li><strong>Normal (11.76–20 ct/kWh)</strong> — standard behaviour</li>
+        <li>
+          <strong>Cheap (&lt; 11.76 ct/kWh)</strong> — charge, run the washing
+          machine, heat water
+        </li>
+        <li>
+          <strong>Negative (&lt; 0 ct/kWh)</strong> — turn on every available
+          load
+        </li>
+      </ul>
+
+      <h2 data-i18n="h_ev">Smart EV charging</h2>
+      <p data-i18n="ev_body">
+        An EV is the largest flexible load in the house — up to 11 kW. The HA
+        automation re-evaluates every five minutes: if there's a PV surplus,
+        charge current is dynamically set to match it. If the electricity price
+        is in the cheap zone (typically 1–5 am), full-speed charging kicks in.
+        Otherwise, charging is paused. Timing one charge session correctly saves
+        €5–10.
+      </p>
+      <pre><code>automation:
+  - alias: 'EV Smart Charge'
+    trigger:
+      - platform: time_pattern
+        minutes: '/5'
+    condition:
+      - condition: state
+        entity_id: binary_sensor.ev_plugged_in
+        state: 'on'
+    action:
+      - choose:
+          - conditions:
+              - '{{ solar_surplus_kw > 1.5 }}'   # solar mode
+            sequence:
+              - service: number.set_value
+                data: '{{ [6, (solar_surplus_kw * 1000 / 230) | int] | max }}'
+          - conditions:
+              - "{{ price_zone == 'cheap' }}"     # price mode
+            sequence:
+              - service: evse.set_charge_current
+                data: { current: 16 }
+        default:
+          - service: evse.set_charge_current
+            data: { current: 0 }                 # pause</code></pre>
+
+      <h2 data-i18n="h_meters_ai">Reading legacy meters with AI</h2>
+      <p data-i18n="meters_ai_body">
+        Gas and water meters have no electrical interface and cannot be legally
+        modified. The solution: an ESP32-CAM running the open-source firmware
+        "AI on the Edge Device". The camera points at the meter display, a
+        TensorFlow Lite model recognises the digits directly on the
+        microcontroller, and the reading is published via MQTT. Total cost:
+        around €15 per meter.
+      </p>
+      <pre><code>PV production > household consumption?
+  |
+  +-- Battery not full?      → charge battery         (priority 1)
+  |
+  +-- EV plugged in?         → dynamic EVSE setpoint  (priority 2)
+  |
+  +-- Water heater armed?    → heat water              (priority 3)
+  |
+  +-- Washing machine wait?  → start now               (priority 4)
+  |
+  +-- Still surplus?         → feed-in (unavoidable)</code></pre>
+
+      <h2 data-i18n="h_automation">Automation philosophy: five levels</h2>
+      <p data-i18n="automation_intro">
+        Most smart home setups stop at level 2. The genuinely interesting part
+        starts at level 3:
+      </p>
+      <ol data-i18n-html="automation_levels">
+        <li>
+          <strong>Level 1 – Reactive:</strong> switch pressed → light on
+          (achievable with KNX alone)
+        </li>
+        <li><strong>Level 2 – Scheduled:</strong> turn on at sunset</li>
+        <li>
+          <strong>Level 3 – Context-aware:</strong> turn on at sunset, but only
+          if someone is home and lux is below 50
+        </li>
+        <li>
+          <strong>Level 4 – Predictive:</strong> pre-heat a room before arrival
+          using cheap overnight electricity
+        </li>
+        <li>
+          <strong>Level 5 – Optimising:</strong> charge the EV while balancing
+          PV self-consumption against the spot price delta
+        </li>
+      </ol>
+      <p data-i18n-html="automation_key">
+        The key enabler for the higher levels: a
+        <strong>unified data foundation</strong>. Once PV production, smart
+        meter, electricity price, EV state of charge, and presence are all
+        available as HA sensors, an automation like "if price &lt; 5 ct/kWh AND
+        solar &gt; 2 kW AND EV &lt; 80%" is trivial to write.
+      </p>
+
+      <h2 data-i18n="h_principles">Design principles</h2>
+      <ol data-i18n-html="principles_list">
+        <li>
+          <strong>Keep critical systems local</strong> — KNX keeps working when
+          the NAS reboots
+        </li>
+        <li>
+          <strong>Use open protocols</strong> — MQTT, Modbus, KNX: documented,
+          no SDK needed
+        </li>
+        <li>
+          <strong>Avoid cloud dependencies</strong> — every cloud service is a
+          future single point of failure
+        </li>
+        <li>
+          <strong>Build modular</strong> — one integration failure must not
+          bring down others
+        </li>
+        <li>
+          <strong>Ensure observability</strong> — log everything to HA; if you
+          can't measure it, you can't optimise it
+        </li>
+        <li>
+          <strong>Don't over-automate</strong> — manual override must always
+          work, first-class
+        </li>
+      </ol>
+
+      <h2 data-i18n="h_challenges">Challenges (the honest part)</h2>
+      <p data-i18n="challenges_body">
+        System complexity creeps up faster than expected. HA updates can break
+        integrations. The most important stability metric: if the house becomes
+        unreliable, features get rolled back fast. The solution: anything
+        KNX-critical is configured in ETS as a fallback. HA is enhancement, not
+        dependency — the switches always work.
+      </p>
+
+      <hr />
+
+      <p data-i18n="closing">
+        If you want to start this kind of setup: you don't have to build
+        everything at once. A single MQTT temperature sensor is a valid starting
+        point. Each layer adds value on its own — and the combination becomes
+        genuinely interesting over time.
+      </p>
+    </main>
+    <footer></footer>
+  </body>
+</html>
