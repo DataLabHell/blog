@@ -244,10 +244,11 @@
               '<h2 data-i18n="' + titleKey + '">' + p.title + '</h2>' +
               (p.desc ? '<p data-i18n="' + descKey + '">' + p.desc + '</p>' : '') +
               (p.date ? '<span class="post-date post-date--card" data-date="' + p.date + '">' + formatDate(p.date, currentLang) + '</span>' : '') +
-              '<span class="post-read-more" data-i18n="read_more">Read more →</span>' +
             '</div>' +
-            (p.image && p.image.indexOf('/brand/') === -1
-              ? '<img class="post-card-image" src="' + p.image + '" alt="">'
+            (p.image
+              ? (p.image.indexOf('/brand/') !== -1 || /\.svg$/i.test(p.image)
+                ? '<div class="post-card-image post-card-image--brand"><img src="' + p.image + '" alt=""></div>'
+                : '<img class="post-card-image" src="' + p.image + '" alt="">')
               : '');
           grid.appendChild(card);
         });

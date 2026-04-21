@@ -96,7 +96,7 @@ header {
 
 .post-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 2px;
   background: var(--light-gray);
   margin-top: 0;
@@ -108,8 +108,14 @@ header {
   text-decoration: none;
   display: flex;
   align-items: stretch;
+  overflow: hidden;
   border-left: 3px solid transparent;
   transition: background 0.15s, border-color 0.15s;
+}
+
+.post-card:first-child,
+.post-card:last-child:nth-child(even) {
+  grid-column: 1 / -1;
 }
 
 .post-card:hover {
@@ -119,12 +125,14 @@ header {
 
 .post-card-body {
   flex: 1;
-  padding: 1.75rem 2.5rem;
+  padding: 2rem 2.5rem;
 }
+
 
 .post-card-image {
   display: block;
   width: 200px;
+  height: 100%;
   min-height: 160px;
   flex-shrink: 0;
   align-self: stretch;
@@ -155,16 +163,14 @@ header {
 }
 
 .post-tag {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
-}
-
-.post-card-tags .post-tag::before,
-.post-hero-tags .post-tag::before {
-  content: '#';
+  background: rgba(45, 111, 245, 0.08);
+  padding: 0.25em 0.6em;
+  border-radius: 2px;
 }
 
 .post-card-tags {
@@ -200,11 +206,6 @@ header {
   margin-bottom: 1.25rem;
 }
 
-.post-read-more {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
-}
 
 /* ── POST HERO ───────────────────────────── */
 .post-hero {
