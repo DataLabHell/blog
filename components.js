@@ -19,6 +19,7 @@
       footer_privacy:'Datenschutz',
       footer_revoke: 'Einwilligungen widerrufen',
       filter_all:    'Alle',
+      by:            'von',
     },
     en: {
       blog_label:    'Blog',
@@ -30,6 +31,7 @@
       footer_privacy:'Privacy Policy',
       footer_revoke: 'Revoke consent',
       filter_all:    'All',
+      by:            'by',
     }
   };
 
@@ -214,9 +216,6 @@
               card.style.display = show ? '' : 'none';
               if (show) visible++;
             });
-            // Update the "All" button count to reflect current filter
-            var countEl = filterEl.querySelector('.tag-filter-count[data-total]');
-            if (countEl) countEl.textContent = '(' + (active ? visible : totalPosts) + ')';
           });
         }
 
@@ -232,7 +231,7 @@
           translations.de[descKey]  = p.descDe  || p.desc;
 
           var tags     = p.tags || [];
-          var tagsHtml = tags.map(function (t) { return '<span class="post-tag">' + t + '</span>'; }).join('');
+          var tagsHtml = tags.map(function (t) { return '<button class="post-tag" data-tag="' + t + '">' + t + '</button>'; }).join('');
 
           var card = document.createElement('a');
           card.className = 'post-card';
@@ -243,7 +242,10 @@
               (tagsHtml ? '<div class="post-card-tags">' + tagsHtml + '</div>' : '') +
               '<h2 data-i18n="' + titleKey + '">' + p.title + '</h2>' +
               (p.desc ? '<p data-i18n="' + descKey + '">' + p.desc + '</p>' : '') +
-              (p.date ? '<span class="post-date post-date--card" data-date="' + p.date + '">' + formatDate(p.date, currentLang) + '</span>' : '') +
+              '<div class="post-card-meta">' +
+                (p.date ? '<span class="post-date" data-date="' + p.date + '">' + formatDate(p.date, currentLang) + '</span>' : '') +
+                (p.author ? '<span class="post-author" data-author="' + p.author + '"><span data-i18n="by">' + translations[currentLang].by + '</span> ' + p.author + '</span>' : '') +
+              '</div>' +
             '</div>' +
             (p.image
               ? (p.image.indexOf('/brand/') !== -1 || /\.svg$/i.test(p.image)
@@ -251,6 +253,14 @@
                 : '<img class="post-card-image" src="' + p.image + '" alt="">')
               : '');
           grid.appendChild(card);
+        });
+
+        grid.addEventListener('click', function (e) {
+          var tag = e.target.closest('.post-tag[data-tag]');
+          if (!tag) return;
+          e.preventDefault();
+          var btn = filterEl.querySelector('.tag-filter-btn[data-tag="' + tag.getAttribute('data-tag') + '"]');
+          if (btn) btn.click();
         });
 
         applyLang(currentLang);

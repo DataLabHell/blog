@@ -37,7 +37,7 @@ header {
 
 /* ── PAGE HERO (blog override) ───────────── */
 .page-hero {
-  padding: 6rem 0 2rem;
+  padding: 8rem 0 4rem;
 }
 
 /* ── TAG FILTER ──────────────────────────── */
@@ -131,9 +131,9 @@ header {
 
 .post-card-image {
   display: block;
-  width: 200px;
+  width: 280px;
   height: 100%;
-  min-height: 160px;
+  min-height: 180px;
   flex-shrink: 0;
   align-self: stretch;
   object-fit: cover;
@@ -171,6 +171,14 @@ header {
   background: rgba(45, 111, 245, 0.08);
   padding: 0.25em 0.6em;
   border-radius: 2px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.post-tag:hover {
+  background: rgba(45, 111, 245, 0.16);
 }
 
 .post-card-tags {
@@ -185,7 +193,8 @@ header {
   margin-bottom: 1rem;
 }
 
-.post-date {
+.post-date,
+.post-author {
   font-size: 0.8rem;
   color: var(--mid-gray);
 }
@@ -211,26 +220,43 @@ header {
 .post-hero {
   background: var(--dark);
   color: var(--white);
-  padding: 9rem 0 4rem;
+  padding: 8rem 0 4rem;
 }
 
 .post-hero-tags {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .post-hero-tags .post-tag {
+  background: none;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  line-height: 1.6;
   color: var(--accent);
+  cursor: default;
+}
+
+.post-hero-tags .post-tag:hover {
+  background: none;
+}
+
+.post-hero-tags .post-tag + .post-tag::before {
+  content: '·';
+  margin-right: 0.5rem;
+  color: rgba(255,255,255,0.3);
 }
 
 .post-hero h1 {
-  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   max-width: 780px;
 }
 
@@ -243,8 +269,8 @@ header {
 
 .post-hero-meta .post-date,
 .post-hero-meta .post-author {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* ── ARTICLE ─────────────────────────────── */
@@ -448,7 +474,7 @@ header {
   .post-card-image,
   .post-card-image--brand {
     width: 100%;
-    height: 180px;
+    height: 220px;
   }
 
   .article-wrap {

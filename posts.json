@@ -9,7 +9,7 @@
     ],
     "author": "Daniel Baldauf",
     "image": "static/brand/LOGO_DLH.svg",
-    "desc": "We are an extra-university R&D Incubator and Innovation Lab based in Austria. Here is why we are starting to write publicly about our work.",
+    "desc": "We are a research and technology organisation and as an R&D Incubator & Innovation Lab unique in its form. Here is why we are starting to write publicly about our work.",
     "descDe": "Wir sind eine außeruniversitäre Forschungseinrichtung und R&D Incubator & Innovation Lab in Österreich. Hier erklären wir, warum wir beginnen, öffentlich über unsere Arbeit zu schreiben."
   },
   {
@@ -25,6 +25,7 @@
       "DIY"
     ],
     "author": "Johannes Sappl",
+    "image": "static/posts/smart-home.png",
     "desc": "How I integrated KNX, Home Assistant, and dynamic EPEX Spot pricing to build a fully local, energy-aware smart home — from solar inverter to EV charging.",
     "descDe": "Wie ich KNX, Home Assistant und dynamische EPEX-Spot-Preise zu einem vollständig lokalen, energiebewussten Smart Home kombiniert habe — vom Wechselrichter bis zur E-Auto-Ladung."
   }
