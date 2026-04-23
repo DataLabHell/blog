@@ -28,5 +28,22 @@
     "image": "static/posts/smart-home.png",
     "desc": "How I integrated KNX, Home Assistant, and dynamic EPEX Spot pricing to build a fully local, energy-aware smart home — from solar inverter to EV charging.",
     "descDe": "Wie ich KNX, Home Assistant und dynamische EPEX-Spot-Preise zu einem vollständig lokalen, energiebewussten Smart Home kombiniert habe — vom Wechselrichter bis zur E-Auto-Ladung."
+  },
+  {
+    "path": "posts/faraday-mcp-server.html",
+    "title": "LLM-Agentic Science with the Model Context Protocol",
+    "titleDe": "LLM-agentische Wissenschaft mit dem Model Context Protocol",
+    "date": "2026-04-23",
+    "tags": [
+      "MCP",
+      "LLM",
+      "Cheminformatics",
+      "Spectroscopy",
+      "Research"
+    ],
+    "author": "DLH-lab",
+    "image": "static/posts/faraday_logo.png",
+    "desc": "Two case studies in connecting a large language model directly to NIST and PubChem reference data — a retrospective database audit of the n-alkane series, and a forward-looking IR-bandpass design for an industrial CO analyzer.",
+    "descDe": "Zwei Fallstudien zur direkten Anbindung eines Sprachmodells an NIST- und PubChem-Referenzdaten — eine retrospektive Datenbankprüfung der n-Alkan-Reihe und ein vorausschauender IR-Bandpass-Entwurf für einen industriellen CO-Analysator."
   }
 ]

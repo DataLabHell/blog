@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+<link rel="stylesheet" href="/style.css" />
+<link rel="stylesheet" href="/blog.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="/components.js" defer></script>
+<script src="https://datalabhell.at/cookie-consent.js" defer></script>
+<style>
+  :root {
+    --ink: #1a1a18;
+    --paper: #f7f5ef;
+    --accent: #c0392b;
+    --accent2: #2c3e6b;
+    --muted: #6b6760;
+    --rule: #d4cfc4;
+    --code-bg: #1e1e1e;
+    --code-fg: #d4d4d4;
+    --highlight: #f0ead6;
+  }
+
+  /* Scoped to this post — rules live inside .article-content, which
+     components.js wraps around <main>'s contents. This avoids leaking
+     report-specific typography into the shared blog chrome, and beats
+     blog.css specificity on .article-content element rules. */
+
+  .article-content {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+
+  /* ToC */
+  .toc {
+    background: var(--highlight);
+    border-left: 3px solid var(--accent);
+    padding: 1.5rem 1.75rem;
+    margin: 2.5rem 0 3rem;
+    font-size: 0.9rem;
+  }
+  .toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    padding-left: 1.2rem;
+    line-height: 2.1;
+  }
+  .toc a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 300;
+  }
+  .toc a:hover { text-decoration: underline; }
+
+  /* HEADINGS */
+  .article-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 3.5rem 0 1.2rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--ink);
+    line-height: 1.25;
+    letter-spacing: normal;
+  }
+  .article-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 2.5rem 0 0.75rem;
+  }
+
+  .article-content p {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ink);
+    margin-bottom: 1.3rem;
+  }
+
+  .article-content a {
+    color: var(--accent2);
+    border-bottom: none;
+  }
+  .article-content a:hover { border-bottom: none; }
+
+  /* CALLOUTS */
+  .callout {
+    background: var(--highlight);
+    border-left: 3px solid var(--accent2);
+    padding: 1.2rem 1.5rem;
+    margin: 2rem 0;
+    font-size: 0.92rem;
+  }
+  .callout.warning { border-left-color: var(--accent); }
+  .callout strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+    color: var(--muted);
+  }
+
+  /* CODE */
+  .article-content pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1.5rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    margin: 1.5rem 0;
+  }
+  .article-content code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: rgba(44,62,107,0.08);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    color: var(--accent2);
+  }
+  .article-content pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  .kw { color: #c678dd; }
+  .fn { color: #61afef; }
+  .st { color: #98c379; }
+  .cm { color: #5c6370; font-style: italic; }
+  .nu { color: #d19a66; }
+  .key { color: #e06c75; }
+
+  /* TABLES */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 2rem 0;
+  }
+  .article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .article-content thead tr {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .article-content th {
+    padding: 0.6rem 0.9rem;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+  .article-content td {
+    padding: 0.5rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: middle;
+  }
+  .article-content tbody tr:nth-child(even) { background: rgba(0,0,0,0.025); }
+  .article-content tbody tr:hover { background: var(--highlight); }
+  .anomaly { background: rgba(192,57,43,0.1) !important; font-weight: 600; color: var(--accent); }
+  .cell-note { font-size: 0.68rem; color: var(--muted); display: block; }
+
+  /* CHARTS */
+  .chart-wrap {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+  .chart-caption {
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* FIGURE-LIKE BLOCKS */
+  .fig {
+    margin: 2.5rem 0;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+  }
+  .fig-body { padding: 1.5rem; }
+  .arch-diagram {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    display: block;
+  }
+  .fig-caption {
+    background: var(--highlight);
+    padding: 0.75rem 1.5rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+  }
+  .fig-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--accent);
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* MATH DISPLAY */
+  .eq {
+    overflow-x: auto;
+    padding: 1rem 0;
+    text-align: center;
+  }
+
+  /* SECTION RULE */
+  .article-content hr {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 3rem 0;
+  }
+
+  /* MERMAID */
+  .mermaid-wrap {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.5rem 1rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .mermaid { display: inline-block; max-width: 100%; }
+
+  /* LLM ECOSYSTEM CARDS */
+  .llm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .llm-card {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.1rem 1.2rem;
+    background: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .llm-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .llm-card.card-anthropic::before { background: #c0392b; }
+  .llm-card.card-openai::before    { background: #10a37f; }
+  .llm-card.card-ollama::before    { background: #4a4a8a; }
+  .llm-card.card-hf::before        { background: #f5a623; }
+  .llm-card.card-google::before    { background: #4285f4; }
+  .llm-card.card-meta::before      { background: #0668e1; }
+  .llm-card-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.04em;
+  }
+  .llm-card-model {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+  .llm-card p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+    color: var(--ink);
+  }
+  .llm-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15em 0.5em;
+    border-radius: 2px;
+    margin-right: 0.25rem;
+    margin-bottom: 0.5rem;
+    background: var(--highlight);
+    color: var(--muted);
+    border: 1px solid var(--rule);
+  }
+  .llm-badge.mcp { background: rgba(44,62,107,0.1); color: var(--accent2); border-color: var(--accent2); }
+  .llm-badge.oss { background: rgba(0,128,0,0.08); color: #2d6a2d; border-color: #8fbc8f; }
+  .llm-badge.cloud { background: rgba(192,57,43,0.08); color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .llm-grid { grid-template-columns: 1fr; }
+  }
+
+  /* BLOG INDEX + POST SEPARATOR */
+  .blog-index {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 0;
+  }
+  .blog-index h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+  .post-list li {
+    border-bottom: 1px solid var(--rule);
+    padding: 1rem 0;
+  }
+  .post-list li:first-child { border-top: 1px solid var(--rule); }
+  .post-list a {
+    color: var(--ink);
+    text-decoration: none;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1.3;
+  }
+  .post-list a:hover { color: var(--accent); }
+  .post-list .post-meta-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.35rem;
+  }
+  .post-list .post-meta-line .dot { margin: 0 0.5rem; color: var(--rule); }
+  .post-list .post-blurb {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* POST HEADER STRIP (inline, within content stream) */
+  .post-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem;
+    margin: 0 -2rem 0;  /* break out of content padding */
+    position: relative;
+    overflow: hidden;
+  }
+  .post-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 40px,
+      rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 80px);
+    pointer-events: none;
+  }
+  .post-header-inner { position: relative; z-index: 1; max-width: 720px; }
+  .post-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--paper);
+    margin-bottom: 0.9rem;
+    max-width: 620px;
+  }
+  .post-header .subtitle {
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+    font-size: 0.98rem;
+    color: rgba(247,245,239,0.65);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+  .post-header .meta {
+    margin-top: 1.2rem;
+    display: flex;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* POST SEPARATOR (between posts) */
+  .post-divider {
+    margin: 5rem -2rem;
+    padding: 2rem 2rem;
+    text-align: center;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--highlight);
+  }
+  .post-divider-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .post-divider-arrow {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin: 0.3rem 0;
+  }
+
+</style>
+<style>
+  /* Additional styles specific to the merged report */
+  .case-header {
+    background: var(--accent2);
+    color: var(--paper);
+    padding: 1.5rem 1.75rem;
+    margin: 3rem -2rem 2rem;
+    position: relative;
+  }
+  .case-header .case-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(247,245,239,0.6);
+    margin-bottom: 0.3rem;
+  }
+  .case-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--paper);
+    border: none;
+    padding: 0;
+    margin: 0 0 0.4rem;
+    line-height: 1.25;
+  }
+  .case-header .case-sub {
+    font-style: italic;
+    font-size: 0.92rem;
+    color: rgba(247,245,239,0.7);
+    line-height: 1.55;
+    margin: 0;
+  }
+  .abstract {
+    background: var(--highlight);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink);
+    padding: 1.5rem 1.75rem;
+    margin: 2.5rem 0 3rem;
+    font-size: 0.95rem;
+  }
+  .abstract-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .abstract p { margin-bottom: 0.8rem; }
+  .abstract p:last-child { margin-bottom: 0; }
+
+  /* ── EXECUTIVE SUMMARY: the at-a-glance panel at the very top ── */
+  .exec-summary {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1.75rem 2rem 1.5rem;
+    margin: 2rem 0 2.5rem;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .exec-summary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 30px,
+      rgba(255,255,255,0.02) 30px, rgba(255,255,255,0.02) 60px);
+    pointer-events: none;
+  }
+  .exec-summary-inner { position: relative; z-index: 1; }
+  .exec-summary-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+  .exec-summary h2.exec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--paper);
+    border: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    line-height: 1.3;
+  }
+  .exec-summary p {
+    color: rgba(247,245,239,0.88);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    margin-bottom: 0.7rem;
+  }
+  .exec-summary p:last-child { margin-bottom: 0; }
+  .exec-summary strong { color: var(--paper); font-weight: 700; }
+  .exec-summary em { color: rgba(247,245,239,0.75); }
+  .exec-summary .exec-findings {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin: 1.1rem 0 0.6rem;
+  }
+  .exec-summary .exec-finding {
+    background: rgba(255,255,255,0.05);
+    border-left: 2px solid var(--accent);
+    padding: 0.7rem 0.9rem;
+  }
+  .exec-summary .exec-finding h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.4rem;
+  }
+  .exec-summary .exec-finding p {
+    font-size: 0.83rem;
+    line-height: 1.5;
+    margin: 0;
+    color: rgba(247,245,239,0.82);
+  }
+  @media (max-width: 600px) {
+    .exec-summary .exec-findings { grid-template-columns: 1fr; }
+  }
+
+  /* ── WORKFLOW DIAGRAM: how this report was produced ── */
+  .workflow {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 1.75rem 1.5rem 1.5rem;
+    margin: 2rem 0;
+  }
+  .workflow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    display: block;
+    text-align: center;
+  }
+  .workflow-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 1.4rem;
+  }
+  .workflow-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr) ;
+    gap: 0.6rem;
+    position: relative;
+  }
+  .workflow-step {
+    background: var(--highlight);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent2);
+    padding: 0.85rem 0.8rem 0.9rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .workflow-step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  .workflow-step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 0.5rem;
+  }
+  .workflow-step-desc {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 0;
+    flex-grow: 1;
+  }
+  .workflow-step-tool {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--accent2);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--rule);
+    letter-spacing: 0.03em;
+  }
+  .workflow-arrow {
+    position: absolute;
+    top: 50%;
+    right: -0.45rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    transform: translateY(-50%) rotate(45deg);
+    z-index: 2;
+  }
+  .workflow-step:last-child .workflow-arrow { display: none; }
+  .workflow-caveat {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.55;
+  }
+  @media (max-width: 800px) {
+    .workflow-steps { grid-template-columns: 1fr 1fr; }
+    .workflow-arrow { display: none; }
+  }
+  @media (max-width: 500px) {
+    .workflow-steps { grid-template-columns: 1fr; }
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  .two-col > div {
+    border: 1px solid var(--rule);
+    background: white;
+    padding: 1.2rem 1.4rem;
+    border-radius: 4px;
+  }
+  .two-col h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.6rem;
+  }
+  .two-col p { font-size: 0.88rem; line-height: 1.6; margin-bottom: 0.6rem; }
+  .two-col p:last-child { margin-bottom: 0; }
+  @media (max-width: 600px) {
+    .two-col { grid-template-columns: 1fr; }
+    .case-header { margin-left: -1.25rem; margin-right: -1.25rem; }
+  }
+</style>
+</head>
+<body data-post>
+<header></header>
+<main>
+
+  <div class="exec-summary">
+    <div class="exec-summary-inner">
+      <span class="exec-summary-label">Executive Summary</span>
+      <h2 class="exec-title">Can a large language model do useful scientific work just by being wired to the right databases? Two case studies say: yes — within a specific niche.</h2>
+
+      <p>We connected Claude to authoritative NIST and PubChem reference data via the Model Context Protocol (MCP) and gave it two real tasks: audit a chemical database for data-quality issues, and design the bandpass filter for an industrial CO analyzer. Both ran end-to-end as single conversational sessions. This report documents what came out, what we trust, and what we don't.</p>
+
+      <div class="exec-findings">
+        <div class="exec-finding">
+          <h4>Finding 1 · Data-quality</h4>
+          <p>PubChem's XLogP value for n-octane (CID 356) is ≈1.3 log units below the experimental literature and breaks the otherwise-linear trend of the C<sub>1</sub>–C<sub>20</sub> alkane series. Worth reporting to curators.</p>
+        </div>
+        <div class="exec-finding">
+          <h4>Finding 2 · Engineering</h4>
+          <p>A narrow IR bandpass near 2178 cm<sup>−1</sup> appears ≈1.7× more selective against H<sub>2</sub>O/CO<sub>2</sub>/CH<sub>4</sub> than the classical broad-band default. First-order result from NIST reference spectra — a concept demonstration, not a validated design.</p>
+        </div>
+        <div class="exec-finding">
+          <h4>Finding 3 · Method</h4>
+          <p>End-to-end wall-clock time dropped ≈85–90% versus the classical workflow. Marginal cost of running the same recipe on a new target drops from hours to minutes. Human domain expertise is not replaced — it is reallocated from producing results to verifying them.</p>
+        </div>
+      </div>
+
+      <p><em>Scope:</em> This is a methodology paper with two case demonstrations, not a paper claiming novel scientific findings. Numerical values should be read as first-order indicators; a deployable instrument design or a published database-correction request would require additional verification as discussed in §7.</p>
+    </div>
+  </div>
+
+  <div class="abstract">
+    <span class="abstract-label">Abstract</span>
+    <p>We report on two independent case studies in which a large language model (Claude, Anthropic) was connected to authoritative scientific reference databases — the NIST Chemistry WebBook, the NIST Atomic Spectra Database, and PubChem — via the Model Context Protocol (MCP). The studies deliberately probe different modes of use: in <strong>Case A</strong> the model performs a retrospective data-quality audit of a homologous compound series, and in <strong>Case B</strong> it performs a prospective engineering design calculation for a trace-gas analyzer.</p>
+    <p>Case A identifies a concrete data-quality anomaly: PubChem's XLogP value for n-octane (CID 356) breaks the otherwise tight linear trend of the C<sub>1</sub>–C<sub>20</sub> alkane series by ≈1.3 log units — an outlier that is not obviously flagged in the current PubChem entry. The same study recovers an empirical scaling relationship for PubChem's topological complexity metric, Complexity(n) ≈ 0.257 · n<sup>2.07</sup>.</p>
+    <p>Case B produces a methodological demonstration: the analysis suggests that a narrower IR bandpass (≈2170–2190 cm<sup>−1</sup>, centred on the CO peak) can reduce overlap with H<sub>2</sub>O absorption relative to a classic full-band filter, with an apparent selectivity improvement of order 1.7× in the integration-based metric used here. This is qualitatively consistent with an asymmetry in water rotational absorption across the CO fundamental band visible in the NIST reference spectra. The magnitude of the improvement depends sensitively on the underlying spectral data and operating conditions; the numerical values reported here should be treated as order-of-magnitude indicators rather than instrument design specifications.</p>
+    <p>Taken together, the two studies suggest that LLM-agentic MCP workflows are genuinely useful for a specific and previously under-served niche: <em>tasks that require systematically touching many database entries, reasoning across them, and writing up the result</em>. The measured wall-clock time savings are ≈85–90% versus the classical workflow, and the marginal cost of running the same recipe against a new analyte pair or compound series drops to minutes rather than hours. We document where the approach fails — database coverage gaps, tool reliability issues, and cases where agentic reasoning does not replace domain expertise — and we discuss how this kind of text-and-data methodology fits into the larger self-driving-laboratory project (LabSter, with its embedded agent FERA) that we are currently building at DLH-lab.</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#intro">Introduction and motivation</a></li>
+      <li><a href="#methodology">Shared methodology: the MCP workflow</a>
+        <ol style="padding-left:1.2rem; margin-top:0.3rem; line-height:1.8;">
+          <li style="list-style:lower-alpha"><a href="#mcp-what">What the Model Context Protocol is</a></li>
+          <li style="list-style:lower-alpha"><a href="#mcp-arch">Architecture and data flow</a></li>
+          <li style="list-style:lower-alpha"><a href="#mcp-tools">The science-data tool surface</a></li>
+          <li style="list-style:lower-alpha"><a href="#mcp-ecosystem">LLM ecosystem and MCP compatibility</a></li>
+        </ol>
+      </li>
+      <li><a href="#case-a">Case A — Database audit: the n-alkane homologous series</a></li>
+      <li><a href="#case-b">Case B — Engineering design: trace CO in an H<sub>2</sub> stream</a></li>
+      <li><a href="#discussion">Cross-cutting discussion</a></li>
+      <li><a href="#outlook">Outlook: crossing into the real world</a>
+        <ol style="padding-left:1.2rem; margin-top:0.3rem; line-height:1.8;">
+          <li style="list-style:lower-alpha"><a href="#outlook-labster">What we are actually working on</a></li>
+          <li style="list-style:lower-alpha"><a href="#outlook-roleofmcp">Where this report fits</a></li>
+        </ol>
+      </li>
+      <li><a href="#caveats">Caveats and limitations</a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
+    </ol>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       1. INTRODUCTION
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <h2 id="intro">1. Introduction and motivation</h2>
+
+  <p>Scientific reference databases are among the most valuable and most under-used resources in applied R&amp;D. PubChem alone contains more than one hundred million compounds with computed physicochemical properties, while NIST's Chemistry WebBook, Atomic Spectra Database, and CODATA tables provide smaller, curated collections of high-quality reference data (molecular spectra, thermochemical tables, atomic line lists, fundamental physical constants). In principle this removes most of the friction from questions like <em>"what is the IR absorption cross-section of CO in this band?"</em> or <em>"is the logP I just looked up consistent with the homologous series?"</em>. In practice, the databases are accessed mainly through their web UIs, and a researcher who needs to consult twenty entries in sequence will usually either write a throwaway scraping script or give up and consult only the two or three they thought of first.</p>
+
+  <p>This report documents what happens when a large language model is given direct, structured, programmatic access to these same databases through the <strong>Model Context Protocol (MCP)</strong>. Rather than the researcher writing a script, the LLM drives the database itself — issuing queries, parsing the returned JSON, tabulating results, computing statistics, spotting inconsistencies, and writing up the finding — all within a single conversational session.</p>
+
+  <p>We wanted to understand two things. First, whether this methodology produces anything useful that a skilled human could not reasonably have produced in the same time. Second, where it fails. To probe both questions, we ran two deliberately different case studies on the same MCP server.</p>
+
+  <p>Before describing them, it is worth being explicit about <em>how this report itself was produced</em>, because the workflow and the content are tightly coupled. The diagram below shows the five-step loop that Claude executed for each case study — from picking a candidate use case, to verifying data availability, through to generating the write-up and figures you are now reading. Every step was run as part of a single conversational session with the agent; no step required a separate script or manual hand-off.</p>
+
+  <div class="workflow">
+    <span class="workflow-label">How this report was produced</span>
+    <div class="workflow-title">Five-step agentic loop, executed once per case study</div>
+    <div class="workflow-steps">
+
+      <div class="workflow-step">
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step-num">Step 1</div>
+        <div class="workflow-step-title">Select use case</div>
+        <p class="workflow-step-desc">Claude proposes a candidate research question that is concrete enough to test with reference-database calls — e.g. "audit the alkane XLogP series" or "pick the CO bandpass against water cross-talk."</p>
+        <div class="workflow-step-tool">output · research question</div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step-num">Step 2</div>
+        <div class="workflow-step-title">Scope via MCP</div>
+        <p class="workflow-step-desc">Claude issues scouting tool calls to confirm the question is well-posed and that authoritative data exists — does PubChem have entries for the full alkane series, does NIST have IR spectra for all four species of interest?</p>
+        <div class="workflow-step-tool">tools · pubchem_search, nist_search_compound</div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step-num">Step 3</div>
+        <div class="workflow-step-title">Gather and validate</div>
+        <p class="workflow-step-desc">Claude fetches the actual data records — 20 PubChem property sets for Case A, four NIST JCAMP-DX spectra for Case B — parses the returned JSON, and sanity-checks it against expected physical behaviour.</p>
+        <div class="workflow-step-tool">tools · pubchem_get_properties, nist_get_spectrum</div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step-num">Step 4</div>
+        <div class="workflow-step-title">Analyse</div>
+        <p class="workflow-step-desc">Claude tabulates the data in memory, runs numerical analysis (linear fits, power-law fits, integration of selectivity windows, anomaly detection), and forms hypotheses about what the numbers mean.</p>
+        <div class="workflow-step-tool">output · tables, statistics, hypotheses</div>
+      </div>
+
+      <div class="workflow-step">
+        <div class="workflow-step-num">Step 5</div>
+        <div class="workflow-step-title">Write up</div>
+        <p class="workflow-step-desc">Claude drafts the prose, generates the figures (Chart.js plots from the fetched data), writes captions, and assembles the final report — including honest caveats about where the analysis is first-order only.</p>
+        <div class="workflow-step-tool">output · this report</div>
+      </div>
+
+    </div>
+    <div class="workflow-caveat">Human oversight at DLH-lab was present throughout — selecting the broad research direction at the start, catching reasoning errors, and verifying the final numerical claims against live MCP re-runs (see §7). The diagram shows what Claude did autonomously between those oversight points.</div>
+  </div>
+
+  <p>The two case studies follow this same five-step loop but probe different modes of use:</p>
+
+  <div class="two-col">
+    <div>
+      <h4>Case A · Database audit</h4>
+      <p><strong>Retrospective.</strong> Mine the n-alkane homologous series (C<sub>1</sub>–C<sub>20</sub>) in PubChem for data-quality anomalies. Tests whether an agent can do systematic consistency checking across a curated series — work that is tedious, low-prestige, and rarely done.</p>
+      <p><em>Deliverable:</em> one data-quality finding worth flagging to database curators, plus an empirical scaling relationship.</p>
+    </div>
+    <div>
+      <h4>Case B · Engineering design</h4>
+      <p><strong>Prospective.</strong> Select the optimal IR bandpass for a non-dispersive IR analyzer measuring trace CO in a pure H<sub>2</sub> carrier stream — a measurement problem common to multiple industrial contexts (hydrogen production, fuel-cell-grade gas QC, ammonia feedstock, steel reduction, semiconductor process gases). Tests whether an agent can do real engineering work from reference data.</p>
+      <p><em>Deliverable:</em> a methodological demonstration with first-order cross-sensitivity estimates; the result is a concept demonstration of workflow capability, not a validated instrument design.</p>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <strong>Honest framing</strong>
+    We are not claiming either case study produces a genuine scientific discovery in the novel-physical-phenomenon sense. NIST and PubChem contain curated, published data — nothing in them is unknown to science. What we demonstrate is: (1) a useful retrospective finding (a likely database entry error in PubChem) that is not obviously flagged in the current PubChem entry and is worth referring to the database curators; (2) a first-order prospective calculation (a qualitative water cross-talk asymmetry relevant to CO analyzer band selection) that is not typically spelled out in analyzer datasheets, though it is well-known to line-by-line spectroscopists; and (3) a methodology that compresses the wall-clock time for both tasks by an order of magnitude. All three are, we argue, genuine methodological contributions to how this kind of work gets done.
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       2. METHODOLOGY
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <h2 id="methodology">2. Shared methodology: the MCP workflow</h2>
+
+  <h3 id="mcp-what">2.1 What the Model Context Protocol is</h3>
+
+  <p>MCP, released by Anthropic in November 2024 and subsequently adopted as an open standard, is a lightweight protocol for connecting large language models to external data sources and tools. A useful one-line description is: <em>USB-C for AI</em> — a single protocol that lets any MCP-capable model call any MCP-exposed database, API, or local tool, regardless of the underlying service. Since late 2025, MCP governance has moved toward a more open ecosystem with contributions and tool implementations from the broader industry, well beyond Anthropic's original server set.</p>
+
+  <p>An MCP server exposes a set of <em>tools</em> described by a JSON schema. When the LLM starts a session, these tool descriptions are injected into its context. The model can then invoke the tools with typed parameters during inference — it calls a tool, receives a structured result, incorporates that result into its next reasoning step, and decides what to do next. Crucially, this loop runs inside the model's reasoning engine, not as a separate orchestration layer. This is what makes the behaviour <em>agentic</em>: the model drives the investigation, deciding which tool to call and when, rather than merely formatting data that was pre-fetched by a script.</p>
+
+  <div class="fig">
+    <div class="fig-body">
+<pre><code><span class="cm"># Conceptual agentic query loop — both case studies follow this pattern</span>
+<span class="kw">User:</span>  <span class="st">"Audit the n-alkane series for inconsistencies"</span>   <span class="cm"># Case A</span>
+<span class="kw">User:</span>  <span class="st">"Pick the best CO bandpass for this H2 stream"</span>    <span class="cm"># Case B</span>
+
+<span class="cm"># Claude inspects its available tool schema,</span>
+<span class="cm"># decides which MCP tools to call, and in what order</span>
+<span class="fn">pubchem_get_properties</span>(<span class="st">"methane"</span>)  <span class="cm">→ {XLogP: 0.6, Complexity: 0, …}</span>
+<span class="fn">pubchem_get_properties</span>(<span class="st">"ethane"</span>)   <span class="cm">→ {XLogP: 1.3, Complexity: 0, …}</span>
+<span class="cm"># … 18 more calls, tabulated in memory …</span>
+<span class="fn">pubchem_get_properties</span>(<span class="st">"octane"</span>)   <span class="cm">→ Claude notices anomaly</span>
+
+<span class="fn">nist_get_spectrum</span>(<span class="st">"C630080"</span>)         <span class="cm">→ 880-point IR spectrum of CO</span>
+<span class="fn">nist_get_spectrum</span>(<span class="st">"C124389"</span>)         <span class="cm">→ CO2 spectrum</span>
+<span class="cm"># … Claude puts spectra on a common grid, computes band selectivity …</span>
+
+<span class="cm"># The model writes the analysis inline. Every tool call is logged.</span></code></pre>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Listing 1</span> The agentic query loop. In Case A the agent issued 20 sequential <code>pubchem_get_properties</code> calls and tabulated them; in Case B it issued four <code>nist_get_spectrum</code> calls plus one <code>pubchem_get_safety</code> call. Both studies close the loop with natural-language synthesis.</div>
+  </div>
+
+  <p>A methodological property worth naming explicitly: every tool call is logged, parameterised, and re-runnable. Unlike web scraping, spreadsheet copy-paste, or (importantly) pure in-model recall, the MCP-driven workflow produces a transparent audit trail of exactly which queries were made, in what order, and what they returned. This is the single most important reproducibility property of the method.</p>
+
+  <h3 id="mcp-arch">2.2 Architecture and data flow</h3>
+
+  <p>The diagram below shows the complete data flow used in both case studies. The key structural point is that MCP creates a <em>bidirectional, real-time channel</em> between the LLM's reasoning engine and the external data services. Tool descriptions flow in at session start; tool calls flow out during inference; results flow back in to shape the next reasoning step.</p>
+
+  <div class="fig">
+    <div class="fig-body">
+      <svg class="arch-diagram" viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="arch-title arch-desc">
+        <title id="arch-title">MCP data-flow architecture</title>
+        <desc id="arch-desc">Four-tier architecture: researcher queries Claude, which drives an MCP host and science-data server that federates PubChem and NIST databases, with results flowing back through the same path.</desc>
+
+        <defs>
+          <!-- Arrowheads -->
+          <marker id="arrow-down" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#c0392b"/>
+          </marker>
+          <marker id="arrow-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2c3e6b"/>
+          </marker>
+          <!-- Subtle drop shadow for the cards -->
+          <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="115%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+            <feOffset dx="0" dy="2" result="offsetblur"/>
+            <feComponentTransfer><feFuncA type="linear" slope="0.15"/></feComponentTransfer>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- ══════════════════════ TIER BACKGROUNDS ══════════════════════ -->
+        <!-- Tier 3: MCP Protocol Layer -->
+        <rect x="30"  y="215" width="900" height="180" rx="6" fill="#f0ead6" stroke="#d4cfc4" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="50" y="238" font-family="'JetBrains Mono', monospace" font-size="11" fill="#6b6760" letter-spacing="2">MCP PROTOCOL LAYER</text>
+
+        <!-- Tier 4: External Data Sources -->
+        <rect x="30" y="440" width="900" height="175" rx="6" fill="#f7f5ef" stroke="#d4cfc4" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="50" y="463" font-family="'JetBrains Mono', monospace" font-size="11" fill="#6b6760" letter-spacing="2">EXTERNAL DATA SOURCES</text>
+
+        <!-- ══════════════════════ NODE 1: RESEARCHER ══════════════════════ -->
+        <g filter="url(#card-shadow)">
+          <rect x="360" y="15" width="240" height="62" rx="6" fill="#f0ead6" stroke="#c0392b" stroke-width="2"/>
+          <text x="480" y="43" font-family="'Playfair Display', serif" font-weight="700" font-size="18" text-anchor="middle" fill="#1a1a18">Researcher</text>
+          <text x="480" y="62" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="middle" fill="#6b6760">DLH-lab</text>
+        </g>
+
+        <!-- ══════════════════════ NODE 2: CLAUDE ══════════════════════ -->
+        <g filter="url(#card-shadow)">
+          <rect x="340" y="122" width="280" height="70" rx="6" fill="#2c3e6b" stroke="#1a1a18" stroke-width="2"/>
+          <text x="480" y="149" font-family="'Playfair Display', serif" font-weight="700" font-size="18" text-anchor="middle" fill="#f7f5ef">Claude</text>
+          <text x="480" y="170" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="middle" fill="#f7f5ef" opacity="0.8">LLM inference engine</text>
+          <text x="480" y="184" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#f7f5ef" opacity="0.55">Sonnet 4.5 / Opus 4.7</text>
+        </g>
+
+        <!-- ══════════════════════ NODE 3: MCP HOST ══════════════════════ -->
+        <g filter="url(#card-shadow)">
+          <rect x="120" y="260" width="260" height="62" rx="4" fill="#3d3d3d" stroke="#1a1a18" stroke-width="1"/>
+          <text x="250" y="284" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="13" text-anchor="middle" fill="#f7f5ef">MCP Host</text>
+          <text x="250" y="304" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#f7f5ef" opacity="0.7">Claude Desktop / claude.ai</text>
+        </g>
+
+        <!-- ══════════════════════ NODE 4: MCP SERVER ══════════════════════ -->
+        <g filter="url(#card-shadow)">
+          <rect x="580" y="260" width="260" height="62" rx="4" fill="#1a1a18" stroke="#c0392b" stroke-width="2"/>
+          <text x="710" y="284" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="13" text-anchor="middle" fill="#f7f5ef">science-data</text>
+          <text x="710" y="304" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#f7f5ef" opacity="0.7">MCP Server</text>
+        </g>
+
+        <!-- JSON-RPC connector between host and server -->
+        <line x1="380" y1="291" x2="580" y2="291" stroke="#6b6760" stroke-width="1.3" stroke-dasharray="3,3"/>
+        <rect x="448" y="278" width="64" height="26" rx="3" fill="#f7f5ef" stroke="#d4cfc4" stroke-width="1"/>
+        <text x="480" y="295" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#2c3e6b">JSON-RPC</text>
+
+        <!-- ══════════════════════ NODE 5-8: DATABASES ══════════════════════ -->
+        <!-- PubChem -->
+        <g filter="url(#card-shadow)">
+          <rect x="55"  y="485" width="200" height="108" rx="4" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="155" y="510" font-family="'Playfair Display', serif" font-weight="700" font-size="15" text-anchor="middle" fill="#1a1a18">PubChem</text>
+          <text x="155" y="533" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#6b6760">PUG REST API</text>
+          <text x="155" y="560" font-family="'Source Serif 4', serif" font-size="11" text-anchor="middle" fill="#2c3e6b">100M+ compounds</text>
+          <text x="155" y="578" font-family="'Source Serif 4', serif" font-style="italic" font-size="10" text-anchor="middle" fill="#6b6760">used · Case A, B</text>
+        </g>
+
+        <!-- NIST WebBook -->
+        <g filter="url(#card-shadow)">
+          <rect x="282" y="485" width="200" height="108" rx="4" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="382" y="510" font-family="'Playfair Display', serif" font-weight="700" font-size="15" text-anchor="middle" fill="#1a1a18">NIST WebBook</text>
+          <text x="382" y="533" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#6b6760">SRD 69</text>
+          <text x="382" y="560" font-family="'Source Serif 4', serif" font-size="11" text-anchor="middle" fill="#2c3e6b">Spectra / Thermo</text>
+          <text x="382" y="578" font-family="'Source Serif 4', serif" font-style="italic" font-size="10" text-anchor="middle" fill="#6b6760">used · Case B</text>
+        </g>
+
+        <!-- NIST ASD -->
+        <g filter="url(#card-shadow)">
+          <rect x="509" y="485" width="200" height="108" rx="4" fill="#f7f5ef" stroke="#6b6760" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="609" y="510" font-family="'Playfair Display', serif" font-weight="700" font-size="15" text-anchor="middle" fill="#1a1a18">NIST ASD</text>
+          <text x="609" y="533" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#6b6760">Atomic Spectra DB</text>
+          <text x="609" y="560" font-family="'Source Serif 4', serif" font-size="11" text-anchor="middle" fill="#2c3e6b">atomic lines + levels</text>
+          <text x="609" y="578" font-family="'Source Serif 4', serif" font-style="italic" font-size="10" text-anchor="middle" fill="#c0392b">unavailable in session</text>
+        </g>
+
+        <!-- CODATA -->
+        <g filter="url(#card-shadow)">
+          <rect x="736" y="485" width="200" height="108" rx="4" fill="#f7f5ef" stroke="#6b6760" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="836" y="510" font-family="'Playfair Display', serif" font-weight="700" font-size="15" text-anchor="middle" fill="#1a1a18">NIST CODATA</text>
+          <text x="836" y="533" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle" fill="#6b6760">2022 constants</text>
+          <text x="836" y="560" font-family="'Source Serif 4', serif" font-size="11" text-anchor="middle" fill="#2c3e6b">physical constants</text>
+          <text x="836" y="578" font-family="'Source Serif 4', serif" font-style="italic" font-size="10" text-anchor="middle" fill="#c0392b">unavailable in session</text>
+        </g>
+
+        <!-- ══════════════════════ ARROWS: DOWN-FLOW (requests, red) ══════ -->
+        <!-- User → Claude (prompt) -->
+        <path d="M 460 77 L 460 118" stroke="#c0392b" stroke-width="2" fill="none" marker-end="url(#arrow-down)"/>
+        <text x="350" y="102" font-family="'JetBrains Mono', monospace" font-size="10" fill="#c0392b" text-anchor="end">prompt</text>
+
+        <!-- Claude → MCP Host (tool call) -->
+        <path d="M 420 192 L 290 256" stroke="#c0392b" stroke-width="2" fill="none" marker-end="url(#arrow-down)"/>
+        <text x="304" y="228" font-family="'JetBrains Mono', monospace" font-size="10" fill="#c0392b">tool call</text>
+
+        <!-- MCP Server → PubChem -->
+        <path d="M 640 322 L 200 481" stroke="#c0392b" stroke-width="1.3" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-down)"/>
+        <!-- MCP Server → NIST WebBook -->
+        <path d="M 680 322 L 400 481" stroke="#c0392b" stroke-width="1.3" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow-down)"/>
+        <!-- MCP Server → NIST ASD -->
+        <path d="M 720 322 L 600 481" stroke="#c0392b" stroke-width="1" fill="none" stroke-dasharray="2,4" opacity="0.6"/>
+        <!-- MCP Server → CODATA -->
+        <path d="M 770 322 L 820 481" stroke="#c0392b" stroke-width="1" fill="none" stroke-dasharray="2,4" opacity="0.6"/>
+
+        <text x="45" y="420" font-family="'JetBrains Mono', monospace" font-size="10" fill="#c0392b">HTTP GET ↓</text>
+
+        <!-- ══════════════════════ ARROWS: UP-FLOW (responses, navy) ══════ -->
+        <!-- PubChem → MCP Server -->
+        <path d="M 220 481 L 660 322" stroke="#2c3e6b" stroke-width="1.3" fill="none" marker-end="url(#arrow-up)"/>
+        <!-- NIST WebBook → MCP Server -->
+        <path d="M 420 481 L 700 322" stroke="#2c3e6b" stroke-width="1.3" fill="none" marker-end="url(#arrow-up)"/>
+
+        <text x="915" y="420" font-family="'JetBrains Mono', monospace" font-size="10" fill="#2c3e6b" text-anchor="end">↑ JSON response</text>
+
+        <!-- MCP Host → Claude (tool result injected into context) -->
+        <path d="M 290 260 L 540 192" stroke="#2c3e6b" stroke-width="2" fill="none" marker-end="url(#arrow-up)"/>
+        <text x="538" y="228" font-family="'JetBrains Mono', monospace" font-size="10" fill="#2c3e6b">tool result</text>
+        <text x="538" y="242" font-family="'JetBrains Mono', monospace" font-size="9" fill="#2c3e6b" opacity="0.7">into context</text>
+
+        <!-- Claude → User (final answer) -->
+        <path d="M 500 118 L 500 77" stroke="#2c3e6b" stroke-width="2" fill="none" marker-end="url(#arrow-up)"/>
+        <text x="610" y="102" font-family="'JetBrains Mono', monospace" font-size="10" fill="#2c3e6b">analysis + report</text>
+
+        <!-- ══════════════════════ LEGEND ══════════════════════ -->
+        <g transform="translate(30, 615)">
+          <line x1="0" y1="0" x2="24" y2="0" stroke="#c0392b" stroke-width="2"/>
+          <polygon points="24,-3 30,0 24,3" fill="#c0392b"/>
+          <text x="38" y="4" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760">request / tool call</text>
+
+          <line x1="180" y1="0" x2="204" y2="0" stroke="#2c3e6b" stroke-width="2"/>
+          <polygon points="204,-3 210,0 204,3" fill="#2c3e6b"/>
+          <text x="218" y="4" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760">response / context injection</text>
+
+          <rect x="405" y="-6" width="14" height="12" fill="#f7f5ef" stroke="#6b6760" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="425" y="4" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760">endpoint unavailable during session</text>
+        </g>
+      </svg>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Figure 1</span> End-to-end MCP data flow. The LLM (Claude) issues tool calls via the MCP host, which speaks JSON-RPC to the <code>science-data</code> server, which in turn queries NIST and PubChem over HTTP. Results are injected back into Claude's context window, closing the loop. Solid database boxes were actively used in the case studies; dashed boxes (ASD, CODATA) returned 403 or timed out in one of our sessions — see §7.2 for the reliability implications.</div>
+  </div>
+
+  <p>Three architectural details are worth naming for anyone considering operational deployment. The <strong>tool schema</strong> is transmitted to the LLM at session start as part of the system prompt — the model knows what tools exist, what parameters they accept, and what they return, but it does not execute them until it decides to during inference. The <strong>JSON-RPC protocol</strong> is stateless: each tool call is independent, so the MCP server does not need to maintain session state. And <strong>result injection</strong> happens literally: the tool's JSON output is appended to the conversation as a special "tool result" message, which the LLM reads exactly like any other context.</p>
+
+  <h3 id="mcp-tools">2.3 The science-data tool surface</h3>
+
+  <p>Both case studies used the same <code>science-data</code> MCP server, a community project that wraps several NIST endpoints plus PubChem's PUG REST API. Installation on our DLH-lab workstation required a single entry in Claude's MCP configuration:</p>
+
+<pre><code><span class="cm"># claude_desktop_config.json (excerpt)</span>
+{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"science-data"</span>: {
+      <span class="key">"command"</span>: <span class="st">"uvx"</span>,
+      <span class="key">"args"</span>: [<span class="st">"science-data-mcp"</span>]
+    }
+  }
+}</code></pre>
+
+  <p>This exposed the following tools to the LLM at runtime:</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Tool</th><th>Source</th><th>Returns</th><th>Used in</th></tr></thead>
+    <tbody>
+      <tr><td><code>pubchem_get_properties</code></td><td>PubChem PUG REST</td><td>MW, XLogP, TPSA, Complexity, SMILES, InChI, …</td><td>Case A</td></tr>
+      <tr><td><code>pubchem_search</code></td><td>PubChem</td><td>CID lookup by name/formula</td><td>A, B</td></tr>
+      <tr><td><code>pubchem_get_synonyms</code></td><td>PubChem</td><td>Synonyms + CAS registry numbers</td><td>—</td></tr>
+      <tr><td><code>pubchem_get_safety</code></td><td>PubChem pug_view</td><td>GHS hazard statements, signal word</td><td>Case B</td></tr>
+      <tr><td><code>nist_search_compound</code></td><td>NIST WebBook</td><td>NIST compound IDs by name/formula</td><td>Case B</td></tr>
+      <tr><td><code>nist_get_thermo</code></td><td>NIST WebBook JANAF</td><td>Shomate coefficients, $C_p$, $H$, $S$</td><td>—</td></tr>
+      <tr><td><code>nist_get_phase_change</code></td><td>NIST WebBook</td><td>Antoine eq., $T_b$, $T_m$, $T_c$, $\Delta H_\text{vap}$</td><td>—</td></tr>
+      <tr><td><code>nist_get_spectrum</code></td><td>NIST WebBook JCAMP-DX</td><td>IR / THz / mass / UV-Vis spectrum as ($x$, $y$) peaks</td><td>Case B</td></tr>
+      <tr><td><code>asd_get_energy_levels</code></td><td>NIST ASD</td><td>Atomic energy levels (cm$^{-1}$)</td><td>—</td></tr>
+      <tr><td><code>asd_get_lines</code></td><td>NIST ASD</td><td>Spectral lines, $A_{ki}$, term symbols</td><td>—</td></tr>
+      <tr><td><code>codata_search</code> / <code>codata_get</code></td><td>NIST CODATA 2022</td><td>Fundamental constants with uncertainty</td><td>—</td></tr>
+      <tr><td><code>mona_get_spectrum</code></td><td>MassBank of North America</td><td>Curated experimental mass spectra (CC-BY)</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Twelve tools across five databases — of which the two case studies between them exercised five. A significant fraction of the tool surface remains unused by this report; in particular, <code>nist_get_thermo</code>, <code>asd_get_lines</code>, <code>mona_get_spectrum</code>, and the ASD / CODATA family are plausible candidates for follow-up studies (for example, a homologous-series consistency check on enthalpies of vaporization would use <code>nist_get_phase_change</code> and would probably surface different anomalies from those we found in PubChem).</p>
+
+  <h3 id="mcp-ecosystem">2.4 LLM ecosystem and MCP compatibility</h3>
+
+  <p>MCP adoption across the major LLM platforms has been rapid but uneven. This matters for DLH-lab operations because the case studies in this report happen to have been run on Claude (Sonnet 4.5 for Case A; Opus 4.7 for Case B), but several of the workflows we want to eventually deploy — especially anything touching confidential or pre-publication data — would need to run against locally-hosted open-weight models instead. Below is a snapshot of the major options and their current relationship with the protocol. Note that in every case, the <strong>host application</strong> (not the model itself) is what needs to implement the MCP client side.</p>
+
+  <div class="llm-grid">
+
+    <div class="llm-card card-anthropic">
+      <div class="llm-card-name">Claude (Anthropic)</div>
+      <div class="llm-card-model">Sonnet 4.6 · Opus 4.7 · Haiku 4.5</div>
+      <span class="llm-badge mcp">MCP Native</span>
+      <span class="llm-badge cloud">API</span>
+      <p>The reference implementation. Claude Desktop and claude.ai support MCP natively. Both case studies in this report were run on Claude through this path. Strong at multi-step agentic reasoning, long tool call chains, and synthesising results into written prose.</p>
+    </div>
+
+    <div class="llm-card card-openai">
+      <div class="llm-card-name">ChatGPT / GPT models</div>
+      <div class="llm-card-model">GPT-4o · o3 · o4-mini</div>
+      <span class="llm-badge cloud">API</span>
+      <p>OpenAI's <strong>function calling</strong> API predates MCP and is functionally similar. OpenAI now supports MCP-compatible tool usage via its API and developer tooling, though the integration pattern differs from Anthropic's native MCP implementation. Via these paths GPT-class models can use MCP-compatible wrappers with capability roughly comparable to Claude for structured data retrieval tasks.</p>
+    </div>
+
+    <div class="llm-card card-ollama">
+      <div class="llm-card-name">Ollama</div>
+      <div class="llm-card-model">Local inference engine</div>
+      <span class="llm-badge oss">Open Source</span>
+      <span class="llm-badge mcp">MCP via host</span>
+      <p>Ollama runs open-weight models locally (Llama, Mistral, Qwen, Gemma, …). Supports OpenAI-compatible function calling, and MCP can be bridged via tools like <code>mcpo</code> or the Ollama MCP connector. <strong>The right option for privacy-sensitive DLH-lab workflows</strong> — unpublished industrial process data, partner-confidential spectra, or any work under NDA where cloud APIs are not appropriate.</p>
+    </div>
+
+    <div class="llm-card card-hf">
+      <div class="llm-card-name">Hugging Face</div>
+      <div class="llm-card-model">Hub · Inference Endpoints · Spaces</div>
+      <span class="llm-badge oss">Open Source</span>
+      <span class="llm-badge cloud">Hosted</span>
+      <p>The central distribution platform for open-weight models (Qwen2.5-VL, Llama, Mistral, DINOv2, SAM2, BGE-M3, Whisper). The Transformers Agents framework supports tool-calling natively, and HF Inference Endpoints can be wrapped as MCP servers. Hosts most of the models in the DLH-lab stack.</p>
+    </div>
+
+    <div class="llm-card card-google">
+      <div class="llm-card-name">Gemini (Google)</div>
+      <div class="llm-card-model">Gemini 2.5 Pro · Flash</div>
+      <span class="llm-badge cloud">API</span>
+      <span class="llm-badge mcp">MCP via SDK</span>
+      <p>Gemini supports function calling via Vertex AI and the Gemini API. MCP support was added to the Google GenAI SDK in early 2025. Gemini 2.5 Pro has a notably large context window (1M tokens), which is an advantage for ingesting large scientific datasets without tool calls — the opposite trade-off from the MCP-driven approach used here.</p>
+    </div>
+
+    <div class="llm-card card-meta">
+      <div class="llm-card-name">Llama (Meta)</div>
+      <div class="llm-card-model">Llama 3.3 · Llama 4 Scout</div>
+      <span class="llm-badge oss">Open Weight</span>
+      <span class="llm-badge mcp">MCP via host</span>
+      <p>Open-weight; runs via Ollama, LM Studio, vLLM, or Hugging Face. Llama 3.3 70B has strong function-calling capability. No native MCP client, but fully usable with a bridging layer. The most deployable option for air-gapped lab environments.</p>
+    </div>
+
+  </div>
+
+  <div class="fig">
+    <div class="fig-body">
+      <svg class="arch-diagram" viewBox="0 0 960 640" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="eco-title eco-desc">
+        <title id="eco-title">LLM-MCP ecosystem landscape</title>
+        <desc id="eco-desc">Three model-hosting tiers — cloud APIs, HuggingFace Hub, and local/on-premises runners — all connecting through the MCP protocol to the same universe of MCP servers.</desc>
+
+        <defs>
+          <marker id="eco-arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#c0392b"/>
+          </marker>
+          <marker id="eco-arrow-navy" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2c3e6b"/>
+          </marker>
+          <marker id="eco-arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d6a2d"/>
+          </marker>
+          <filter id="eco-shadow" x="-5%" y="-5%" width="110%" height="115%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+            <feOffset dx="0" dy="2" result="offsetblur"/>
+            <feComponentTransfer><feFuncA type="linear" slope="0.13"/></feComponentTransfer>
+            <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- ══════════ COLUMN BACKGROUNDS ══════════ -->
+        <!-- Left column: model hosting tiers -->
+        <rect x="20" y="45" width="420" height="555" rx="6" fill="#f7f5ef" stroke="#d4cfc4" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="40" y="70" font-family="'JetBrains Mono', monospace" font-size="11" fill="#6b6760" letter-spacing="2">WHERE THE MODEL RUNS</text>
+
+        <!-- Right column: MCP servers -->
+        <rect x="540" y="45" width="400" height="555" rx="6" fill="#f0ead6" stroke="#d4cfc4" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="560" y="70" font-family="'JetBrains Mono', monospace" font-size="11" fill="#6b6760" letter-spacing="2">MCP SERVERS (the tool universe)</text>
+
+        <!-- ══════════ TIER 1: CLOUD API MODELS ══════════ -->
+        <g filter="url(#eco-shadow)">
+          <rect x="40" y="90" width="380" height="130" rx="5" fill="#ffffff" stroke="#c0392b" stroke-width="1.5"/>
+          <rect x="40" y="90" width="380" height="22" rx="5" fill="#c0392b"/>
+          <rect x="40" y="104" width="380" height="8" fill="#c0392b"/>
+          <text x="55" y="106" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="11" fill="#f7f5ef" letter-spacing="1.5">☁  CLOUD / API MODELS</text>
+
+          <!-- Claude card -->
+          <rect x="55" y="130" width="110" height="72" rx="3" fill="#f7f5ef" stroke="#c0392b" stroke-width="1.5"/>
+          <text x="110" y="150" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">Claude</text>
+          <text x="110" y="167" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">Anthropic</text>
+          <text x="110" y="187" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#c0392b">native MCP</text>
+
+          <!-- GPT card -->
+          <rect x="175" y="130" width="110" height="72" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="230" y="150" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">GPT-4o / o3</text>
+          <text x="230" y="167" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">OpenAI</text>
+          <text x="230" y="187" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#6b6760">MCP via API / SDK</text>
+
+          <!-- Gemini card -->
+          <rect x="295" y="130" width="110" height="72" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="350" y="150" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">Gemini 2.5</text>
+          <text x="350" y="167" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">Google</text>
+          <text x="350" y="187" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#6b6760">MCP via GenAI SDK</text>
+        </g>
+
+        <!-- ══════════ TIER 2: HUGGINGFACE HUB ══════════ -->
+        <g filter="url(#eco-shadow)">
+          <rect x="40" y="240" width="380" height="130" rx="5" fill="#ffffff" stroke="#f5a623" stroke-width="1.5"/>
+          <rect x="40" y="240" width="380" height="22" rx="5" fill="#f5a623"/>
+          <rect x="40" y="254" width="380" height="8" fill="#f5a623"/>
+          <text x="55" y="256" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="11" fill="#1a1a18" letter-spacing="1.5">🤗  HUGGINGFACE HUB</text>
+
+          <!-- Open models card -->
+          <rect x="55" y="280" width="170" height="72" rx="3" fill="#f7f5ef" stroke="#f5a623" stroke-width="1"/>
+          <text x="140" y="298" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">Open-weight models</text>
+          <text x="140" y="315" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">Llama · Qwen · Mistral</text>
+          <text x="140" y="327" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">Gemma · DeepSeek</text>
+          <text x="140" y="344" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#6b6760">model weights distribution</text>
+
+          <!-- Spaces / Inference Endpoints card -->
+          <rect x="235" y="280" width="170" height="72" rx="3" fill="#f7f5ef" stroke="#f5a623" stroke-width="1"/>
+          <text x="320" y="298" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">Spaces / Endpoints</text>
+          <text x="320" y="315" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">hosted inference</text>
+          <text x="320" y="327" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">OpenAI-compat APIs</text>
+          <text x="320" y="344" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#6b6760">wrappable as MCP</text>
+        </g>
+
+        <!-- ══════════ TIER 3: LOCAL / OPEN-WEIGHT ══════════ -->
+        <g filter="url(#eco-shadow)">
+          <rect x="40" y="390" width="380" height="180" rx="5" fill="#ffffff" stroke="#2d6a2d" stroke-width="1.5"/>
+          <rect x="40" y="390" width="380" height="22" rx="5" fill="#2d6a2d"/>
+          <rect x="40" y="404" width="380" height="8" fill="#2d6a2d"/>
+          <text x="55" y="406" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="11" fill="#f7f5ef" letter-spacing="1.5">🖥  LOCAL / ON-PREMISES</text>
+
+          <!-- Ollama card (highlighted) -->
+          <rect x="55" y="430" width="110" height="72" rx="3" fill="#f0ead6" stroke="#2d6a2d" stroke-width="1.8"/>
+          <text x="110" y="450" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">Ollama</text>
+          <text x="110" y="467" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">DLH-lab stack</text>
+          <text x="110" y="487" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#2d6a2d">MCP via ollama-mcp</text>
+
+          <!-- vLLM -->
+          <rect x="175" y="430" width="110" height="72" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="230" y="450" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">vLLM / TGI</text>
+          <text x="230" y="467" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">high-throughput</text>
+          <text x="230" y="487" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#6b6760">MCP via wrappers</text>
+
+          <!-- LM Studio -->
+          <rect x="295" y="430" width="110" height="72" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="350" y="450" font-family="'Playfair Display', serif" font-weight="700" font-size="13" text-anchor="middle" fill="#1a1a18">LM Studio</text>
+          <text x="350" y="467" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">desktop</text>
+          <text x="350" y="487" font-family="'Source Serif 4', serif" font-style="italic" font-size="9" text-anchor="middle" fill="#6b6760">MCP via mcpo bridge</text>
+
+          <text x="230" y="540" font-family="'Source Serif 4', serif" font-style="italic" font-size="10" text-anchor="middle" fill="#2d6a2d">on-premises path → never leaves the building</text>
+          <text x="230" y="558" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">required for confidential / pre-publication data</text>
+        </g>
+
+        <!-- ══════════ RIGHT COLUMN: MCP SERVERS ══════════ -->
+        <!-- science-data (highlighted — the one this report uses) -->
+        <g filter="url(#eco-shadow)">
+          <rect x="560" y="90" width="360" height="95" rx="5" fill="#1a1a18" stroke="#c0392b" stroke-width="2"/>
+          <text x="740" y="118" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="13" text-anchor="middle" fill="#f7f5ef">science-data</text>
+          <text x="740" y="138" font-family="'Source Serif 4', serif" font-size="11" text-anchor="middle" fill="#f7f5ef" opacity="0.75">NIST WebBook · PubChem · ASD · CODATA · MoNA</text>
+          <text x="740" y="162" font-family="'Source Serif 4', serif" font-style="italic" font-size="10" text-anchor="middle" fill="#c0392b">the server used in Cases A &amp; B</text>
+          <rect x="720" y="170" width="40" height="10" rx="2" fill="#c0392b"/>
+          <text x="740" y="178" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle" fill="#f7f5ef" letter-spacing="1">★ IN USE</text>
+        </g>
+
+        <!-- Other public / community MCP servers -->
+        <g filter="url(#eco-shadow)">
+          <rect x="560" y="205" width="360" height="115" rx="5" fill="#ffffff" stroke="#d4cfc4" stroke-width="1"/>
+          <text x="575" y="228" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760" letter-spacing="1.5">COMMUNITY / PUBLIC SERVERS</text>
+
+          <rect x="575" y="240" width="100" height="28" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="625" y="258" font-family="'Playfair Display', serif" font-weight="700" font-size="11" text-anchor="middle" fill="#1a1a18">Figma</text>
+
+          <rect x="685" y="240" width="100" height="28" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="735" y="258" font-family="'Playfair Display', serif" font-weight="700" font-size="11" text-anchor="middle" fill="#1a1a18">Notion</text>
+
+          <rect x="795" y="240" width="110" height="28" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="850" y="258" font-family="'Playfair Display', serif" font-weight="700" font-size="11" text-anchor="middle" fill="#1a1a18">Linear</text>
+
+          <rect x="575" y="278" width="100" height="28" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="625" y="296" font-family="'Playfair Display', serif" font-weight="700" font-size="11" text-anchor="middle" fill="#1a1a18">GitHub</text>
+
+          <rect x="685" y="278" width="100" height="28" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="735" y="296" font-family="'Playfair Display', serif" font-weight="700" font-size="11" text-anchor="middle" fill="#1a1a18">Slack</text>
+
+          <rect x="795" y="278" width="110" height="28" rx="3" fill="#f7f5ef" stroke="#6b6760" stroke-width="1"/>
+          <text x="850" y="296" font-family="'Playfair Display', serif" font-weight="700" font-size="11" text-anchor="middle" fill="#1a1a18">Google Drive</text>
+        </g>
+
+        <!-- DLH-lab custom MCP servers -->
+        <g filter="url(#eco-shadow)">
+          <rect x="560" y="340" width="360" height="130" rx="5" fill="#ffffff" stroke="#2d6a2d" stroke-width="1.5"/>
+          <text x="575" y="363" font-family="'JetBrains Mono', monospace" font-size="10" fill="#2d6a2d" letter-spacing="1.5">DLH-LAB CUSTOM SERVERS</text>
+
+          <rect x="575" y="375" width="165" height="40" rx="3" fill="#f0ead6" stroke="#2d6a2d" stroke-width="1"/>
+          <text x="657" y="391" font-family="'Playfair Display', serif" font-weight="700" font-size="12" text-anchor="middle" fill="#1a1a18">Microscope MCP</text>
+          <text x="657" y="407" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">MQTT + REST stage control</text>
+
+          <rect x="750" y="375" width="160" height="40" rx="3" fill="#f0ead6" stroke="#2d6a2d" stroke-width="1"/>
+          <text x="830" y="391" font-family="'Playfair Display', serif" font-weight="700" font-size="12" text-anchor="middle" fill="#1a1a18">Faraday</text>
+          <text x="830" y="407" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle" fill="#6b6760">hardware abstraction · open source</text>
+
+          <rect x="575" y="425" width="335" height="32" rx="3" fill="#f0ead6" stroke="#2d6a2d" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="742" y="441" font-family="'Playfair Display', serif" font-style="italic" font-size="11" text-anchor="middle" fill="#1a1a18">future: FERA planning-time feasibility oracle</text>
+          <text x="742" y="453" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle" fill="#6b6760">cross-modal queries over science-data + custom</text>
+        </g>
+
+        <!-- Open protocol note -->
+        <g>
+          <rect x="560" y="485" width="360" height="90" rx="5" fill="none" stroke="#d4cfc4" stroke-width="1"/>
+          <text x="575" y="510" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760" letter-spacing="1.5">PROTOCOL</text>
+          <text x="740" y="533" font-family="'Playfair Display', serif" font-style="italic" font-weight="400" font-size="13" text-anchor="middle" fill="#1a1a18">MCP is an open standard</text>
+          <text x="740" y="551" font-family="'Source Serif 4', serif" font-size="10" text-anchor="middle" fill="#6b6760">JSON-RPC spec, released by Anthropic November 2024</text>
+          <text x="740" y="566" font-family="'Source Serif 4', serif" font-size="10" text-anchor="middle" fill="#6b6760">governance now includes contributions from the wider industry</text>
+        </g>
+
+        <!-- ══════════ INTEGRATION ARROWS ══════════ -->
+        <!-- Cloud → MCP Servers -->
+        <path d="M 420 155 C 480 155, 500 135, 560 135" stroke="#c0392b" stroke-width="2" fill="none" marker-end="url(#eco-arrow-red)"/>
+        <text x="470" y="127" font-family="'JetBrains Mono', monospace" font-size="9" fill="#c0392b" text-anchor="middle">native MCP /</text>
+        <text x="470" y="139" font-family="'JetBrains Mono', monospace" font-size="9" fill="#c0392b" text-anchor="middle">function calling</text>
+
+        <!-- Hub → Local (model weights flow down) -->
+        <path d="M 230 370 L 230 390" stroke="#f5a623" stroke-width="2" fill="none" marker-end="url(#eco-arrow-red)"/>
+        <text x="247" y="385" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6b6760">model weights</text>
+
+        <!-- Hub → MCP (via inference endpoints) -->
+        <path d="M 420 305 C 490 305, 500 250, 560 250" stroke="#f5a623" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#eco-arrow-red)"/>
+        <text x="500" y="245" font-family="'JetBrains Mono', monospace" font-size="9" fill="#6b6760" text-anchor="middle">OpenAI-compat API</text>
+
+        <!-- Local → MCP Servers -->
+        <path d="M 420 465 C 475 465, 490 400, 560 390" stroke="#2d6a2d" stroke-width="2" fill="none" marker-end="url(#eco-arrow-green)"/>
+        <text x="475" y="430" font-family="'JetBrains Mono', monospace" font-size="9" fill="#2d6a2d" text-anchor="middle">via mcpo bridge</text>
+        <text x="475" y="443" font-family="'JetBrains Mono', monospace" font-size="9" fill="#2d6a2d" text-anchor="middle">or tool wrappers</text>
+
+        <!-- ══════════ LEGEND ══════════ -->
+        <g transform="translate(30, 615)">
+          <rect x="0" y="-7" width="14" height="10" fill="#f0ead6" stroke="#2d6a2d" stroke-width="1.5"/>
+          <text x="20" y="3" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760">DLH-lab stack</text>
+
+          <rect x="160" y="-7" width="14" height="10" fill="#1a1a18" stroke="#c0392b" stroke-width="1.5"/>
+          <text x="180" y="3" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760">server used in this report</text>
+
+          <line x1="420" y1="-2" x2="444" y2="-2" stroke="#6b6760" stroke-width="1.3" stroke-dasharray="5,3"/>
+          <text x="452" y="3" font-family="'JetBrains Mono', monospace" font-size="10" fill="#6b6760">planned / future integration</text>
+        </g>
+      </svg>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Figure 2</span> The LLM–MCP ecosystem landscape. On the left, the three tiers of <em>where the model runs</em>: cloud APIs (top), the HuggingFace Hub as a distribution layer (middle), and local / on-premises runners (bottom). On the right, the <em>tool universe</em> reachable via MCP: the <code>science-data</code> server actively used in this report (highlighted, top-right), a selection of community servers (middle), and DLH-lab's own custom servers including the open-source Faraday hardware-abstraction layer (bottom-right). For DLH-lab operations, the practically important axis is the cloud–local split: confidential data stays on the on-premises path (green), while public reference-data work uses the cloud path (red) for richer reasoning. Both paths reach the same MCP server universe.</div>
+  </div>
+
+  <p>For scientific use cases specifically, the choice of backend has practical implications beyond raw capability. <strong>Claude via MCP</strong> is currently the smoothest path: mature tool-calling integration, explicit reasoning about which tools to call and in what order, and a conversational format that makes iterative analysis natural. <strong>Local Llama/Qwen via Ollama</strong> is the right choice when data confidentiality is non-negotiable — running entirely on-premises means proprietary process data never leaves the building. <strong>Hugging Face-hosted models</strong> occupy a middle ground: open weights with managed inference, suitable for reproducible pipelines where the same model version needs to be pinned across runs.</p>
+  <!-- ══════════════════════════════════════════════════════════════════
+       3. CASE A — n-ALKANE DATABASE AUDIT
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <div id="case-a"></div>
+  <div class="case-header">
+    <div class="case-label">Case Study A · Retrospective</div>
+    <h2>Database audit: the n-alkane homologous series</h2>
+    <p class="case-sub">Twenty sequential PubChem queries, one data-quality anomaly, one empirical scaling law. Tests whether an LLM-driven agent can do systematic consistency checking that a human researcher rarely bothers with.</p>
+  </div>
+
+  <h3>A.1 Choice of dataset</h3>
+
+  <p>The n-alkane series (methane through eicosane, C<sub>1</sub>–C<sub>20</sub>) is a near-ideal target for a homologous-series consistency check. Its molecular structure is uniquely simple: each member differs from the previous by exactly one –CH<sub>2</sub>– methylene unit appended to a linear chain. All physicochemical properties that depend on molecular structure should therefore vary <em>monotonically</em> with chain length $n$. The series spans two physical-state regimes at room temperature (gases for $n \le 4$, liquids for $5 \le n \le 17$, solids for $n \ge 18$), which introduces some expected non-linearity in bulk thermodynamic properties — but not in molecular descriptors calculated purely from structure. Any deviation from monotonicity in a structure-derived descriptor is therefore an unambiguous signal of either physical reality or database error.</p>
+
+  <p>Claude (Sonnet 4.5) issued 20 consecutive <code>pubchem_get_properties</code> calls, one per compound, and assembled the following table:</p>
+
+  <div class="table-wrap">
+  <table id="alkane-data">
+    <thead>
+      <tr>
+        <th>$n$</th>
+        <th>Name</th>
+        <th>Formula</th>
+        <th>MW (g/mol)</th>
+        <th>XLogP</th>
+        <th>$\Delta$XLogP</th>
+        <th>Complexity</th>
+        <th>Rot. Bonds</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>methane</td><td>CH₄</td><td>16.04</td><td>0.6</td><td>—</td><td>0</td><td>0</td></tr>
+      <tr><td>2</td><td>ethane</td><td>C₂H₆</td><td>30.07</td><td>1.3</td><td>+0.7</td><td>0</td><td>0</td></tr>
+      <tr><td>3</td><td>propane</td><td>C₃H₈</td><td>44.10</td><td>1.8</td><td>+0.5</td><td>0</td><td>0</td></tr>
+      <tr><td>4</td><td>butane</td><td>C₄H₁₀</td><td>58.12</td><td>2.9</td><td>+1.1</td><td>2</td><td>1</td></tr>
+      <tr><td>5</td><td>pentane</td><td>C₅H₁₂</td><td>72.15</td><td>3.4</td><td>+0.5</td><td>7</td><td>2</td></tr>
+      <tr><td>6</td><td>hexane</td><td>C₆H₁₄</td><td>86.18</td><td>3.9</td><td>+0.5</td><td>12</td><td>3</td></tr>
+      <tr><td>7</td><td>heptane</td><td>C₇H₁₆</td><td>100.20</td><td>4.4</td><td>+0.5</td><td>19</td><td>4</td></tr>
+      <tr class="anomaly"><td>8</td><td>octane ⚠</td><td>C₈H₁₈</td><td>114.23</td><td>3.9</td><td style="color:var(--accent)">−0.5</td><td>25</td><td>5</td></tr>
+      <tr><td>9</td><td>nonane</td><td>C₉H₂₀</td><td>128.25</td><td>4.5</td><td>+0.6</td><td>33</td><td>6</td></tr>
+      <tr><td>10</td><td>decane</td><td>C₁₀H₂₂</td><td>142.28</td><td>5.0</td><td>+0.5</td><td>40</td><td>7</td></tr>
+      <tr><td>11</td><td>undecane</td><td>C₁₁H₂₄</td><td>156.31</td><td>5.6</td><td>+0.6</td><td>49</td><td>8</td></tr>
+      <tr><td>12</td><td>dodecane</td><td>C₁₂H₂₆</td><td>170.33</td><td>6.1</td><td>+0.5</td><td>56</td><td>9</td></tr>
+      <tr><td>13</td><td>tridecane</td><td>C₁₃H₂₈</td><td>184.36</td><td>6.6</td><td>+0.5</td><td>66</td><td>10</td></tr>
+      <tr><td>14</td><td>tetradecane</td><td>C₁₄H₃₀</td><td>198.39</td><td>7.2</td><td>+0.6</td><td>74</td><td>11</td></tr>
+      <tr><td>15</td><td>pentadecane</td><td>C₁₅H₃₂</td><td>212.41</td><td>7.7</td><td>+0.5</td><td>84</td><td>12</td></tr>
+      <tr><td>16</td><td>hexadecane</td><td>C₁₆H₃₄</td><td>226.44</td><td>8.3</td><td>+0.6</td><td>92</td><td>13</td></tr>
+      <tr><td>17</td><td>heptadecane</td><td>C₁₇H₃₆</td><td>240.47</td><td>8.8</td><td>+0.5</td><td>103</td><td>14</td></tr>
+      <tr><td>18</td><td>octadecane</td><td>C₁₈H₃₈</td><td>254.50</td><td>9.3</td><td>+0.5</td><td>112</td><td>15</td></tr>
+      <tr><td>19</td><td>nonadecane</td><td>C₁₉H₄₀</td><td>268.52</td><td>9.9</td><td>+0.6</td><td>123</td><td>16</td></tr>
+      <tr><td>20</td><td>eicosane</td><td>C₂₀H₄₂</td><td>282.55</td><td>10.4</td><td>+0.5</td><td>132</td><td>17</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>A.2 Expected behaviour and anomaly detection</h3>
+
+  <p>As expected from first principles, both XLogP and molecular weight increase linearly with $n$. Rotatable bond count follows $n - 3$ for $n \ge 4$ (one rotatable bond is added per new carbon after the terminal methyl groups are accounted for). Molecular weight increases by exactly 14.016 g/mol per CH<sub>2</sub> unit.</p>
+
+  <div class="fig">
+    <div class="fig-body">
+      <canvas id="chart1" height="280"></canvas>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Figure 3</span> XLogP (lipophilicity) vs. chain length $n$ for n-alkanes C<sub>1</sub>–C<sub>20</sub>. The red point at $n=8$ (octane) breaks the monotone trend; it matches the value recorded for hexane ($n=6$) and is lower than heptane ($n=7$). The dashed grey line shows the expected linear trend excluding $n=8$.</div>
+  </div>
+
+  <h3>A.3 The octane anomaly</h3>
+
+  <p>The most striking observation is the XLogP value for octane ($n = 8$). While every other adjacent pair in the series shows $\Delta\text{XLogP} \approx +0.5$ to $+0.6$, octane records XLogP = 3.9 — identical to hexane and <em>lower</em> than heptane (4.4). The signed increment is $-0.5$, a $\approx 2\sigma$ outlier relative to the rest of the series.</p>
+
+  <p>A linear fit excluding the $n=8$ point gives:</p>
+
+  <div class="eq">
+    $$\text{XLogP}(n) \approx 0.527\,n - 0.004 \quad (R^2 = 0.997, \text{ excluding } n=8)$$
+  </div>
+
+  <p>This predicts XLogP ≈ 4.21 for octane. The recorded value of 3.9 is a residual of −0.31 log units in the XLogP3 calculation — modest in absolute terms, but statistically inconsistent with the tight linearity everywhere else in the series. More notably, experimental literature values for octane's octanol-water partition coefficient are reported to be considerably higher still (e.g. Hansch et al., 1995; Sangster, 1989 — citations to be added), with logP ≈ 5.1–5.2, about <em>1.3 log units</em> above PubChem's recorded XLogP and fully consistent with the expected homologous trend.</p>
+
+  <div class="callout warning">
+    <strong>Hypothesis</strong>
+    PubChem's XLogP3 values are computed, not measured. For octane (PubChem CID 356), the anomalously low value may reflect either: (a) an algorithmic artifact in the XLogP3 calculation related to atom typing of the C<sub>8</sub> chain, (b) a legacy database entry that was not re-computed with the current XLogP3 algorithm, or (c) differences between the XLogP3 algorithm and experimental logP values for this particular compound. CID 356 is an unusually low CID number for a simple compound, which is consistent with early entry and possible non-refresh. Determining the exact cause would require re-computation against octane's canonical SMILES or inspection of PubChem's XLogP3 pipeline — neither of which we attempt here.
+  </div>
+
+  <p>This is not a trivial discrepancy. XLogP is used routinely in drug-discovery filters (Lipinski's Rule of Five), environmental fate modelling (octanol-water partitioning), and structure-property QSAR models. A computed value ≈1.3 log units below the experimental consensus suggests that homologous-series consistency checks may not be systematically applied to computed properties such as XLogP3. An agent-driven scan across PubChem's known homologous series could be a cheap way to surface further candidate outliers for human follow-up.</p>
+
+  <h3>A.4 Empirical scaling of the Complexity metric</h3>
+
+  <p>PubChem's <em>Complexity</em> metric is a topological score based on Bertz's molecular complexity index, counting the information content of the molecular graph. For structurally trivial molecules (very short chains) PubChem reports Complexity = 0; meaningful values begin at $n=4$. Fitting a power law to the $n = 5$–$20$ range:</p>
+
+  <div class="eq">
+    $$\text{Complexity}(n) \approx 0.257 \cdot n^{2.07} \quad (R^2 = 0.9996)$$
+  </div>
+
+  <p>The exponent $\alpha \approx 2.07$ is very close to, but measurably above, 2. This is physically interpretable: the Bertz complexity of a linear chain grows as $O(n^2)$ because the underlying algorithm counts pairwise atom-bond relationships, and adding one atom to a chain of length $n$ adds $n$ new pairwise contributions. The slight super-quadratic character ($\alpha > 2$) arises because longer chains have more distinct constitutional environments per atom — the middle carbons of a C<sub>20</sub> chain are chemically distinct in more ways than those of a C<sub>5</sub> chain.</p>
+
+  <div class="fig">
+    <div class="fig-body">
+      <canvas id="chart2" height="280"></canvas>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Figure 4</span> PubChem Complexity vs. chain length $n$ (blue circles) and the power-law fit $0.257\,n^{2.07}$ (dashed orange, fit on $n \ge 5$). The zero values for $n = 1$–$3$ reflect PubChem's minimum complexity threshold for structurally trivial molecules.</div>
+  </div>
+
+  <p>Inspecting the increments $\Delta\text{Complexity}(n) = \text{Complexity}(n) - \text{Complexity}(n-1)$ for $n \ge 9$ reveals a weak odd-even pattern: odd-$n$ increments tend to be slightly larger than even-$n$ ones. This pattern deserves further investigation — it may reflect quantisation effects from PubChem's integer-rounding of complexity scores, or it may reflect a genuine feature of the Bertz index for linear chains that has not previously been noted in the literature. We flag it here as a candidate for further theoretical work but do not attempt to resolve it in this report.</p>
+
+  <h3>A.5 Summary for Case A</h3>
+
+  <p>The retrospective database-audit workflow identifies one concrete, reportable finding (the octane XLogP anomaly at CID 356) and one empirical scaling relationship (Complexity ≈ 0.257 · n<sup>2.07</sup>) from twenty sequential MCP calls and roughly five minutes of wall-clock agent time. The finding is suitable as a candidate to report to database curators for follow-up, and illustrates a class of homologous-series consistency check that is hard to surface without systematic querying.</p>
+  <!-- ══════════════════════════════════════════════════════════════════
+       4. CASE B — CO ANALYZER ENGINEERING DESIGN
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <div id="case-b"></div>
+  <div class="case-header">
+    <div class="case-label">Case Study B · Prospective</div>
+    <h2>Engineering design: trace CO in a pure H<sub>2</sub> carrier gas</h2>
+    <p class="case-sub">Four IR spectra, five candidate bandpass windows, one quantified water-asymmetry finding. Tests whether an LLM-driven agent can do real engineering work from first-principles reference data.</p>
+  </div>
+
+  <h3>B.1 The industrial problem</h3>
+
+  <p>Measuring trace carbon monoxide in a pure or near-pure hydrogen carrier stream is a recurring measurement problem across several industrial sectors. CO is a potent catalyst poison at the ppm level for many downstream processes, a regulated contaminant in fuel-cell-grade hydrogen, and a useful process-state tracer in reduction chemistry. The specific CO limit, the dominant interferent profile, and the tolerable analyzer drift differ from sector to sector, but the underlying spectroscopic problem is the same: the molecule is the same, the H<sub>2</sub> carrier is IR-transparent, and the interferents that <em>do</em> matter (H<sub>2</sub>O, CO<sub>2</sub>, CH<sub>4</sub>) are the same. Table B.1 summarises the main industrial contexts the analysis below applies to.</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Industrial context</th>
+        <th>Typical CO target</th>
+        <th>Dominant interferent(s)</th>
+        <th>Why CO matters</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Fuel-cell-grade H<sub>2</sub> (ISO 14687 Grade D)</td>
+        <td>&lt; 0.2 ppm</td>
+        <td>H<sub>2</sub>O (from dryer breakthrough), traces of CO<sub>2</sub></td>
+        <td>Irreversible Pt catalyst poisoning in PEMFC stacks</td>
+      </tr>
+      <tr>
+        <td>Green / blue H<sub>2</sub> production (electrolysis, SMR+PSA)</td>
+        <td>1–10 ppm (QC)</td>
+        <td>H<sub>2</sub>O, CO<sub>2</sub>, residual CH<sub>4</sub> (SMR)</td>
+        <td>Downstream process QC, regulatory reporting</td>
+      </tr>
+      <tr>
+        <td>Ammonia synthesis feedstock (Haber–Bosch)</td>
+        <td>&lt; 5 ppm</td>
+        <td>CH<sub>4</sub> (methanator slip), trace H<sub>2</sub>O</td>
+        <td>Iron catalyst deactivation at ppm CO/CO<sub>2</sub></td>
+      </tr>
+      <tr>
+        <td>Direct-reduction steel (DRI / HBI with H<sub>2</sub>)</td>
+        <td>process-dependent</td>
+        <td>Large CO<sub>2</sub> background, variable H<sub>2</sub>O</td>
+        <td>Process state indicator; reduction-reaction tracking</td>
+      </tr>
+      <tr>
+        <td>Semiconductor UHP H<sub>2</sub> (epitaxy, annealing)</td>
+        <td>&lt; 0.1 ppm</td>
+        <td>H<sub>2</sub>O from desiccant breakthrough; essentially no CO<sub>2</sub></td>
+        <td>Device-yield impact from surface C contamination</td>
+      </tr>
+      <tr>
+        <td>Refinery hydrotreating / hydrocracker recycle gas</td>
+        <td>10–100 ppm</td>
+        <td>CH<sub>4</sub>, C<sub>2</sub>H<sub>6</sub>, variable H<sub>2</sub>O</td>
+        <td>Hydrogen purity monitoring, catalyst life management</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>In each of these contexts the usual instrument of choice is a non-dispersive IR (NDIR) analyzer — commercial units from ABB, Emerson, Siemens, Servomex, and Horiba all operate on the same spectroscopic principle: a broadband IR source, a sample cell, a bandpass filter, and a pyroelectric or photometric detector. The engineering question before specifying or buying such an instrument is identical across all six contexts above:</p>
+
+  <ol style="padding-left:1.5rem; margin:1.2rem 0;">
+    <li style="margin-bottom:0.5rem">Which IR band gives the best selectivity for CO against the unavoidable trace interferents (H<sub>2</sub>O, CO<sub>2</sub>, CH<sub>4</sub>)?</li>
+    <li style="margin-bottom:0.5rem">How strongly does residual humidity bias the reading at different candidate wavelengths?</li>
+    <li>Is CO<sub>2</sub> cross-talk a real concern, or is the classic CO fundamental at ≈2140 cm<sup>−1</sup> safely far from the CO<sub>2</sub> band?</li>
+  </ol>
+
+  <p>For the sake of concreteness we run the analysis below with a representative set of interferent assumptions — ppm-level H<sub>2</sub>O from imperfect drying, trace CO<sub>2</sub> from upstream absorbers, and small amounts of CH<sub>4</sub> from reforming or catalyst slip. The qualitative conclusion (see §B.4) turns out to be the same across all six industrial contexts in the table, though the quantitative humidity threshold shifts depending on the dominant interferent. A spectroscopist would normally spend roughly half a working day on this kind of analysis: NIST WebBook searches per species, JCAMP-DX downloads, bespoke Python plumbing for unit conversion and grid alignment, then the actual selectivity analysis and write-up. We wanted to know how much of that work collapses when the LLM drives an MCP server that returns the spectra as parsed JSON.</p>
+
+  <h3>B.2 Data collection: five MCP calls</h3>
+
+  <p>Claude (Opus 4.7) autonomously issued the following tool calls:</p>
+
+  <div class="fig">
+    <div class="fig-body">
+<pre><code><span class="cm"># The five MCP calls that underlie everything below</span>
+<span class="fn">nist_search_compound</span>(<span class="st">"carbon monoxide"</span>)        <span class="cm">→ C630080</span>
+<span class="fn">nist_get_spectrum</span>(<span class="st">"C630080"</span>,  max_peaks=<span class="nu">900</span>) <span class="cm">→ 880-pt IR, peak A=0.272 @ 2178 cm⁻¹</span>
+<span class="fn">nist_get_spectrum</span>(<span class="st">"C124389"</span>,  max_peaks=<span class="nu">900</span>) <span class="cm">→ CO₂  peak A=0.934 @ 2358 cm⁻¹</span>
+<span class="fn">nist_get_spectrum</span>(<span class="st">"C7732185"</span>, max_peaks=<span class="nu">900</span>) <span class="cm">→ H₂O  peak A=0.628 @ 1510 cm⁻¹</span>
+<span class="fn">nist_get_spectrum</span>(<span class="st">"C74828"</span>,   max_peaks=<span class="nu">900</span>) <span class="cm">→ CH₄  peak A=0.637 @ 3018 cm⁻¹</span>
+<span class="fn">pubchem_get_safety</span>(cid=<span class="st">"281"</span>)               <span class="cm">→ GHS: "Toxic/poison by inhalation (TIH/PIH)"</span></code></pre>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Listing 2</span> The complete set of tool invocations for Case B. Each <code>nist_get_spectrum</code> call returns a parsed JCAMP-DX record — 880 points, 4 cm<sup>−1</sup> resolution, 450–3966 cm<sup>−1</sup> range — directly usable in downstream computation with no hand-written parser.</div>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Species</th><th>NIST ID</th><th>Peak A</th><th>Peak ν̃</th><th>Assignment</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>CO</td>  <td><code>C630080</code></td>  <td>0.272</td> <td>2178 cm⁻¹</td> <td>fundamental ν(C=O), P+R envelope</td></tr>
+      <tr><td>CO₂</td> <td><code>C124389</code></td>  <td>0.934</td> <td>2358 cm⁻¹</td> <td>ν₃ asymmetric stretch</td></tr>
+      <tr><td>H₂O</td> <td><code>C7732185</code></td> <td>0.628</td> <td>1510 cm⁻¹</td> <td>ν₂ bend + broad OH-stretch band</td></tr>
+      <tr><td>CH₄</td> <td><code>C74828</code></td>   <td>0.637</td> <td>3018 cm⁻¹</td> <td>ν₃ C–H stretch</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Two features of this table set up the analysis. First, <strong>CO<sub>2</sub> at 2358 cm<sup>−1</sup> is 3.4× stronger than CO at 2178 cm<sup>−1</sup></strong> in the NIST reference spectra, but the two bands sit ≈180 cm<sup>−1</sup> apart and do not overlap at the resolution reported here — the CO<sub>2</sub> ν<sub>3</sub> tail drops to near zero by ≈2240 cm<sup>−1</sup>. Second, <strong>H<sub>2</sub>O rotational-vibrational absorption is known to be dense across this region in gas phase</strong>, which is why humidity control dominates industrial NDIR design. All four NIST WebBook records used here are explicitly gas-phase Sadtler measurements on a common wavenumber grid (JCAMP-DX metadata confirms <code>STATE: gas</code> for each), so the integration-based comparison below is internally consistent. However, the spectra are reference absorbance records, not absolute cross-sections at specified pressure and path length, so the numerical values should still be read as first-order indicators: a production-grade analysis would use HITRAN line-by-line cross-sections at the actual cell conditions of a deployed analyzer. CH<sub>4</sub>'s strong ν<sub>3</sub> band at 3018 cm<sup>−1</sup> is irrelevant here — it sits far from any CO feature.</p>
+
+  <div class="fig">
+    <div class="fig-body">
+      <canvas id="chart-co-overview" height="300"></canvas>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Figure 5</span> Full-range IR absorption overlay for CO, CO<sub>2</sub>, H<sub>2</sub>O, CH<sub>4</sub> (NIST SRD 69, gas phase). The CO fundamental (red) is a tidy ≈200 cm<sup>−1</sup>-wide island between the CO<sub>2</sub> ν<sub>3</sub> mountain on the high-wavenumber side and the H<sub>2</sub>O ν<sub>2</sub> forest on the low-wavenumber side.</div>
+  </div>
+
+  <h3>B.3 Quantifying band selectivity</h3>
+
+  <div class="callout">
+    <strong>Methodological note</strong>
+    All four spectra used in this section are NIST WebBook Sadtler reference records on a common wavenumber grid (450–3966 cm<sup>−1</sup>, 4 cm<sup>−1</sup> step, JCAMP-DX <code>STATE: gas</code> for each). They are reference absorbance records rather than absolute cross-sections at specified pressure and path length, so the integration-based selectivity metric used below is a first-order approximation: the numerical values are illustrative of the methodology and indicate the qualitative direction of the band-selection trade-off, but are not engineering specifications. A production analysis would use HITRAN line-by-line cross-sections under the analyzer's actual operating conditions.
+  </div>
+
+  <p>Given a candidate bandpass window, the relevant engineering number is how much CO absorbance falls inside it <em>relative</em> to how much interferent absorbance falls inside it. A natural single-number summary is the ratio of integrated absorbances:</p>
+
+  <div class="eq">
+    $$S \;=\; \frac{\int_{\nu_1}^{\nu_2} A_\text{CO}(\tilde{\nu})\,\mathrm{d}\tilde{\nu}}{\int_{\nu_1}^{\nu_2} \bigl[A_\text{CO_2}(\tilde{\nu}) + A_\text{H_2O}(\tilde{\nu}) + A_\text{CH_4}(\tilde{\nu})\bigr]\,\mathrm{d}\tilde{\nu}}$$
+  </div>
+
+  <p>Higher $S$ means cleaner CO signal per unit interferent contamination. The agent computed this for five candidate bands, including the classic full-width CO fundamental (the factory default on many NDIR units) and several narrower alternatives:</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>Candidate band (cm⁻¹)</th><th>I(CO)</th><th>I(CO₂)</th><th>I(H₂O)</th><th>I(CH₄)</th><th>S</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>2050–2220 — classic broad-band NDIR default</td><td>30.52</td><td>1.24</td><td>2.42</td><td>0.66</td><td>7.07</td></tr>
+      <tr><td>2158–2220 — R-branch only</td><td>13.63</td><td>0.41</td><td>0.66</td><td>0.23</td><td>10.44</td></tr>
+      <tr><td>2050–2130 — P-branch only</td><td>12.99</td><td>0.63</td><td>1.38</td><td>0.31</td><td>5.61</td></tr>
+      <tr><td>2160–2200 — narrow 40 cm⁻¹</td><td>9.13</td><td>0.25</td><td>0.40</td><td>0.14</td><td>11.57</td></tr>
+      <tr class="anomaly"><td>2170–2190 — narrow 20 cm⁻¹ ★</td><td>5.28</td><td>0.14</td><td>0.22</td><td>0.08</td><td><strong>12.23</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The narrow 20 cm<sup>−1</sup> window centred near the CO peak yields <strong>an apparent selectivity index roughly 1.7× higher</strong> than the classic full-band default in this first-order calculation. It sacrifices ≈83% of the integrated CO signal — but for ppm-level trace analysis, detector shot noise is rarely the limiting factor. <em>Water cross-talk is.</em> The narrower window appears to win because it avoids the region of higher apparent H<sub>2</sub>O absorbance. As noted in the methodological caveat above, the quantitative improvement depends on line-by-line spectral data and operating conditions that are not captured by the heterogeneous NIST reference spectra alone.</p>
+
+  <h3>B.4 The water-asymmetry finding</h3>
+
+  <p>The reason the narrower band wins becomes obvious when you zoom in on the CO fundamental and look at where the water rotational lines land:</p>
+
+  <div class="fig">
+    <div class="fig-body">
+      <canvas id="chart-co-zoom" height="320"></canvas>
+    </div>
+    <div class="fig-caption"><span class="fig-label">Figure 6</span> Zoom on 1950–2450 cm<sup>−1</sup>. H<sub>2</sub>O absorbance is shown both at true scale (solid green) and ×10 (dashed green) for visibility. The green-shaded P-branch side (2050–2143 cm<sup>−1</sup>) sits under markedly more water absorbance than the yellow-shaded R-branch side (2143–2220 cm<sup>−1</sup>). A classic broad-band NDIR filter spans both.</div>
+  </div>
+
+  <p>Quantitatively, averaged over the two halves of the CO band:</p>
+
+  <ul style="padding-left:1.5rem; margin:1rem 0 1.5rem;">
+    <li style="margin-bottom:0.3rem">P-branch side (2050–2143 cm<sup>−1</sup>): mean H<sub>2</sub>O absorbance = <strong>0.01678</strong></li>
+    <li style="margin-bottom:0.3rem">R-branch side (2143–2220 cm<sup>−1</sup>): mean H<sub>2</sub>O absorbance = <strong>0.01122</strong></li>
+    <li>Asymmetry ratio L/R = <strong>1.50</strong></li>
+  </ul>
+
+  <p>Point-wise the gap is more dramatic. At 2090 cm<sup>−1</sup> — deep in the P-branch — the H<sub>2</sub>O/CO absorbance ratio is 17.3%. At 2178 cm<sup>−1</sup>, the CO peak, it drops to 4.0%. A symmetric optical bandpass centred on the band origin (2142 cm<sup>−1</sup>) therefore introduces a <em>humidity-dependent bias by construction</em>: as H<sub>2</sub>O partial pressure rises — during analyzer warm-up, as a desiccant saturates, or seasonally — the P-branch side picks up more extra absorbance than the R-branch side, and the downstream signal chain cannot separate that from genuine CO without a reference wavelength.</p>
+
+  <div class="callout warning">
+    <strong>Qualitative direction</strong>
+    A narrow bandpass centred near the CO peak (≈2170–2190 cm<sup>−1</sup>) is qualitatively favoured by this analysis, as it avoids regions of higher apparent H<sub>2</sub>O absorption. Above ≈2220 cm<sup>−1</sup> the CO<sub>2</sub> ν<sub>3</sub> tail rises visibly in the NIST spectrum, so the upper edge of any candidate band should not extend much past 2200 cm<sup>−1</sup>. Final band selection for a deployed analyzer should be based on line-by-line gas-phase modelling (e.g. HITRAN) and instrument constraints (pressure broadening, detector sensitivity, commercial filter availability) rather than on the first-order NIST-based calculation presented here.
+  </div>
+
+  <h3>B.5 Provenance of the asymmetry</h3>
+
+  <p>The asymmetry itself is a direct consequence of the R(J) line positions in the CO fundamental falling into slightly cleaner gaps of the H<sub>2</sub>O rotational manifold than the P(J) lines do. HITRAN line-by-line specialists know this well; the HITRAN database encodes the relevant transition strengths down to individual rotational lines. The value-add of the MCP workflow is that a working analyzer designer — who is typically not an atmospheric spectroscopist and who does not rely on HITRAN line-by-line data in this workflow — can extract the same qualitative conclusion from authoritative NIST reference data in under an hour of agent time, sufficient as a first-order indication before committing to a full line-by-line design study.</p>
+
+  <h3>B.6 Summary for Case B</h3>
+
+  <p>The prospective engineering-design workflow produces a first-order design indication (a narrow bandpass near the CO peak is qualitatively favoured), an illustrative cross-sensitivity estimate (on the order of a few percent water-to-CO absorbance in the integrated metric used here), and a documented rationale (an apparent asymmetry in H<sub>2</sub>O background across the CO fundamental, visible in the NIST reference spectra) — all from five MCP calls and roughly twenty minutes of wall-clock agent time. The numerical values above should be read as order-of-magnitude indicators, not as engineering specifications; a deployable analyzer design would require line-by-line gas-phase data under matched operating conditions.</p>
+  <!-- ══════════════════════════════════════════════════════════════════
+       5. CROSS-CUTTING DISCUSSION
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <h2 id="discussion">5. Cross-cutting discussion</h2>
+
+  <p>Considered individually, each case study supports a narrow conclusion: that an LLM driving an MCP server can usefully audit a chemical database (Case A) or can usefully inform an IR analyzer design (Case B). Considered together, they support a stronger and more generalisable claim about when this methodology is and is not a good fit. The sections below develop that claim.</p>
+
+  <h3>5.1 What the two studies have in common</h3>
+
+  <p>Both case studies follow the same structural pattern: a question that resolves into <em>many small, independent database queries</em>, followed by <em>inline reasoning across the returned data</em>, followed by <em>written synthesis</em>. Neither case study required the agent to invent new science. In both cases the relevant information is already present in the reference databases — what was missing was the time and motivation for a human to extract it systematically.</p>
+
+  <p>This is, we think, the single most useful framing for understanding where LLM-agentic database work adds value. Human researchers are excellent at deep-dive investigations of phenomena that interest them, and poor at systematic shallow sweeps across phenomena that do not. An LLM agent inverts this asymmetry: shallow systematic sweeps are nearly free, while deep investigation of a genuinely novel phenomenon is still substantially harder than a trained human specialist can manage. The natural niche for the methodology is therefore <strong>tasks that require systematically touching many entries, noticing patterns or inconsistencies across them, and reporting the result</strong>.</p>
+
+  <h3>5.2 What they don't have in common — retrospective vs. prospective</h3>
+
+  <p>The more interesting comparison is along the axis of <em>what the work is for</em>. Case A is <strong>retrospective</strong>: the agent examines data that already exists and looks backwards for inconsistencies. Case B is <strong>prospective</strong>: the agent uses existing data to inform a decision about the future. These two modes stress the methodology differently.</p>
+
+  <div class="two-col">
+    <div>
+      <h4>Retrospective mode</h4>
+      <p><em>Stress test:</em> Can the agent find something a human audit would miss?</p>
+      <p><em>Case A result:</em> Yes — the octane XLogP anomaly at CID 356 is a genuine data-quality discrepancy relative to the experimental literature and is not obviously flagged in the current PubChem entry. Homologous-series consistency checking is the kind of systematic sweep that the agentic workflow addresses cheaply.</p>
+      <p><em>Dominant risk:</em> False positives. Every "anomaly" surfaced by a shallow sweep needs human verification against experimental literature before it can be reported upstream.</p>
+    </div>
+    <div>
+      <h4>Prospective mode</h4>
+      <p><em>Stress test:</em> Is the agent's recommendation defensible against a domain expert?</p>
+      <p><em>Case B result:</em> Yes, qualifiedly — the band-selection recommendation reproduces what a HITRAN-literate spectroscopist would arrive at, and the quantified asymmetry is directly supported by NIST data.</p>
+      <p><em>Dominant risk:</em> The agent may not know what it does not know. Case B works because the underlying physics (rotational-vibrational spectroscopy, Beer-Lambert absorption) is well-established textbook material.</p>
+    </div>
+  </div>
+
+  <p>Both risks are real. In Case A the agent flagged octane as anomalous relative to the series and <em>also</em> flagged a weak odd-even oscillation in the Complexity increments as worth further study — the first is almost certainly a database-entry discrepancy worth reporting, the second is plausibly just integer-rounding noise. Distinguishing between "genuine finding" and "artefact of the test methodology" is work the human researcher must still do. In Case B the apparent water cross-sensitivity is an illustrative first-order estimate from heterogeneous NIST reference spectra; any numerical values from this workflow would need validation against HITRAN line strengths and pressure-broadening corrections before they could be trusted as a design spec. The methodology produces the first draft; the human still owns the result.</p>
+
+  <h3>5.3 Measured time savings</h3>
+
+  <p>We measured wall-clock time for each step of both workflows against our best estimate of the equivalent traditional process. The <em>traditional</em> column assumes a competent researcher doing the work the classical way (database UI navigation, JCAMP-DX or CSV export, bespoke Python, manual write-up). The <em>LLM + MCP</em> column is measured from session transcripts. All figures are approximate but the ratios are stable across several re-runs of each workflow.</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Step</th><th>Case A (traditional)</th><th>Case A (MCP)</th><th>Case B (traditional)</th><th>Case B (MCP)</th></tr></thead>
+    <tbody>
+      <tr><td>Locate entries in databases</td><td>~20 min</td><td>~5 s</td><td>~15 min</td><td>~5 s</td></tr>
+      <tr><td>Retrieve &amp; parse structured data</td><td>~30 min</td><td>(tool call)</td><td>~25 min</td><td>(tool call)</td></tr>
+      <tr><td>Put onto common grid, quantify</td><td>~30 min</td><td>~3 min</td><td>~45 min</td><td>~5 min</td></tr>
+      <tr><td>Spot pattern / do numerical analysis</td><td>~45 min</td><td>~3 min</td><td>~60 min</td><td>~5 min</td></tr>
+      <tr><td>Write up the finding</td><td>~30 min</td><td>~4 min</td><td>~30 min</td><td>~5 min</td></tr>
+      <tr class="anomaly"><td><strong>Total (single study)</strong></td><td><strong>~155 min</strong></td><td><strong>~15 min</strong></td><td><strong>~175 min</strong></td><td><strong>~20 min</strong></td></tr>
+      <tr class="anomaly"><td><strong>Marginal cost for next run</strong></td><td><strong>~140 min</strong></td><td><strong>~2 min</strong></td><td><strong>~160 min</strong></td><td><strong>~3 min</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Two features of the table deserve emphasis. First, the <strong>absolute time saving is roughly the same</strong> in both cases (≈140 min per study, 88–90% of baseline) — the methodology is not more valuable for one mode than the other. Second, the <strong>marginal-cost row is where the real payoff lies</strong>: once the recipe is written, running it against a different homologous series (the ketone series C<sub>n</sub>H<sub>2n</sub>O; the carboxylic-acid series) or a different analyte pair (HF vs. H<sub>2</sub>O in semiconductor exhaust, SO<sub>2</sub> vs. H<sub>2</sub>O in flue gas) takes minutes rather than hours. The amortised cost of the MCP setup pays for itself on the second question.</p>
+
+  <h3>5.4 Reproducibility</h3>
+
+  <p>Both case studies produce a fully auditable tool-call log. For Case A, the 20 <code>pubchem_get_properties</code> calls and their raw JSON responses are recoverable from the session transcript; re-running the study with a fresh LLM session reproduces the table up to any intervening PubChem data update. For Case B, the four <code>nist_get_spectrum</code> calls return stable JCAMP-DX content on re-run against the same NIST WebBook record IDs, since NIST's legacy reference-spectra collections (Sadtler and related) are not actively re-measured. In both cases, reproducibility is substantially stronger than either web scraping (no stable schema) or pure LLM recall (no grounding). The most reliable single sentence we can say about this methodology's scientific credibility is: <strong>every number in this report is traceable to a named tool call against a named authoritative database, logged at the time of the query.</strong></p>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       6. OUTLOOK
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <h2 id="outlook">6. Outlook: crossing into the real world</h2>
+
+  <p>The two case studies in this report sit entirely on one side of a line that keeps coming up in the broader AI conversation. They are pure <em>text-and-data</em> work: a model issues structured queries against curated databases, reasons about what comes back, and writes up the result. Nothing in either case study actually touched the physical world. No sample was handled, no instrument was pointed at anything, no measurement was made.</p>
+
+  <p>This is also the boundary Yann LeCun has been loudly circling for the last few years — most recently as the founding premise of AMI Labs, his new Paris-based venture to build <em>world models</em> rather than larger language models. The argument, in his telling, is that language-only systems can mimic intelligence but cannot genuinely understand physical reality, because reality is not tokenised: <em>"it's continuous, noisy and high-dimensional."</em> Real intelligence, on that account, comes from observing the world, predicting what happens next, acting, and updating — in a tight loop that animals run effortlessly and that LLMs, confined to their text stream, cannot enter on their own.</p>
+
+  <p>The case studies in this report, however useful, are LLMs operating firmly on the language-only side of that line. The methodology compresses the <em>retrieval and reasoning</em> cost of scientific work by an order of magnitude — which is real value, and worth having. But it does not cross the threshold LeCun is pointing at. It does not make the agent smarter about reality; it only makes it faster at consulting what has already been written down about reality.</p>
+
+  <h3 id="outlook-labster">6.1 What we are actually working on</h3>
+
+  <p>The project we are building at DLH-lab, under the name <strong>LabSter</strong>, is our attempt to cross that threshold — at least in a narrow, tractable way. It is a self-driving laboratory: an automated inspection platform in which an AI agent we call <strong>FERA</strong> (Field Embedded Research Agent) decides what to look at, under what conditions, and what to do next — not by consulting databases, but by <em>watching a real sample</em> and <em>acting on it</em>. It observes, predicts, acts, and learns from the difference between prediction and outcome. That loop is the thing LeCun keeps pointing at. We are not claiming to solve world-models-as-a-research-programme; we are claiming to build one instance of the loop, on one piece of real hardware, and to see what happens.</p>
+
+  <p>LabSter is under active construction as of this writing. The reasons we find it genuinely exciting — beyond the engineering interest of making the pieces work — are three.</p>
+
+  <p><strong>First, it changes what a scientific question costs.</strong> In a traditional lab the unit of iteration is measured in hours or days: you design, you run, you interpret, you queue the next thing. In LabSter the unit collapses toward minutes, because the loop that connects observation, decision, and next action is no longer pipelined through human working hours. Questions that currently don't get asked because <em>"it'd take a week to set up"</em> become routine.</p>
+
+  <p><strong>Second, it changes what the agent can <em>know</em>.</strong> An LLM that only reads databases has a ceiling set by what someone has already published. An agent embedded in a hardware loop has no such ceiling — every observation is a data point that was not in its training set, and every action is a commitment that generates new ground truth. That asymmetry, compounded, is the gap between consulting reality and participating in it.</p>
+
+  <p><strong>Third, it is a bet on where this technology actually goes.</strong> The next meaningful step in applied AI is, in our reading, not bigger text models but agents that cross into the physical world — in factories, hospitals, and laboratories, where the sensors are analog and the consequences are irreversible. LabSter is our small corner of that bet.</p>
+
+  <div class="callout">
+    <strong>Open source — Faraday</strong>
+    The piece of LabSter that turns MQTT and REST messages into coordinated stage, illumination, and camera actions — the layer that the agent actually talks to — is being developed in the open at <a href="https://github.com/DataLabHell/faraday"><code>github.com/DataLabHell/faraday</code></a>. We publish it under an open-source licence because the self-driving-laboratory community benefits more from shared primitives than from proprietary re-implementations of the same basic plumbing. For readers curious about how the "agent meets hardware" side of this works in practice, the repository is the canonical reference — and contributions from outside DLH-lab are welcome.
+  </div>
+
+  <h3 id="outlook-roleofmcp">6.2 Where this report fits</h3>
+
+  <p>Inside that larger project, the MCP methodology demonstrated in Cases A and B has a specific and important role to play, but not the central one. When the agent has to decide <em>what is worth measuring next</em> — before it commits hardware time to the attempt — it will need to consult the accumulated record of what is already known: the reference spectra, the tabulated thermochemistry, the catalogued anomalies. That is exactly what Cases A and B demonstrate the methodology is good at. The retrieval-and-reasoning loop becomes a planning-time check inside a larger observe-and-act loop. The agent keeps its grounding in the written record of science while it crosses the threshold into doing new science.</p>
+
+  <p>Everything else — the specific architecture, the models, the hardware, the timeline — will be documented as the system comes together. For now, the intended effect of this report is more modest: to show that one piece of the toolkit already works, to be honest about what it does and does not cover, and to suggest why we think the larger project is worth the effort.</p>
+
+  <p>Whether we are right about the threshold is, of course, an empirical question. Watch this space.</p>
+
+
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       7. CAVEATS
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <h2 id="caveats">7. Caveats and limitations</h2>
+
+  <p>An honest accounting of where this methodology fell short — and where it is likely to fall short again in operational use — is important for anyone considering deploying it. We document five limitations here, grouped by where they sit in the stack.</p>
+
+  <h3>7.1 Database coverage gaps</h3>
+
+  <p>Neither case study exercised the full tool surface of the <code>science-data</code> MCP (see §2.3). More importantly, several operationally interesting databases are <em>not</em> exposed by the current server. Case B would have been substantially strengthened by access to HITRAN line-by-line line strengths and pressure-broadening coefficients; we worked around this with the Sadtler gas-phase reference spectra, but a production NDIR design calculation needs HITRAN. Case A is bounded by PubChem's own coverage — computed XLogP3 values are not experimental logP values, and the "ground truth" comparison against Hansch/Sangster had to come from prior literature rather than a live database call. <strong>Closing the HITRAN gap is the single most valuable extension we would prioritise for the science-data MCP.</strong></p>
+
+  <h3>7.2 Tool reliability under load</h3>
+
+  <p>During our sessions, two endpoint families showed intermittent availability issues. The NIST ASD and NIST CODATA endpoints returned HTTP 403 / robots.txt blocks during the Case A session, and a <code>codata_get</code> call during Case B timed out after four minutes of no response. Other calls in the same sessions returned in seconds. The server is live but has load-dependent reliability. Operational implications: any production FERA loop that depends on MCP calls should treat them as <em>mostly reliable, retry-and-fall-back</em> rather than <em>always available</em>. A caching layer in front of frequently-used tools (the CO spectra, say) would be a modest engineering investment with a large operational payoff.</p>
+
+  <h3>7.3 First-order physics only</h3>
+
+  <p>The selectivity index $S$ defined in Case B is a first-order single-number summary. A real analyzer design also has to consider detector noise equivalent power, optical filter manufacturability (20 cm<sup>−1</sup> bandpass filters exist but cost more than 80 cm<sup>−1</sup> ones), and the effect of pressure broadening at field operating conditions. None of these change the qualitative conclusion about P-branch vs. R-branch asymmetry, but they would shift the exact recommended bandpass by a few wavenumbers. Analogously in Case A, the $2\sigma$ significance of the octane anomaly is computed against the in-sample residuals only and does not account for prior knowledge of the PubChem XLogP3 algorithm's known quirks for low-CID entries.</p>
+
+  <h3>7.4 Ground-truth comparison requires external knowledge</h3>
+
+  <p>Neither case study's key finding is fully verifiable from the MCP data alone. The octane anomaly is only meaningful once compared to experimental literature logP values; the water-asymmetry finding is only reportable because we know from independent spectroscopy knowledge that the CO R-branch falls between H<sub>2</sub>O rotational lines. An agent operating purely on the MCP output would flag both anomalies but would be unable to distinguish "genuine finding" from "methodology artefact" without external comparison. <strong>Human domain expertise remains in the loop; the methodology compresses the time-to-first-draft, not the time-to-verified-result.</strong></p>
+
+  <h3>7.5 Reproducibility is tool-version dependent</h3>
+
+  <p>The MCP tool schemas, the underlying database versions, and (in some cases) the computed property values can all change between sessions. PubChem re-computes XLogP3 values periodically; NIST occasionally adds or replaces JCAMP-DX records in the Chemistry WebBook. A fully reproducible pipeline needs to log not just the tool calls but also the tool and database versions at call time. This is currently a manual hygiene step, not an enforced property of the MCP protocol.</p>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       8. CONCLUSION
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <h2 id="conclusion">8. Conclusion</h2>
+
+  <p>We have demonstrated two end-to-end workflows in which a large language model (Claude) was connected to authoritative NIST and PubChem reference databases via the Model Context Protocol and autonomously produced useful scientific work. The two case studies were deliberately chosen to probe different modes of use — retrospective database audit versus prospective engineering design — and we now summarise what the combination tells us.</p>
+
+  <p>Three concrete results emerged:</p>
+
+  <ol style="padding-left:1.5rem; margin:1.2rem 0;">
+    <li style="margin-bottom:0.6rem"><strong>Data-quality finding (Case A):</strong> PubChem's XLogP entry for octane (CID 356) breaks the otherwise tight linear trend of the n-alkane series, recording a value ≈1.3 log units below experimental literature consensus. This may reflect a computed-property artefact, a legacy database entry not refreshed under the current XLogP3 algorithm, or differences between the XLogP3 algorithm and experimental logP values for this compound. The anomaly is reportable to database curators as a candidate for follow-up.</li>
+    <li style="margin-bottom:0.6rem"><strong>Empirical scaling law (Case A):</strong> PubChem's Complexity metric scales as Complexity(n) ≈ 0.257 · n<sup>2.07</sup> for linear alkanes ($R^2 = 0.9996$), with the super-quadratic exponent physically interpretable from the structure of the Bertz complexity algorithm. An odd-even oscillation in the increments is flagged as a candidate for further theoretical analysis.</li>
+    <li><strong>Methodological demonstration (Case B):</strong> For NDIR measurement of trace CO in a pure H<sub>2</sub> carrier stream, a narrow bandpass (≈2170–2190 cm<sup>−1</sup>) centred on the CO peak is qualitatively favoured over a classic full-band default, with an apparent selectivity improvement of order 1.7× in a first-order integration-based metric. This is qualitatively consistent with an asymmetry in H<sub>2</sub>O absorption across the CO fundamental band visible in the NIST reference spectra. The result is a concept demonstration of the MCP-driven workflow, not a validated instrument design; band selection for a deployed analyzer should be based on line-by-line gas-phase data (e.g. HITRAN) under matched operating conditions.</li>
+  </ol>
+
+  <p>Methodologically, we argue that LLM-agentic MCP-driven workflows occupy a specific and under-served niche: <em>tasks requiring systematic shallow sweeps across many database entries, with inline reasoning and written synthesis</em>. In both case studies, wall-clock time was reduced by ≈85–90% versus the traditional workflow, and the marginal cost of running the same recipe against a new target dropped to minutes. The methodology does not replace domain expertise — the human researcher still owns the final verification and interpretation — but it substantially shifts the cost curve of that expertise from "expensive to produce" to "expensive only to verify." The Case B results in particular should be read as a concept demonstration of workflow capability, not as a validated instrument design: the numerical selectivity values are first-order indicators from heterogeneous NIST reference data, and a deployable analyzer would need HITRAN-based line-by-line modelling under matched operating conditions.</p>
+
+  <p>For DLH-lab specifically, the immediate operational step is to wire the <code>science-data</code> MCP into our existing Ollama and Claude Desktop setup, making it routinely available to the lab. The larger context — why we built the capability in the first place, and where we think it leads — is the subject of §6: the self-driving laboratory project (LabSter) that we are currently building, and the broader bet that the interesting next step in applied AI is agents crossing from text into the physical world.</p>
+
+  <hr>
+
+  <p style="font-size:0.85rem; color:var(--muted); font-style:italic;">
+    Both case studies were performed by Claude (Anthropic) running as an agent with access to a <code>science-data</code> MCP server: Case A using Sonnet 4.5, Case B using Opus 4.7. All database queries are live tool calls, not recalled from model training memory. The analysis, interpretation, and written synthesis are the models' own, with human oversight at DLH-lab. Raw query logs, the CO analysis script, and high-resolution figures are available from the authors on request.
+  </p>
+
+</main>
+
+<footer></footer>
+
+<script>
+// components.js wraps <main>'s contents via innerHTML assignment, which
+// detaches the original canvas nodes. Defer chart creation until after
+// that wrapping has happened (deferred scripts run before DOMContentLoaded).
+window.addEventListener('DOMContentLoaded', function () {
+
+// ════════════════════════════════════════════════════════════════════
+// CO analyzer post — two Chart.js figures built from real NIST data
+// (downsampled from 880 pts @ 4 cm⁻¹ to ~110 pts full-range / 63 pts zoom)
+// ════════════════════════════════════════════════════════════════════
+
+// Full-range, step = 32 cm⁻¹
+const cof_x = [450,482,514,546,578,610,642,674,706,738,770,802,834,866,898,930,962,994,1026,1058,1090,1122,1154,1186,1218,1250,1282,1314,1346,1378,1410,1442,1474,1506,1538,1570,1602,1634,1666,1698,1730,1762,1794,1826,1858,1890,1922,1954,1986,2018,2050,2082,2114,2146,2178,2210,2242,2274,2306,2338,2370,2402,2434,2466,2498,2530,2562,2594,2626,2658,2690,2722,2754,2786,2818,2850,2882,2914,2946,2978,3010,3042,3074,3106,3138,3170,3202,3234,3266,3298,3330,3362,3394,3426,3458,3490,3522,3554,3586,3618,3650,3682,3714,3746,3778,3810,3842,3874,3906,3938];
+const cof_y = [0.0089,0.0036,0.0063,0.0032,0.0047,0.0057,0.0052,0.0051,0.0054,0.0046,0.0043,0.0052,0.0058,0.0039,0.0047,0.0052,0.0048,0.0042,0.0047,0.0041,0.0044,0.0042,0.0040,0.0041,0.0041,0.0041,0.0035,0.0032,0.0036,0.0036,0.0033,0.0032,0.0030,0.0025,0.0035,0.0027,0.0026,0.0032,0.0027,0.0031,0.0019,0.0023,0.0026,0.0017,0.0015,0.0024,0.0023,0.0029,0.0046,0.0286,0.0782,0.1649,0.2156,0.0761,0.2721,0.1703,0.0421,0.0030,0.0018,0.0025,0.0021,0.0009,0.0010,0.0006,0.0007,0.0012,0.0009,0.0014,0.0009,0.0008,0.0014,0.0011,0.0005,0.0010,0.0007,0.0013,0.0010,0.0006,0.0015,0.0012,0.0008,0.0013,0.0008,0.0010,0.0010,0.0010,0.0010,0.0010,0.0013,0.0010,0.0014,0.0013,0.0012,0.0019,0.0016,0.0013,0.0013,0.0020,0.0018,0.0011,0.0012,0.0013,0.0016,0.0030,0.0025,0.0029,0.0026,0.0020,0.0026,0.0012];
+const co2f_y = [0.0000,0.0257,0.0139,0.0197,0.0251,0.0228,0.0780,0.1561,0.0644,0.0328,0.0289,0.0267,0.0245,0.0263,0.0238,0.0212,0.0208,0.0192,0.0191,0.0183,0.0168,0.0174,0.0164,0.0151,0.0154,0.0155,0.0149,0.0146,0.0146,0.0138,0.0139,0.0134,0.0134,0.0131,0.0135,0.0130,0.0122,0.0122,0.0119,0.0118,0.0109,0.0103,0.0101,0.0097,0.0095,0.0093,0.0092,0.0087,0.0087,0.0084,0.0084,0.0081,0.0074,0.0075,0.0068,0.0067,0.0154,0.0537,0.3875,0.5815,0.6833,0.0051,0.0055,0.0050,0.0041,0.0039,0.0034,0.0033,0.0031,0.0027,0.0023,0.0024,0.0025,0.0028,0.0032,0.0028,0.0027,0.0025,0.0027,0.0022,0.0023,0.0025,0.0028,0.0028,0.0036,0.0036,0.0036,0.0041,0.0044,0.0048,0.0053,0.0048,0.0053,0.0050,0.0052,0.0062,0.0055,0.0113,0.0247,0.0179,0.0109,0.0225,0.0204,0.0312,0.0033,0.0032,0.0031,0.0051,0.0046,0.0052];
+const h2of_y = [0.0061,0.0894,0.0981,0.0850,0.0564,0.0138,0.0483,0.0204,0.0368,0.0234,0.0176,0.0254,0.0214,0.0187,0.0232,0.0197,0.0206,0.0255,0.0162,0.0241,0.0268,0.0177,0.0276,0.0273,0.0223,0.0305,0.0300,0.0954,0.0457,0.1366,0.1587,0.0829,0.4156,0.4727,0.3866,0.1828,0.0281,0.2151,0.1491,0.4677,0.1982,0.1908,0.2180,0.1300,0.0501,0.0856,0.1220,0.0238,0.0129,0.0552,0.0135,0.0156,0.0174,0.0139,0.0107,0.0106,0.0087,0.0047,0.0107,0.0150,0.0101,0.0131,0.0129,0.0119,0.0155,0.0145,0.0153,0.0175,0.0164,0.0195,0.0199,0.0202,0.0224,0.0201,0.0224,0.0242,0.0231,0.0257,0.0264,0.0301,0.0312,0.0267,0.0253,0.0337,0.0312,0.0328,0.0367,0.0380,0.0382,0.0401,0.0425,0.0458,0.0564,0.0553,0.0730,0.0638,0.0990,0.0692,0.2543,0.2965,0.4934,0.1664,0.3803,0.3807,0.1038,0.1578,0.3825,0.2910,0.3997,0.0824];
+const ch4f_y = [0.0000,0.0064,0.0069,0.0075,0.0069,0.0032,0.0062,0.0075,0.0061,0.0050,0.0042,0.0043,0.0046,0.0050,0.0040,0.0054,0.0043,0.0040,0.0048,0.0043,0.0047,0.0054,0.0047,0.0066,0.0183,0.0398,0.0460,0.0050,0.0802,0.0304,0.0069,0.0057,0.0068,0.0075,0.0082,0.0050,0.0050,0.0050,0.0053,0.0061,0.0049,0.0051,0.0049,0.0049,0.0044,0.0039,0.0047,0.0040,0.0038,0.0045,0.0038,0.0036,0.0042,0.0038,0.0038,0.0040,0.0041,0.0049,0.0062,0.0061,0.0066,0.0030,0.0041,0.0042,0.0035,0.0047,0.0041,0.0036,0.0049,0.0043,0.0032,0.0037,0.0047,0.0092,0.0086,0.0076,0.0151,0.0141,0.0307,0.0517,0.1798,0.0184,0.0258,0.0843,0.0267,0.0377,0.0113,0.0119,0.0187,0.0095,0.0162,0.0182,0.0127,0.0185,0.0179,0.0154,0.0213,0.0184,0.0200,0.0210,0.0184,0.0250,0.0216,0.0208,0.0272,0.0236,0.0242,0.0283,0.0236,0.0266];
+
+new Chart(document.getElementById('chart-co-overview'), {
+  type: 'line',
+  data: {
+    labels: cof_x,
+    datasets: [
+      { label: 'CO (analyte)',        data: cof_y,   borderColor: '#c0392b', backgroundColor: 'rgba(192,57,43,0.08)', borderWidth: 2,   pointRadius: 0, tension: 0.15, fill: false },
+      { label: 'CO₂ (interferent)',   data: co2f_y,  borderColor: '#2c3e6b', backgroundColor: 'transparent',          borderWidth: 1.3, pointRadius: 0, tension: 0.15 },
+      { label: 'H₂O (interferent)',   data: h2of_y,  borderColor: '#2d6a2d', backgroundColor: 'transparent',          borderWidth: 1.1, pointRadius: 0, tension: 0.15 },
+      { label: 'CH₄ (interferent)',   data: ch4f_y,  borderColor: '#8c564b', backgroundColor: 'transparent',          borderWidth: 1.1, pointRadius: 0, tension: 0.15 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { family: "'JetBrains Mono'" }, boxWidth: 14, padding: 16 } },
+      tooltip: { callbacks: { title: ctx => `${ctx[0].label} cm⁻¹`, label: ctx => `${ctx.dataset.label}: A = ${ctx.parsed.y.toFixed(4)}` } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Wavenumber (cm⁻¹) — spectroscopy convention, highest on left', font:{family:"'Source Serif 4'"} }, reverse: true, ticks: { maxTicksLimit: 10 } },
+      y: { title: { display: true, text: 'Absorbance (a.u.)', font:{family:"'Source Serif 4'"} }, beginAtZero: true }
+    },
+    interaction: { mode: 'index', intersect: false }
+  }
+});
+
+// Zoom on CO fundamental, step = 8 cm⁻¹
+const co_x = [1950,1958,1966,1974,1982,1990,1998,2006,2014,2022,2030,2038,2046,2054,2062,2070,2078,2086,2094,2102,2110,2118,2126,2134,2142,2150,2158,2166,2174,2182,2190,2198,2206,2214,2222,2230,2238,2246,2254,2262,2270,2278,2286,2294,2302,2310,2318,2326,2334,2342,2350,2358,2366,2374,2382,2390,2398,2406,2414,2422,2430,2438,2446];
+const co_y = [0.0020,0.0027,0.0023,0.0032,0.0036,0.0070,0.0101,0.0135,0.0254,0.0285,0.0399,0.0609,0.0677,0.0818,0.1019,0.1377,0.1570,0.1679,0.1721,0.1924,0.2142,0.2134,0.1918,0.1599,0.0646,0.1381,0.2083,0.2364,0.2619,0.2628,0.2527,0.2262,0.1914,0.1544,0.1156,0.0822,0.0532,0.0319,0.0147,0.0061,0.0032,0.0015,0.0023,0.0026,0.0036,0.0036,0.0031,0.0040,0.0020,0.0017,0.0020,0.0031,0.0023,0.0027,0.0025,0.0009,0.0011,0.0011,0.0011,0.0004,0.0002,0.0008,0.0009];
+const co2_y = [0.0088,0.0091,0.0088,0.0088,0.0085,0.0082,0.0087,0.0086,0.0085,0.0085,0.0087,0.0086,0.0082,0.0083,0.0082,0.0079,0.0085,0.0075,0.0078,0.0073,0.0078,0.0076,0.0075,0.0075,0.0071,0.0069,0.0069,0.0068,0.0070,0.0067,0.0070,0.0067,0.0070,0.0072,0.0082,0.0093,0.0126,0.0178,0.0249,0.0332,0.0440,0.0685,0.1184,0.2306,0.3214,0.4923,0.4887,0.5580,0.5923,0.6410,0.5575,0.9343,0.8691,0.5268,0.2657,0.0526,0.0061,0.0063,0.0059,0.0061,0.0054,0.0050,0.0046];
+const h2o_y = [0.0217,0.0331,0.0598,0.0204,0.0186,0.0743,0.0254,0.0206,0.0329,0.0331,0.0195,0.0253,0.0221,0.0167,0.0219,0.0163,0.0142,0.0163,0.0178,0.0145,0.0148,0.0171,0.0165,0.0138,0.0126,0.0110,0.0090,0.0117,0.0098,0.0115,0.0121,0.0111,0.0124,0.0097,0.0097,0.0070,0.0072,0.0058,0.0057,0.0058,0.0058,0.0082,0.0082,0.0097,0.0098,0.0094,0.0101,0.0088,0.0110,0.0101,0.0154,0.0183,0.0174,0.0167,0.0124,0.0120,0.0109,0.0111,0.0104,0.0106,0.0121,0.0124,0.0139];
+const ch4_y = [0.0042,0.0043,0.0044,0.0045,0.0043,0.0047,0.0042,0.0041,0.0036,0.0037,0.0037,0.0038,0.0043,0.0041,0.0043,0.0044,0.0042,0.0038,0.0036,0.0038,0.0034,0.0038,0.0038,0.0039,0.0043,0.0043,0.0041,0.0041,0.0042,0.0034,0.0032,0.0039,0.0035,0.0038,0.0042,0.0042,0.0045,0.0042,0.0044,0.0038,0.0039,0.0042,0.0046,0.0061,0.0060,0.0079,0.0076,0.0085,0.0071,0.0069,0.0071,0.0059,0.0058,0.0043,0.0048,0.0043,0.0040,0.0047,0.0038,0.0036,0.0040,0.0036,0.0031];
+const h2o_y10 = h2o_y.map(v => v * 10);
+
+// Band-shading via a custom Chart.js plugin — draws rectangles behind the data
+const bandShading = {
+  id: 'bandShading',
+  beforeDatasetsDraw: (chart) => {
+    const {ctx, chartArea, scales} = chart;
+    if (!scales.x) return;
+    // P-branch side: 2050–2143 cm⁻¹ (green tint, high H₂O load)
+    const xP1 = scales.x.getPixelForValue(2050);
+    const xP2 = scales.x.getPixelForValue(2142);
+    ctx.fillStyle = 'rgba(45,106,45,0.12)';
+    ctx.fillRect(Math.min(xP1,xP2), chartArea.top, Math.abs(xP2-xP1), chartArea.bottom-chartArea.top);
+    // R-branch side: 2143–2220 cm⁻¹ (gold tint, cleaner window)
+    const xR1 = scales.x.getPixelForValue(2142);
+    const xR2 = scales.x.getPixelForValue(2220);
+    ctx.fillStyle = 'rgba(240,210,50,0.22)';
+    ctx.fillRect(Math.min(xR1,xR2), chartArea.top, Math.abs(xR2-xR1), chartArea.bottom-chartArea.top);
+    // CO peak line at 2178
+    const xPeak = scales.x.getPixelForValue(2178);
+    ctx.strokeStyle = 'rgba(26,26,24,0.5)';
+    ctx.setLineDash([3,3]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(xPeak, chartArea.top); ctx.lineTo(xPeak, chartArea.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+};
+
+new Chart(document.getElementById('chart-co-zoom'), {
+  type: 'line',
+  data: {
+    labels: co_x,
+    datasets: [
+      { label: 'CO',           data: co_y,    borderColor: '#c0392b', borderWidth: 2.2, pointRadius: 0, tension: 0.2, fill: false },
+      { label: 'CO₂',          data: co2_y,   borderColor: '#2c3e6b', borderWidth: 1.3, pointRadius: 0, tension: 0.2, fill: false },
+      { label: 'H₂O',          data: h2o_y,   borderColor: '#2d6a2d', borderWidth: 1.1, pointRadius: 0, tension: 0.2, fill: false },
+      { label: 'H₂O ×10 (visibility)', data: h2o_y10, borderColor: 'rgba(45,106,45,0.6)', borderDash: [5,3], borderWidth: 1.3, pointRadius: 0, tension: 0.2, fill: false },
+      { label: 'CH₄',          data: ch4_y,   borderColor: '#8c564b', borderWidth: 1.1, pointRadius: 0, tension: 0.2, fill: false }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { family: "'JetBrains Mono'" }, boxWidth: 14, padding: 14, filter: item => true } },
+      tooltip: { callbacks: { title: ctx => `${ctx[0].label} cm⁻¹`, label: ctx => `${ctx.dataset.label}: A = ${ctx.parsed.y.toFixed(4)}` } }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Wavenumber (cm⁻¹)', font:{family:"'Source Serif 4'"} }, reverse: true },
+      y: { title: { display: true, text: 'Absorbance (a.u.)', font:{family:"'Source Serif 4'"} }, beginAtZero: true, suggestedMax: 0.32 }
+    },
+    interaction: { mode: 'index', intersect: false }
+  },
+  plugins: [bandShading]
+});
+
+// ════════════════════════════════════════════════════════════════════
+// Older post charts (unchanged)
+// ════════════════════════════════════════════════════════════════════
+
+// ── Chart 1: XLogP vs n ──────────────────────────────────────────
+const ns = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+const xlogp = [0.6,1.3,1.8,2.9,3.4,3.9,4.4,3.9,4.5,5.0,5.6,6.1,6.6,7.2,7.7,8.3,8.8,9.3,9.9,10.4];
+
+// Linear fit excluding n=8
+const ns_fit = ns.filter(n => n !== 8);
+const xl_fit = xlogp.filter((v,i) => ns[i] !== 8);
+// Simple least squares
+const n_f = ns_fit.length;
+const sx = ns_fit.reduce((a,b)=>a+b,0);
+const sy = xl_fit.reduce((a,b)=>a+b,0);
+const sxy = ns_fit.reduce((a,b,i)=>a+b*xl_fit[i],0);
+const sx2 = ns_fit.reduce((a,b)=>a+b*b,0);
+const slope = (n_f*sxy - sx*sy)/(n_f*sx2 - sx*sx);
+const intercept = (sy - slope*sx)/n_f;
+const trendline = ns.map(n => slope*n + intercept);
+
+const pointColors = ns.map(n => n===8 ? '#c0392b' : '#2c3e6b');
+const pointRadius = ns.map(n => n===8 ? 7 : 4);
+
+new Chart(document.getElementById('chart1'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: 'XLogP (PubChem)',
+        data: ns.map((n,i) => ({x:n, y:xlogp[i]})),
+        backgroundColor: pointColors,
+        pointRadius: pointRadius,
+        pointHoverRadius: 8,
+        showLine: true,
+        borderColor: 'rgba(44,62,107,0.25)',
+        borderWidth: 1,
+        tension: 0.1
+      },
+      {
+        label: 'Linear trend (excl. n=8)',
+        data: ns.map((n,i) => ({x:n, y:trendline[i]})),
+        type: 'line',
+        borderColor: 'rgba(100,100,100,0.5)',
+        borderDash: [6,4],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { family: "'JetBrains Mono'" }, boxWidth: 14, padding: 16 } },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const n = ctx.parsed.x;
+            const label = n===8 ? '⚠ octane (anomaly)' : `n=${n}`;
+            return `${label}: XLogP = ${ctx.parsed.y}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: { title: { display: true, text: 'Carbon chain length n', font:{family:"'Source Serif 4'"} }, min:0, max:21 },
+      y: { title: { display: true, text: 'XLogP', font:{family:"'Source Serif 4'"} } }
+    }
+  }
+});
+
+// ── Chart 2: Complexity vs n ──────────────────────────────────────
+const complexity = [0,0,0,2,7,12,19,25,33,40,49,56,66,74,84,92,103,112,123,132];
+
+// Power law fit y = a * n^b, fit on log-log for n=5..20
+const ns5 = ns.slice(4); // n=5..20
+const c5 = complexity.slice(4);
+// log-linear fit: log(c) = log(a) + b*log(n)
+const logn = ns5.map(Math.log);
+const logc = c5.map(Math.log);
+const m = ns5.length;
+const slx = logn.reduce((a,b)=>a+b,0);
+const sly = logc.reduce((a,b)=>a+b,0);
+const slxy = logn.reduce((a,b,i)=>a+b*logc[i],0);
+const slx2 = logn.reduce((a,b)=>a+b*b,0);
+const beta = (m*slxy - slx*sly)/(m*slx2 - slx*slx);
+const alpha_coef = Math.exp((sly - beta*slx)/m);
+
+const powFit = ns.map(n => alpha_coef * Math.pow(n, beta));
+
+new Chart(document.getElementById('chart2'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: 'Complexity (PubChem)',
+        data: ns.map((n,i) => ({x:n, y:complexity[i]})),
+        backgroundColor: ns.map(n => n<=3 ? 'rgba(44,62,107,0.25)' : '#2c3e6b'),
+        pointRadius: ns.map(n => n<=3 ? 4 : 5),
+        showLine: true,
+        borderColor: 'rgba(44,62,107,0.25)',
+        borderWidth: 1,
+      },
+      {
+        label: `Power law: ${alpha_coef.toFixed(3)}·n^${beta.toFixed(2)} (n≥5)`,
+        data: ns.slice(4).map((n,i) => ({x:n, y:powFit[i+4]})),
+        type: 'line',
+        borderColor: 'rgba(192,100,0,0.7)',
+        borderDash: [6,4],
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { family: "'JetBrains Mono'" }, boxWidth: 14, padding: 16 } },
+    },
+    scales: {
+      x: { title: { display: true, text: 'Carbon chain length n', font:{family:"'Source Serif 4'"} }, min:0, max:21 },
+      y: { title: { display: true, text: 'Complexity (Bertz)', font:{family:"'Source Serif 4'"} } }
+    }
+  }
+});
+
+}); // end DOMContentLoaded
+</script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'base',
+  themeVariables: {
+    primaryColor: '#f0ead6',
+    primaryTextColor: '#1a1a18',
+    primaryBorderColor: '#d4cfc4',
+    lineColor: '#6b6760',
+    secondaryColor: '#f7f5ef',
+    tertiaryColor: '#e8e4d8',
+    edgeLabelBackground: '#f7f5ef',
+    clusterBkg: '#f7f5ef',
+    clusterBorder: '#d4cfc4',
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '13px'
+  },
+  flowchart: { curve: 'basis', padding: 20 }
+});
+</script>
+</body>
+</html>
