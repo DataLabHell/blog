@@ -457,6 +457,24 @@ header {
   display: none;
 }
 
+/* ── POST FIGURES ────────────────────────── */
+[data-post] figure {
+  margin: 2rem 0;
+}
+
+[data-post] figure img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
+
+[data-post] figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+}
+
 /* ── RESPONSIVE ──────────────────────────── */
 @media (max-width: 700px) {
   .nav-blog {

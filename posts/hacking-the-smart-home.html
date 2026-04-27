@@ -257,6 +257,10 @@
         serial can be integrated this way. In my case: the solar inverter and
         the smart meter.
       </p>
+      <figure>
+        <img src="/static/posts/hacking-the-smart-home/inverter-ew11-dongle.webp" alt="Elfin EW11 Wi-Fi to RS485 dongle" loading="lazy" />
+        <figcaption>The Elfin EW11 — a €25 serial-to-Wi-Fi bridge that replaces proprietary gateways</figcaption>
+      </figure>
 
       <h2 data-i18n="h_inverter">
         Reading the inverter and smart meter locally
@@ -267,6 +271,10 @@
         Modbus RTU polling every 10 seconds, data lands directly in HA.
         Real-time PV generation, no cloud required.
       </p>
+      <figure>
+        <img src="/static/posts/hacking-the-smart-home/inverter-ew11-dongle-com-port.webp" alt="EW11 dongle connected to the inverter's RS485 COM port" loading="lazy" />
+        <figcaption>EW11 plugged into the inverter's RS485 port — Modbus RTU over Wi-Fi, no cloud</figcaption>
+      </figure>
       <p data-i18n="meter_body">
         The smart meter has a "Kundenschnittstelle" — a standardised RJ-12
         customer port. The grid operator provides the decryption key by email on
@@ -274,6 +282,10 @@
         publishes it via MQTT. Result: real-time grid draw and feed-in, voltages
         and currents per phase — fully local.
       </p>
+      <figure>
+        <img src="/static/posts/hacking-the-smart-home/smart-meter.webp" alt="Smart meter with RJ-12 customer interface" loading="lazy" />
+        <figcaption>The smart meter's RJ-12 customer port — the decryption key comes from the grid operator by email</figcaption>
+      </figure>
 
       <h2 data-i18n="h_energy">
         Dynamic electricity prices as a control signal
@@ -342,6 +354,10 @@
         microcontroller, and the reading is published via MQTT. Total cost:
         around €15 per meter.
       </p>
+      <figure>
+        <img src="/static/posts/hacking-the-smart-home/ai-on-the-edge-gasmeter.webp" alt="ESP32-CAM with AI on the Edge Device firmware mounted on a gas meter" loading="lazy" />
+        <figcaption>ESP32-CAM running AI on the Edge Device — TensorFlow Lite digit recognition directly on the microcontroller</figcaption>
+      </figure>
       <pre><code>PV production > household consumption?
   |
   +-- Battery not full?      → charge battery         (priority 1)
