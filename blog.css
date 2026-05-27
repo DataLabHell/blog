@@ -381,6 +381,44 @@ header {
   margin: 2.5rem 0;
 }
 
+.post-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.post-subtitle-row p {
+  margin: 0;
+}
+
+.pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0 1.75rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pdf-link:hover {
+  background: var(--off-white);
+  border-color: var(--accent);
+}
+
+.pdf-link svg {
+  width: 1.75rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
 
 /* ── COOKIE BANNER ───────────────────────── */
 #cookie-banner {
