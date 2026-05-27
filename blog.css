@@ -44,10 +44,16 @@ header {
 .tag-filter {
   display: flex;
   align-items: stretch;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
   background: var(--white);
   border-bottom: 2px solid var(--light-gray);
   margin-bottom: 0;
+}
+
+.tag-filter::-webkit-scrollbar {
+  display: none;
 }
 
 .tag-filter-btn {

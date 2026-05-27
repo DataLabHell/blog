@@ -185,7 +185,9 @@
             tagCounts[tag] = (tagCounts[tag] || 0) + 1;
           });
         });
-        var allTags = Object.keys(tagCounts).sort(function (a, b) {
+        var allTags = Object.keys(tagCounts).filter(function (tag) {
+          return tagCounts[tag] > 1;
+        }).sort(function (a, b) {
           return tagCounts[b] - tagCounts[a];
         });
 
