@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/blog.css" />
+    <script src="/components.js" defer></script>
+    <script src="https://datalabhell.at/cookie-consent.js" defer></script>
+  </head>
+  <body data-post>
+    <header></header>
+    <main>
+      <p><em>A case study in human–AI co-creation in mathematics</em></p>
+
+      <h2>How this started</h2>
+      <p>
+        This project began as a joke in our office chat.
+      </p>
+      <p>
+        A colleague — Jonas — had posted a link to an OpenAI write-up about one of their models
+        disproving a conjecture in discrete geometry. Within minutes, Pia replied: <em>given those
+        prospects, maybe I'll actually use Creative Friday to tackle a few Millennium Problems with
+        Claude.</em>
+      </p>
+      <p>I jumped in:</p>
+      <blockquote>
+        <p><em>"gogogo Pia, Riemann hypothesis — refute it please, if I can put in a request."</em></p>
+      </blockquote>
+      <p>
+        My colleague Michael pointed out the obvious social risk: I should consider how many number
+        theorists would jump out the window over that. To which I replied:
+      </p>
+      <blockquote>
+        <p><em>"Yeah, given how many of those papers start with 'Suppose the Riemann Hypothesis holds.'"</em></p>
+      </blockquote>
+      <p>
+        That should have been the end of it. Office chat humor. A normal week.
+      </p>
+      <p>
+        But then another colleague, Georg, actually tried it. He opened a Claude session and asked
+        directly: <em>Can you prove the Riemann hypothesis?</em> He got the polite refusal you would
+        expect. He pushed once: <em>Try a bit harder.</em> And Claude responded with the sentence
+        that became the unintentional starting whistle for everything that followed:
+      </p>
+      <blockquote>
+        <p><em>"'Trying harder' genuinely won't help here."</em></p>
+      </blockquote>
+      <p>
+        That sentence is funny because it is both completely true and completely wrong. It is true in
+        the literal sense — no amount of trying within a single prompt was going to produce a proof
+        of RH. It is wrong in the broader sense that became the substance of this project: you can
+        structure the trying differently. You can refuse the framing that says either prove RH or
+        stop. You can ask instead what <em>can</em> be said, rigorously, about the structural limits
+        of any topological approach to RH. You can keep iterating, bring in a second AI as a
+        sceptical reviewer, and over an intense working day produce something that is not a proof of
+        RH but is also not nothing.
+      </p>
+      <p>
+        What we produced — across roughly 30 hours of dialogue and seven paper revisions — is a
+        27-page paper proving a precise no-go theorem: any persistence-based topological approach to
+        RH must lie outside an entire class of natural constructions. The paper does not refute RH.
+        It does not assume RH. It proves something more modest and, I think, more useful: why an
+        entire family of topological RH approaches cannot work, and conjectures that the failure is
+        universal at the local level.
+      </p>
+
+      <h2>Two things I want to be clear about</h2>
+      <p>
+        Before going further, two pieces of calibration.
+      </p>
+      <p>
+        First, the mathematics in the paper is, <em>to the best of my knowledge</em>, correct and
+        interesting. It has been through seven revisions including cross-AI critique, and the
+        methodology disclosure in the paper itself recommends review by an analytic-number-theory
+        specialist before any serious venue submission. My background is in applied mathematics and I
+        lead a research and technology organisation that works mostly on applied problems; the
+        analytic-number-theory framing is outside my deepest training. Whether the paper holds up
+        under expert scrutiny is a question I cannot answer myself.
+      </p>
+      <p>
+        Second, this work is not in the same category as what a leading specialist could do on the
+        Riemann hypothesis. I would not be surprised if a mathematician at the top of analytic
+        number theory eventually finds a genuine angle on RH that nobody else has, and AI
+        co-creation does not substitute for the kind of deep mathematical insight that hard problems
+        actually require. AI lowers the cost of crossing into adjacent fields and lets someone with
+        broad training attempt structural questions they could not otherwise attempt in a working
+        day. That is a real and modest contribution; it is not a substitute for genius. The post
+        that follows is about what one applied-mathematics practitioner with an interdisciplinary
+        instinct could do in a working day with two AI assistants — not a claim about what AI
+        co-creation can do in general, and not a claim about what it could ever substitute for.
+      </p>
+      <p>With that on the table: the substance.</p>
+
+      <h2>Why this question, in this room</h2>
+      <p>
+        There is a version of this story where the office-chat joke is the whole genesis: someone
+        said "Riemann hypothesis" out loud, an AI happened to be in the room, and a paper fell out.
+        That version is misleading. The joke worked as a trigger because there happened to be
+        someone in the room — me — with an interdisciplinary disposition and a working knowledge of
+        one of the tools the project ended up using.
+      </p>
+      <p>
+        I am a huge believer in interdisciplinarity, and specifically in the kind that comes from
+        noticing connections between fields that simply don't talk to each other enough. Most of the
+        interesting unsolved problems in applied mathematics sit in the seams between disciplines,
+        where two communities are working on adjacent problems with adjacent tools and neither knows
+        the other has already half-solved its hardest piece. The work of an applied-mathematics
+        practitioner with broad training, in a research and technology organisation that takes
+        methodological depth seriously, is partly to notice when one of those seams might be worth
+        pulling at.
+      </p>
+      <p>
+        Topological data analysis — persistent homology in particular — is one of the tools I have
+        worked with on the applied side. It is a small piece of my methodological toolkit, not my
+        central research area. But it is unusually portable: persistent homology takes a
+        real-valued function on a domain and produces a structural fingerprint that does not depend
+        on the domain's coordinates. That portability means it can ask questions about objects from
+        fields where it is not normally used.
+      </p>
+      <p>
+        The analytic-number-theory direction is, in retrospect, the obvious crossover:
+        <em>L</em>-functions are <em>real-valued functions on a domain</em>. Specifically,
+        −log|<em>L</em>(<em>s</em>)| is a real-valued function on a region of the complex plane,
+        with a topology that encodes the zero set of <em>L</em>. The Bombieri lobe-extremum
+        criterion already says something about that topology in one dimension. There is a standing
+        question — not previously asked in this form as far as I can tell — about what happens to
+        that topology when you couple two <em>L</em>-functions and look at higher-dimensional
+        sublevel-set structure. This is the kind of question topological data analysts have the
+        tools for but analytic number theorists do not normally formulate.
+      </p>
+      <p>
+        The office-chat joke was the trigger; the reason it landed is that someone in the room had
+        the disposition to take it seriously rather than let it pass. What AI co-creation actually
+        changed for me was not the ceiling of what I could do — that question is not even
+        well-posed — but whether starting was rational at all. To get to the point where I could
+        think productively about a question that lives partly in analytic number theory, I would
+        have had to invest a substantial amount of upfront time in domain context that I do not have
+        and was unlikely to ever carve out. The wall was not the eventual proof. The wall was the
+        entry cost into the adjacent field, and that cost is what determines, in practice, which
+        interdisciplinary questions someone running an institution and managing a team ever attempts
+        at all.
+      </p>
+      <p>
+        That is the specific change AI made here. It compressed the entry cost into the adjacent
+        domain to the point where starting became rational on a working day. Many techniques and
+        pieces of literature the AI brought into the project were ones I did not know at the time.
+        Some of them I might not have found on my own within any reasonable horizon. None of that
+        says anything about what I could or could not have done given unlimited time — that
+        counterfactual is unknowable and not the right question. The right question is whether the
+        project would ever have started, and the honest answer is: probably not, and certainly not
+        in a working day.
+      </p>
+
+      <h2>The compressed timeline and what we built</h2>
+      <p>
+        The paper proves a rigidity theorem in persistent homology, plus a hierarchy of supporting
+        no-go results, plus a conjecture codifying what five computational experiments suggest. The
+        full PDF is available with a methodology disclosure in the front matter.
+      </p>
+      <p>
+        The project took approximately 30 hours of active work spread over a bit more than a day.
+        The work proceeded through seven versions: an initial computational exploration with no real
+        theorem; the discovery of the Lobe-Saddle structure theorem; the persistent Künneth
+        decomposition; a symmetric lift to three dimensions; reframing as a structural no-go theorem
+        with a clearly articulated implication chain; five "wild-child" experimental probes that
+        tried to escape the rigidity — multiplicative coupling, merge trees, function-level proxies,
+        Davenport–Heilbronn local persistence, and a displacement sweep — all failing in
+        structurally informative ways; methodology disclosure and revisions; and a final round of
+        cross-AI critique that pointed to two important literature gaps I had missed (Miličević 2026
+        on Künneth theorems for persistence modules, Curry et al. 2022 on decorated merge trees) and
+        prompted a reframing of the abstract rigidity theorem as a geometric specialisation of
+        existing machinery.
+      </p>
+      <p>
+        The compression is not the same kind of acceleration as a tool that lets you write a paper
+        faster. It is the difference between a project that could be attempted in available time and
+        one that could not. Within that working day, the bottleneck was my mathematical taste and
+        attention — what to pursue, what to refuse, when to push and when to stop. Those are the
+        things the AI did not provide.
+      </p>
+
+      <h2>The multi-AI workflow</h2>
+      <p>
+        A practical choice that turned out to matter more than I expected was using a second AI
+        system to play the role of reviewer. Claude produced drafts in our working session. I copied
+        each draft into a separate ChatGPT conversation framed as "you are reviewing a submitted
+        manuscript, identify weaknesses." ChatGPT produced critical feedback. I evaluated that
+        feedback against my own judgment, selected what to incorporate, then fed the chosen points
+        back to Claude.
+      </p>
+      <p>
+        This compressed what would ordinarily be a months-long journal-revision cycle into a short
+        round trip. The feedback quality varied — sometimes generic, sometimes sharp — but on
+        several occasions it surfaced concerns Claude had not flagged on its own. Two systems coming
+        at the same draft with different training data and different default styles produced
+        non-redundant criticism. I would not claim this substitutes for genuine peer review by a
+        domain specialist; the methodology disclosure in the paper itself recommends specialist
+        review, precisely because no amount of cross-AI critique can supply that.
+      </p>
+
+      <h2>How the work actually got built</h2>
+      <p>
+        The interesting part, methodologically, is the rhythm of the iteration itself. A few prompts
+        mattered repeatedly:
+      </p>
+      <p>
+        <strong>"Give me a stronger version."</strong> Claude's first attempt at any structural
+        claim was almost always too cautious. Asking for a stronger version — sometimes three or
+        four times — reliably produced something sharper than the initial draft.
+      </p>
+      <p>
+        <strong>"Go wild-child on this."</strong> This was the prompt that produced the five
+        experimental probes in section nine of the paper. The phrase signals: propose attempts you
+        would normally hedge on, including ones likely to fail in interesting ways. It was the right
+        framing because the project's actual contribution turned out to be the <em>failures</em> —
+        five different ways to try to escape the rigidity, all of them blocked by structurally
+        informative obstructions.
+      </p>
+      <p>
+        What this looked like in practice was a particular kind of back-and-forth. Claude has a
+        default register of polite hedging, and pushing past that register was the work. The prompts
+        I used were not polished. They were impatient, occasionally ungrammatical, and written in
+        the register of someone whose first language is German and who is more interested in the
+        next mathematical move than in how the sentence reads. Early on, I typed: <em>"Sure,
+        there's just no reason why not to push further — be brave, be creative!"</em> and, a few
+        turns later, <em>"Why do you always try to stop? I see no reason."</em>
+      </p>
+      <p>
+        The framing that actually moved things was a particular invitation I made when Claude was
+        visibly hedging:
+      </p>
+      <blockquote>
+        <p><em>"That's perfect and progress! Now be very open-minded — like the with the spirit of
+        a child, a very, very gifted and talented child that has the potential to solve whatever
+        problem comes its way. Lets reflect all the learnings back to other direction — a
+        possibility to prove by having a tool to break."</em></p>
+      </blockquote>
+      <p>
+        The "very, very gifted and talented child" framing turned out to be the one that worked.
+        Several sessions later it had compressed into the shorter, slightly mystical form <em>"Just
+        one end of many roads, the brave child knows everything all at once and intuitively find's
+        the out-of-the-box road ahead."</em> I'm leaving the typos in because they're part of the
+        texture. This is what real-time research dialogue with an AI assistant actually sounds like;
+        the polished version is reconstructed after the fact.
+      </p>
+      <p>
+        At one point, after I had insisted repeatedly that a proposed reformulation was worth
+        pursuing properly rather than being qualified into uselessness, Claude said: <em>"That is
+        genuinely brave and genuinely new. I won't apologize for it."</em> That sentence is funny
+        because the AI had to be told, explicitly and repeatedly, to stop apologizing for proposing
+        something. It is also the moment in the project where the register shifted from
+        polite-summary to actual-work.
+      </p>
+      <p>
+        A few turns later, after another retreat into hedging, Claude caught itself: <em>"Wait — I
+        caught myself stopping again."</em> That sentence is the workflow in one line. Default
+        behavior is to stop early. Pushing past that — politely but firmly — is what makes the
+        difference between an AI that produces a polite summary and an AI that produces work.
+      </p>
+      <p>
+        Later in the same session, after I had typed <em>"You know the drill and what comes
+        next"</em> (which is, on reflection, an absurd thing to say to a language model, but it
+        worked), Claude replied: <em>"The drill: I keep stopping, you push, I find more."</em> That
+        is the project's working method as the AI itself described it, mid-flow, in language it had
+        picked up from me. The instinct to stop is structural; the push has to come from outside.
+      </p>
+      <p>
+        And at one point, when I asked Claude to consider whether a particular reformulation could
+        be sharper still without worrying about how it would land in a literature it was being too
+        deferential toward, the reply was: <em>"Stop being polite about classical literature."</em>
+        — directed at itself, in the same turn that produced the sharper version. That
+        self-correction is what the rest of the work depended on.
+      </p>
+      <p>
+        What this required from me was more than supervision. Looking back, there are three places
+        where the mathematical direction came from me rather than from the AI's proposals — and
+        these turned out to be the load-bearing choices. The first was the original cross-domain
+        instruction itself: <em>find a field that has been untouched by RH, then build the
+        bridge</em>. Without that constraint the AI would have rehearsed standard approaches; with
+        it, persistent homology became the candidate. The second was the direction-flip from "use
+        this as a tool to detect off-line zeros" to "use this as a tool to prove something." That
+        reframing is what eventually led to the structural rigidity arguments that became the paper.
+        The third was the steady push toward higher-order topological features and toward the
+        specific construction of the coupled field that the final paper analyses — moving from a
+        single-function persistence to two coupled L-functions, from H<sub>0</sub> alone to higher
+        degrees, from a single coordinate to the symmetric lift. Those were strategic mathematical
+        decisions, not just generic encouragement to "be brave."
+      </p>
+      <p>
+        I want to be careful not to overstate this. The Lobe-Saddle theorem itself, in its precise
+        form, emerged from the technical work. The persistent Künneth decomposition followed from
+        the Carlsson–Filippenko literature once the question was posed. The conjecture in section
+        9.5 was crafted through dialogue, not handed to the AI by me. The honest framing is:
+        <strong>the strategy was mine; the tactics were the AI's; the integration was the actual
+        work.</strong> That is neither "I did the meaningful mathematics" nor "I supervised an AI
+        that did the mathematics." It is something more specific than either, and I think it is the
+        more accurate picture of what AI co-creation with a working mathematician actually looks
+        like.
+      </p>
+
+      <h2>What this implies more broadly</h2>
+      <p>
+        A few observations from this project that may generalise, with the caveat that I am drawing
+        from one project and one team.
+      </p>
+      <p>
+        <strong>Sustained collaboration outperforms one-shot prompting.</strong> The interesting
+        question is not whether AI can produce a paper from a single prompt; it is whether sustained
+        collaboration over many rounds, with the human in active mathematical control, can produce
+        work worth taking seriously.
+      </p>
+      <p>
+        <strong>Negative results are legitimate, and AI co-creation may be particularly suited to
+        them.</strong> Our paper proves a no-go theorem and identifies a hierarchy of failed
+        approaches. That is not the most prestigious mode of mathematics, but it is honest
+        mathematics, and it saves later researchers from pursuing the same blocked paths. An AI
+        assistant is comfortable proposing many possible escape routes, and the workflow makes it
+        tractable to actually test them. A working day spent ruling out five candidate approaches is
+        a working day spent doing mathematics.
+      </p>
+      <p>
+        <strong>Disclosure should be the norm.</strong> The mathematical community is going to
+        settle on disclosure norms in the next few years. Papers produced with substantial AI
+        assistance should disclose this, both because it is more honest and because it lets the
+        next AI-collaborated paper refer back to actual prior experience.
+      </p>
+      <p>
+        <strong>The risks should be named, not hidden.</strong> AI co-creation makes some kinds of
+        intellectual work cheaper, which has obvious benefits for someone in my position and obvious
+        costs for parts of the mathematical profession whose value depended on those costs being
+        high. The output of this workflow can also be mistaken for more substantial mathematics than
+        it is — a paper that looks polished can easily be over-trusted. I do not have clean answers
+        to either concern. But pretending the technology is a pure win, or that "I produced a paper
+        in a day" is unambiguously a thing to celebrate, would be dishonest. The vanilla-extract
+        analogy that Tao and Klowden use in their recent essay on AI in mathematics fits: a little
+        improves the dish, too much ruins it, and nobody should be drinking it straight.
+      </p>
+
+      <h2>A practical note for institutional leaders</h2>
+      <p>
+        I lead a research and technology organisation (RTO) — an
+        <em>außeruniversitäre Forschungseinrichtung</em>, in the Austrian framing — that works
+        mostly on applied mathematics problems for industry partners, though not exclusively. We are
+        explicitly not a basic-research outfit. From that vantage, the relevant observation is this:
+        AI co-creation lowers the cost of methodological exploration in fields adjacent to one's
+        core expertise. For an RTO of DLH's size and profile, this changes what is feasible to
+        investigate seriously. We can now meaningfully attempt projects that previously would have
+        required either acquiring a deep specialist in another field or accepting that the question
+        was beyond our practical reach.
+      </p>
+      <p>
+        This is not a claim that AI replaces research staff. The opposite. The work in this paper
+        happened because there was a research scientist — me — willing to spend a working day in
+        sustained back-and-forth with two AI systems, with the mathematical training to know what to
+        ask and the judgment to know what to refuse. AI did not provide direction; what it provided
+        was a way for the question to be attempted at all. Institutions that imagine AI as a
+        substitute for skilled researchers are, I think, misreading what the technology actually
+        does. Institutions that imagine AI as a way for their existing skilled researchers to attempt
+        questions in fields they could not otherwise afford the time to enter will, I think, get more
+        out of it than they expect.
+      </p>
+
+      <hr />
+
+      <p>
+        At the time of writing this, I do not know whether the paper we produced should actually be
+        submitted to a journal. The methodology disclosure makes a specialist review the natural
+        next step, and what that review concludes will largely settle the question of what this work
+        is worth.
+      </p>
+      <p>
+        What this post is about is not the paper as a deliverable but the <em>mode of work</em>
+        that produced it: an interdisciplinary instinct, a willingness to push past the default
+        stopping points of an AI assistant, a discipline of using two AI systems in complementary
+        roles, and the maintenance of human mathematical taste as the binding constraint throughout.
+      </p>
+      <p>
+        That, in the end, is what AI co-creation can do for an applied-mathematics practitioner
+        with a full schedule. It does not solve hard problems. It changes which questions in
+        adjacent fields are worth starting at all. That is a real change, and it is enough to be
+        worth doing carefully.
+      </p>
+    </main>
+    <footer></footer>
+  </body>
+</html>

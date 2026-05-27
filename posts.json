@@ -28,5 +28,18 @@
     "image": "static/posts/smart-home.png",
     "desc": "How I integrated KNX, Home Assistant, and dynamic EPEX Spot pricing to build a fully local, energy-aware smart home — from solar inverter to EV charging.",
     "descDe": "Wie ich KNX, Home Assistant und dynamische EPEX-Spot-Preise zu einem vollständig lokalen, energiebewussten Smart Home kombiniert habe — vom Wechselrichter bis zur E-Auto-Ladung."
+  },
+  {
+    "path": "posts/ai-co-creation-mathematics.html",
+    "title": "How we proved a structural rigidity theorem with an AI assistant — in a day",
+    "date": "2026-05-27",
+    "tags": [
+      "Research",
+      "AI",
+      "Mathematics"
+    ],
+    "author": "Tobias Hell",
+    "image": "static/posts/ai_cocreation.png",
+    "desc": "A case study in human–AI co-creation in mathematics: how we proved a structural rigidity theorem about topological approaches to the Riemann Hypothesis — and what it means for interdisciplinary research."
   }
 ]
