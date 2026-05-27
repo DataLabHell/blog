@@ -96,7 +96,7 @@ header {
 
 .post-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 2px;
   background: var(--light-gray);
   margin-top: 0;
@@ -111,11 +111,6 @@ header {
   overflow: hidden;
   border-left: 3px solid transparent;
   transition: background 0.15s, border-color 0.15s;
-}
-
-.post-card:first-child,
-.post-card:last-child:nth-child(even) {
-  grid-column: 1 / -1;
 }
 
 .post-card:hover {
