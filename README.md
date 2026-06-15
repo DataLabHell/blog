@@ -1,6 +1,6 @@
 # DLH Blog
 
-Static blog for [blog.datalabhell.at](https://blog.datalabhell.at), served via GitHub Pages.
+Static blog for [blog.datalabhell.ac.at](https://blog.datalabhell.ac.at), served via GitHub Pages.
 
 ## Posts
 
@@ -43,4 +43,4 @@ That's it. The card, tag filters, and post hero are all generated automatically.
 
 ## Cookie consent
 
-Loaded from `https://datalabhell.at/cookie-consent.js` — edit it there, both sites update automatically.
+Loaded from `https://datalabhell.ac.at/cookie-consent.js` — edit it there, both sites update automatically.

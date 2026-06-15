@@ -1,6 +1,6 @@
 /* ── Blog shared components ─────────────────────────────────────── */
 (function () {
-  var MAIN_SITE = 'https://datalabhell.at';
+  var MAIN_SITE = 'https://datalabhell.ac.at';
 
   /* ── Resolve static base path (works from / and /posts/) ── */
   var depth = window.location.pathname.split('/').filter(Boolean).length;
@@ -41,7 +41,7 @@
     return m ? m[1] : localStorage.getItem('dlh_lang');
   }
   function setLang(lang) {
-    document.cookie = 'dlh_lang=' + lang + '; path=/; domain=.datalabhell.at; max-age=31536000; SameSite=Lax';
+    document.cookie = 'dlh_lang=' + lang + '; path=/; domain=.datalabhell.ac.at; max-age=31536000; SameSite=Lax';
     localStorage.setItem('dlh_lang', lang);
   }
 
