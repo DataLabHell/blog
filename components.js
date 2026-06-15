@@ -271,7 +271,7 @@
 
   /* ── Post layout injection ── */
   if (document.body.hasAttribute('data-post')) {
-    var currentPath = window.location.pathname.replace(/^\//, '');
+    var currentPath = window.location.pathname.replace(/^\//, '').replace(/\.html$/, '');
     var mainEl = document.querySelector('main');
 
     if (mainEl) {
@@ -287,7 +287,8 @@
       fetchPosts()
         .then(function (posts) {
           var match = posts.filter(function (p) {
-            return p.path === currentPath || p.path.split('/').pop() === currentPath.split('/').pop();
+            var pPath = p.path.replace(/\.html$/, '');
+            return pPath === currentPath || pPath.split('/').pop() === currentPath.split('/').pop();
           })[0];
           if (!match) return;
 
