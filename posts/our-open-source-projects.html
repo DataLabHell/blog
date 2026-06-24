@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/blog.css" />
+    <script>
+      window.POST_TRANSLATIONS = {
+        de: {
+          intro1:
+            'Bei Data Lab Hell entwickeln wir viel internes Tooling für unsere Forschungs- und Entwicklungsarbeit. Manches davon ist allgemein genug, um auch über unsere eigenen Projekte hinaus nützlich zu sein — das veröffentlichen wir offen. Im Folgenden ein Blick auf einige unserer aktuellen Projekte. Es ist nur eine Momentaufnahme; die vollständige und stets aktuelle Liste findet sich in unserer GitHub-Organisation unter <a href="https://github.com/DataLabHell">github.com/DataLabHell</a>.',
+          h_reporter: "Grafana Reporter",
+          reporter:
+            "<strong>Grafana Reporter</strong> ist ein reines Frontend-Grafana-App-Plugin, das jedes Dashboard in ein PDF verwandelt. Es läuft vollständig im Browser über den offiziellen <em>grafana-image-renderer</em> — ohne Backend-Dienst, ohne mitgeliefertes Chromium und ohne Service-Accounts —, sodass Exporte die Datenquellen-Berechtigungen und das RBAC der angemeldeten Person respektieren. Jedes Panel wird über <code>/render/d-solo</code> gerendert und das Ergebnis mit jsPDF zusammengesetzt; dabei werden wiederholte Panels und Template-Variablen (inklusive <code>$__all</code>) korrekt aufgelöst. Layout (Panels pro Seite, Abstände, Ausrichtung), Header-/Footer-Branding mit einer Logo-Bibliothek, Seitenzahlen und eigene Textelemente sind frei konfigurierbar — global, per Query-Parameter oder pro Report — und ausgelöst wird ein Report über einen Dashboard-Link oder eine teilbare URL.",
+          lead_example: "Ein Beispielreport sieht so aus:",
+          cap_reporter:
+            "Ein Beispielreport — ein Dashboard als gebrandetes PDF.",
+          cap_cgstats:
+            "cgstats zeigt CPU-, Speicher- und Festplattennutzung live im Verhältnis zu den cgroup-Limits.",
+          h_cgstats: "cgstats",
+          cgstats:
+            "<strong>cgstats.sh</strong> ist ein einzelnes POSIX-Shell-Skript, das CPU-, Speicher- und Festplattennutzung live direkt aus den Linux-cgroups (v1/v2) anzeigt. Es ist dafür gebaut, innerhalb eines Containers zu laufen — ganz ohne Abhängigkeiten, Agenten, Sidecars oder Prometheus — und zeigt genutzte Kerne im Verhältnis zum Limit, Speicher im Verhältnis zum Limit sowie die Auslastung beliebiger Festplattenpfade. Die Ausgabe erfolgt wahlweise als farbige, menschenlesbare Tabelle (mit konfigurierbaren Warn-/Kritisch-Schwellen) oder als maschinenlesbares JSON für Dashboards und CI; es kann in einem Intervall aktualisieren oder mit <code>--once</code> eine einzelne Messung ausgeben. Die Installation ist ein einzeiliger curl-Befehl, und entwickelt sowie getestet wurde es vorrangig gegen cgroup v2.",
+          h_ulid: "ULID.jl",
+          ulid: "<strong>ULID.jl</strong> ist eine Julia-Implementierung von ULIDs — <em>Unique Lexicographically Sortable Identifiers</em>, eine 128-Bit-ID aus einem 48-Bit-Zeitstempel und 80 Bit Zufall. Anders als string-basierte Implementierungen speichert sie jede ULID als kompakten binären <code>UInt128</code>, was die IDs klein hält und schnell vergleich- und sortierbar macht — bei erhaltener zeitlicher Ordnung. Neue IDs erzeugt man mit <code>ulid()</code> oder parst sie aus ihrer kanonischen Crockford-Base32-Darstellung — praktisch als sortierbare Schlüssel in Datenbanken und verteilten Systemen.",
+          h_okd: "okd-nvidia-image",
+          okd: "<strong>okd-nvidia-image</strong> baut ein ostree-natives Container-Image für OKD 4.x (SCOS), das die offenen NVIDIA-Kernelmodule und die Userspace-Bibliotheken fest einbäckt. Es schichtet Pakete mit <code>rpm-ostree</code> auf die SCOS-Basis — aktiviert CentOS-Stream- und EPEL-Repos, pinnt eine zur Build-Zeit ermittelte CS9-Kernelversion, kompiliert die <code>kmod-nvidia-open-dkms</code>-Module passend zu genau dieser Kernel-ABI und installiert die CUDA-Treiberbibliotheken sowie Werkzeuge wie <code>nvidia-smi</code> — und committet anschließend das gesamte Dateisystem mit <code>ostree container commit</code>. Das Ergebnis wird als Node-Betriebssystem-Image ausgerollt (z.&nbsp;B. über einen MachineConfigPool-<code>osImageURL</code>) und verschafft OKD-Knoten reproduzierbare GPU-Unterstützung.",
+          h_more: "Mehr und Mitmachen",
+          closing:
+            'Das ist nur eine Auswahl dessen, woran wir arbeiten. Alle unsere Open-Source-Projekte liegen in unserer GitHub-Organisation unter <a href="https://github.com/DataLabHell">github.com/DataLabHell</a> — Issues, Ideen und Pull Requests sind willkommen.',
+        },
+        en: {
+          intro1:
+            'At Data Lab Hell we build a lot of internal tooling to support our research and engineering work. Some of it turns out general enough to be useful beyond our own projects, so we release it openly. Below is a look at a few of our current projects. This is only a snapshot — the full, always up-to-date list lives in our GitHub organisation at <a href="https://github.com/DataLabHell">github.com/DataLabHell</a>.',
+          h_reporter: "Grafana Reporter",
+          reporter:
+            "<strong>Grafana Reporter</strong> is a pure front-end Grafana app plugin that turns any dashboard into a PDF. It runs entirely in the browser using Grafana's official <em>grafana-image-renderer</em> — no backend service, no bundled Chromium, and no service accounts — so exports respect the signed-in user's datasource permissions and RBAC. It renders each panel through <code>/render/d-solo</code> and composes the result with jsPDF, resolving repeated panels and template variables (including <code>$__all</code>) along the way. Layout (panels per page, spacing, orientation), header/footer branding with a logo library, page numbers and custom text elements are all configurable — globally, via query parameters, or per run — and a report can be triggered from a dashboard link or a shareable URL.",
+          lead_example: "An example report looks like this:",
+          cap_reporter:
+            "An example report — a dashboard rendered to a branded PDF.",
+          cap_cgstats:
+            "cgstats showing live CPU, memory and disk usage against cgroup limits.",
+          h_cgstats: "cgstats",
+          cgstats:
+            "<strong>cgstats.sh</strong> is a single POSIX shell script that shows live CPU, memory and disk usage straight from Linux cgroups (v1/v2). It is built to run inside a container with zero dependencies — no agents, sidecars or Prometheus — and reports cores used versus the configured limit, memory versus its limit, and usage for arbitrary disk paths. Output is either colorized human-readable tables (with configurable warning/critical thresholds) or machine-readable JSON for dashboards and CI; it can refresh on an interval or print a single sample with <code>--once</code>. Install is a one-line curl, and it has been primarily developed and tested against cgroup v2.",
+          h_ulid: "ULID.jl",
+          ulid: "<strong>ULID.jl</strong> is a Julia implementation of ULIDs — <em>Unique Lexicographically Sortable Identifiers</em>, a 128-bit id combining a 48-bit timestamp with 80 bits of randomness. Unlike string-based implementations, it stores each ULID as a compact binary <code>UInt128</code>, which keeps them small and fast to compare and sort while staying time-ordered. You can generate fresh ids with <code>ulid()</code> or parse them from their canonical Crockford base32 text — handy as sortable keys in databases and distributed systems.",
+          h_okd: "okd-nvidia-image",
+          okd: "<strong>okd-nvidia-image</strong> builds an ostree-native container image for OKD 4.x (SCOS) that bakes in the NVIDIA open kernel modules and userspace libraries. It layers packages onto the SCOS base with <code>rpm-ostree</code> — enabling CentOS Stream and EPEL repos, pinning a specific CS9 kernel detected at build time, compiling the <code>kmod-nvidia-open-dkms</code> modules against that exact kernel ABI, and installing the CUDA driver libraries and tools like <code>nvidia-smi</code> — then commits the whole filesystem with <code>ostree container commit</code>. The result is rolled out as the node OS image (e.g. via a MachineConfigPool <code>osImageURL</code>), giving OKD nodes reproducible GPU support.",
+          h_more: "More, and getting involved",
+          closing:
+            'This is only a handful of the things we work on. All of our open-source projects live in our GitHub organisation at <a href="https://github.com/DataLabHell">github.com/DataLabHell</a> — issues, ideas and pull requests are welcome.',
+        },
+      };
+    </script>
+    <script src="/components.js" defer></script>
+    <script src="https://datalabhell.ac.at/cookie-consent.js" defer></script>
+  </head>
+  <body data-post>
+    <header></header>
+    <main>
+      <p data-i18n-html="intro1">
+        At Data Lab Hell we build a lot of internal tooling to support our
+        research and engineering work. Some of it turns out general enough to be
+        useful beyond our own projects, so we release it openly. Below is a look
+        at a few of our current projects. This is only a snapshot — the full,
+        always up-to-date list lives in our GitHub organisation at
+        <a href="https://github.com/DataLabHell">github.com/DataLabHell</a>.
+      </p>
+
+      <h2 data-i18n="h_reporter">Grafana Reporter</h2>
+      <p data-i18n-html="reporter">
+        <strong>Grafana Reporter</strong> is a pure front-end Grafana app plugin
+        that turns any dashboard into a PDF. It runs entirely in the browser
+        using Grafana's official <em>grafana-image-renderer</em> — no backend
+        service, no bundled Chromium, and no service accounts — so exports
+        respect the signed-in user's datasource permissions and RBAC. It renders
+        each panel through <code>/render/d-solo</code> and composes the result
+        with jsPDF, resolving repeated panels and template variables (including
+        <code>$__all</code>) along the way. Layout (panels per page, spacing,
+        orientation), header/footer branding with a logo library, page numbers
+        and custom text elements are all configurable — globally, via query
+        parameters, or per run — and a report can be triggered from a dashboard
+        link or a shareable URL.
+      </p>
+      <p data-i18n="lead_example">An example report looks like this:</p>
+      <figure>
+        <img
+          src="/static/posts/our-open-source-projects/example-report.png"
+          alt="An example report generated by Grafana Reporter — a dashboard rendered to a branded PDF"
+          loading="lazy"
+        />
+        <figcaption data-i18n="cap_reporter">
+          An example report — a dashboard rendered to a branded PDF.
+        </figcaption>
+      </figure>
+      <p class="repo-link">
+        <a href="https://github.com/DataLabHell/grafanareporter-app">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            ></path>
+          </svg>
+          github.com/DataLabHell/grafanareporter-app
+        </a>
+      </p>
+
+      <h2 data-i18n="h_cgstats">cgstats</h2>
+      <p data-i18n-html="cgstats">
+        <strong>cgstats.sh</strong> is a single POSIX shell script that shows
+        live CPU, memory and disk usage straight from Linux cgroups (v1/v2). It
+        is built to run inside a container with zero dependencies — no agents,
+        sidecars or Prometheus — and reports cores used versus the configured
+        limit, memory versus its limit, and usage for arbitrary disk paths.
+        Output is either colorized human-readable tables (with configurable
+        warning/critical thresholds) or machine-readable JSON for dashboards and
+        CI; it can refresh on an interval or print a single sample with
+        <code>--once</code>. Install is a one-line curl, and it has been
+        primarily developed and tested against cgroup v2.
+      </p>
+      <figure>
+        <img
+          src="/static/posts/our-open-source-projects/cgstats.png"
+          alt="cgstats live CPU, memory and disk usage output"
+          loading="lazy"
+        />
+        <figcaption data-i18n="cap_cgstats">
+          cgstats showing live CPU, memory and disk usage against cgroup limits.
+        </figcaption>
+      </figure>
+      <p class="repo-link">
+        <a href="https://github.com/DataLabHell/cgstats">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            ></path>
+          </svg>
+          github.com/DataLabHell/cgstats
+        </a>
+      </p>
+
+      <h2 data-i18n="h_ulid">ULID.jl</h2>
+      <p data-i18n-html="ulid">
+        <strong>ULID.jl</strong> is a Julia implementation of ULIDs —
+        <em>Unique Lexicographically Sortable Identifiers</em>, a 128-bit id
+        combining a 48-bit timestamp with 80 bits of randomness. Unlike
+        string-based implementations, it stores each ULID as a compact binary
+        <code>UInt128</code>, which keeps them small and fast to compare and
+        sort while staying time-ordered. You can generate fresh ids with
+        <code>ulid()</code> or parse them from their canonical Crockford base32
+        text — handy as sortable keys in databases and distributed systems.
+      </p>
+      <p class="repo-link">
+        <a href="https://github.com/DataLabHell/ULID.jl">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            ></path>
+          </svg>
+          github.com/DataLabHell/ULID.jl
+        </a>
+      </p>
+
+      <h2 data-i18n="h_okd">okd-nvidia-image</h2>
+      <p data-i18n-html="okd">
+        <strong>okd-nvidia-image</strong> builds an ostree-native container
+        image for OKD 4.x (SCOS) that bakes in the NVIDIA open kernel modules
+        and userspace libraries. It layers packages onto the SCOS base with
+        <code>rpm-ostree</code> — enabling CentOS Stream and EPEL repos, pinning
+        a specific CS9 kernel detected at build time, compiling the
+        <code>kmod-nvidia-open-dkms</code>
+        modules against that exact kernel ABI, and installing the CUDA driver
+        libraries and tools like
+        <code>nvidia-smi</code> — then commits the whole filesystem with
+        <code>ostree container commit</code>. The result is rolled out as the
+        node OS image (e.g. via a MachineConfigPool <code>osImageURL</code>),
+        giving OKD nodes reproducible GPU support.
+      </p>
+      <p class="repo-link">
+        <a href="https://github.com/DataLabHell/okd-nvidia-image">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            ></path>
+          </svg>
+          github.com/DataLabHell/okd-nvidia-image
+        </a>
+      </p>
+
+      <hr />
+
+      <h2 data-i18n="h_more">More, and getting involved</h2>
+      <p data-i18n-html="closing">
+        This is only a handful of the things we work on. All of our open-source
+        projects live in our GitHub organisation at
+        <a href="https://github.com/DataLabHell">github.com/DataLabHell</a> —
+        issues, ideas and pull requests are welcome.
+      </p>
+    </main>
+    <footer></footer>
+  </body>
+</html>

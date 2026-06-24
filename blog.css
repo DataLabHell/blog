@@ -420,6 +420,38 @@ header {
 }
 
 
+/* ── REPO LINK (post body) ───────────────── */
+.repo-link {
+  margin: -0.5rem 0 1.75rem;
+}
+
+.repo-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--light-gray);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.repo-link a:hover {
+  background: var(--off-white);
+  border-color: var(--accent);
+}
+
+.repo-link svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
 /* ── COOKIE BANNER ───────────────────────── */
 #cookie-banner {
   position: fixed;
