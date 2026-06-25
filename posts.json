@@ -45,7 +45,6 @@
   {
     "path": "posts/our-open-source-projects.html",
     "title": "Our Open Source Projects",
-    "titleDe": "Unsere Open-Source-Projekte",
     "date": "2026-06-24",
     "tags": [
       "Open Source",
@@ -53,7 +52,6 @@
     ],
     "author": "Daniel Baldauf",
     "image": "static/posts/open-source-projects.png",
-    "desc": "A look at some of the open-source tools we develop at Data Lab Hell — a backend-less Grafana PDF reporter, a one-file cgroups monitor, a binary ULID for Julia, and NVIDIA GPU images for OKD — plus where to find the rest.",
-    "descDe": "Ein Blick auf einige der Open-Source-Werkzeuge, die wir bei Data Lab Hell entwickeln — ein backend-loser Grafana-PDF-Reporter, ein cgroups-Monitor aus einer Datei, eine binäre ULID für Julia und NVIDIA-GPU-Images für OKD — und wo der Rest zu finden ist."
+    "desc": "A look at some of the open-source tools we develop at Data Lab Hell — a backend-less Grafana PDF reporter, a one-file cgroups monitor, a binary ULID for Julia, and NVIDIA GPU images for OKD — plus where to find the rest."
   }
 ]
