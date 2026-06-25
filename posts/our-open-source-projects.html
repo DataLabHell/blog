@@ -25,7 +25,7 @@
           h_ulid: "ULID.jl",
           ulid: "<strong>ULID.jl</strong> ist eine Julia-Implementierung von ULIDs — <em>Unique Lexicographically Sortable Identifiers</em>, eine 128-Bit-ID aus einem 48-Bit-Zeitstempel und 80 Bit Zufall. Anders als string-basierte Implementierungen speichert sie jede ULID als kompakten binären <code>UInt128</code>, was die IDs klein hält und schnell vergleich- und sortierbar macht — bei erhaltener zeitlicher Ordnung. Neue IDs erzeugt man mit <code>ulid()</code> oder parst sie aus ihrer kanonischen Crockford-Base32-Darstellung — praktisch als sortierbare Schlüssel in Datenbanken und verteilten Systemen.",
           h_okd: "okd-nvidia-image",
-          okd: "<strong>okd-nvidia-image</strong> baut ein ostree-natives Container-Image für OKD 4.x (SCOS), das die offenen NVIDIA-Kernelmodule und die Userspace-Bibliotheken fest einbäckt. Es schichtet Pakete mit <code>rpm-ostree</code> auf die SCOS-Basis — aktiviert CentOS-Stream- und EPEL-Repos, pinnt eine zur Build-Zeit ermittelte CS9-Kernelversion, kompiliert die <code>kmod-nvidia-open-dkms</code>-Module passend zu genau dieser Kernel-ABI und installiert die CUDA-Treiberbibliotheken sowie Werkzeuge wie <code>nvidia-smi</code> — und committet anschließend das gesamte Dateisystem mit <code>ostree container commit</code>. Das Ergebnis wird als Node-Betriebssystem-Image ausgerollt (z.&nbsp;B. über einen MachineConfigPool-<code>osImageURL</code>) und verschafft OKD-Knoten reproduzierbare GPU-Unterstützung.",
+          okd: "<strong>okd-nvidia-image</strong> baut ein ostree-natives Container-Image für OKD 4.18–4.20 (SCOS, basierend auf CentOS Stream 10) das die offenen NVIDIA-Kernelmodule und die Userspace-Bibliotheken fest einbäckt. Es schichtet Pakete mit <code>rpm-ostree</code> auf die SCOS-Basis — pinnt den neuesten verfügbaren CS10-Kernel zur Build-Zeit, kompiliert die <code>kmod-nvidia-open-dkms</code>-Module passend zu genau dieser Kernel-ABI und installiert die CUDA-Treiberbibliotheken sowie Werkzeuge wie <code>nvidia-smi</code> — und committet anschließend das gesamte Dateisystem mit <code>ostree container commit</code>. Der Kernel wird auf den neuesten verfügbaren gepinnt statt auf den laufenden Knoten-Kernel, weil der installierte Kernel so alt sein kann, dass die für den DKMS-Build benötigten Pakete nicht mehr verfügbar sind. Das Ergebnis wird als Node-Betriebssystem-Image ausgerollt (z.&nbsp;B. über einen MachineConfigPool-<code>osImageURL</code>) und verschafft OKD-Knoten reproduzierbare GPU-Unterstützung.",
           h_more: "Mehr und Mitmachen",
           closing:
             'Das ist nur eine Auswahl dessen, woran wir arbeiten. Alle unsere Open-Source-Projekte liegen in unserer GitHub-Organisation unter <a href="https://github.com/DataLabHell">github.com/DataLabHell</a> — Issues, Ideen und Pull Requests sind willkommen.',
@@ -47,7 +47,7 @@
           h_ulid: "ULID.jl",
           ulid: "<strong>ULID.jl</strong> is a Julia implementation of ULIDs — <em>Unique Lexicographically Sortable Identifiers</em>, a 128-bit id combining a 48-bit timestamp with 80 bits of randomness. Unlike string-based implementations, it stores each ULID as a compact binary <code>UInt128</code>, which keeps them small and fast to compare and sort while staying time-ordered. You can generate fresh ids with <code>ulid()</code> or parse them from their canonical Crockford base32 text — handy as sortable keys in databases and distributed systems.",
           h_okd: "okd-nvidia-image",
-          okd: "<strong>okd-nvidia-image</strong> builds an ostree-native container image for OKD 4.x (SCOS) that bakes in the NVIDIA open kernel modules and userspace libraries. It layers packages onto the SCOS base with <code>rpm-ostree</code> — enabling CentOS Stream and EPEL repos, pinning a specific CS9 kernel detected at build time, compiling the <code>kmod-nvidia-open-dkms</code> modules against that exact kernel ABI, and installing the CUDA driver libraries and tools like <code>nvidia-smi</code> — then commits the whole filesystem with <code>ostree container commit</code>. The result is rolled out as the node OS image (e.g. via a MachineConfigPool <code>osImageURL</code>), giving OKD nodes reproducible GPU support.",
+          okd: "<strong>okd-nvidia-image</strong> builds an ostree-native container image for OKD 4.18–4.20 (SCOS, based on CentOS Stream 10) that bakes in the NVIDIA open kernel modules and userspace libraries. It layers packages onto the SCOS base with <code>rpm-ostree</code> — pinning the newest CS10 kernel available at build time, compiling the <code>kmod-nvidia-open-dkms</code> modules against that exact kernel ABI, and installing the CUDA driver libraries and tools like <code>nvidia-smi</code> — then commits the whole filesystem with <code>ostree container commit</code>. The kernel is pinned to the newest available rather than the node's running kernel because the installed kernel can be old enough that packages required to build DKMS modules are no longer available for it. The result is rolled out as the node OS image (e.g. via a MachineConfigPool <code>osImageURL</code>), giving OKD nodes reproducible GPU support.",
           h_more: "More, and getting involved",
           closing:
             'This is only a handful of the things we work on. All of our open-source projects live in our GitHub organisation at <a href="https://github.com/DataLabHell">github.com/DataLabHell</a> — issues, ideas and pull requests are welcome.',
@@ -165,17 +165,19 @@
       <h2 data-i18n="h_okd">okd-nvidia-image</h2>
       <p data-i18n-html="okd">
         <strong>okd-nvidia-image</strong> builds an ostree-native container
-        image for OKD 4.x (SCOS) that bakes in the NVIDIA open kernel modules
-        and userspace libraries. It layers packages onto the SCOS base with
-        <code>rpm-ostree</code> — enabling CentOS Stream and EPEL repos, pinning
-        a specific CS9 kernel detected at build time, compiling the
-        <code>kmod-nvidia-open-dkms</code>
-        modules against that exact kernel ABI, and installing the CUDA driver
-        libraries and tools like
+        image for OKD 4.18–4.20 (SCOS, based on CentOS Stream 10) that bakes in the
+        NVIDIA open kernel modules and userspace libraries. It layers packages
+        onto the SCOS base with <code>rpm-ostree</code> — pinning the newest
+        CS10 kernel available at build time, compiling the
+        <code>kmod-nvidia-open-dkms</code> modules against that exact kernel
+        ABI, and installing the CUDA driver libraries and tools like
         <code>nvidia-smi</code> — then commits the whole filesystem with
-        <code>ostree container commit</code>. The result is rolled out as the
-        node OS image (e.g. via a MachineConfigPool <code>osImageURL</code>),
-        giving OKD nodes reproducible GPU support.
+        <code>ostree container commit</code>. The kernel is pinned to the newest
+        available rather than the node's running kernel because the installed
+        kernel can be old enough that packages required to build DKMS modules
+        are no longer available for it. The result is rolled out as the node OS
+        image (e.g. via a MachineConfigPool <code>osImageURL</code>), giving OKD
+        nodes reproducible GPU support.
       </p>
       <p class="repo-link">
         <a href="https://github.com/DataLabHell/okd-nvidia-image">
