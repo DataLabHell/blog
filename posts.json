@@ -48,7 +48,11 @@
     "date": "2026-06-24",
     "tags": [
       "Open Source",
-      "Engineering"
+      "Engineering",
+      "Grafana",
+      "Julia",
+      "Kubernetes",
+      "NVIDIA"
     ],
     "author": "Daniel Baldauf",
     "image": "static/posts/open-source-projects.png",
