@@ -41,5 +41,21 @@
     "author": "Tobias Hell",
     "image": "static/posts/ai_cocreation.png",
     "desc": "A case study in human–AI co-creation in mathematics: how we proved a structural rigidity theorem about topological approaches to the Riemann Hypothesis — and what it means for interdisciplinary research."
+  },
+  {
+    "path": "posts/our-open-source-projects.html",
+    "title": "Our Open Source Projects",
+    "date": "2026-06-24",
+    "tags": [
+      "Open Source",
+      "Engineering",
+      "Grafana",
+      "Julia",
+      "Kubernetes",
+      "NVIDIA"
+    ],
+    "author": "Daniel Baldauf",
+    "image": "static/posts/open-source-projects.png",
+    "desc": "A look at some of the open-source tools we develop at Data Lab Hell — a backend-less Grafana PDF reporter, a one-file cgroups monitor, a binary ULID for Julia, and NVIDIA GPU images for OKD — plus where to find the rest."
   }
 ]
