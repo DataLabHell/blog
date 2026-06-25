@@ -1,6 +1,6 @@
 # DLH Blog
 
-Static blog for [blog.datalabhell.ac.at](https://blog.datalabhell.ac.at), served via GitHub Pages.
+Static blog for [blog.datalabhell.ac.at](https://blog.datalabhell.ac.at), served via Cloudflare Pages.
 
 ## Adding a new post
 
