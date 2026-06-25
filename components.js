@@ -78,6 +78,13 @@
     document.documentElement.lang = lang;
     var langBtn = document.getElementById('lang-toggle');
     if (langBtn) langBtn.textContent = lang === 'de' ? 'EN' : 'DE';
+    document.querySelectorAll('[data-lang-switch]').forEach(function (el) {
+      if (el.classList.contains('lang-badge--hero')) {
+        el.textContent = lang === 'de' ? 'Also available in English' : 'Auch auf Deutsch verfügbar';
+      } else {
+        el.textContent = lang === 'de' ? 'EN' : 'DE';
+      }
+    });
     // Update <title> and <meta description> on post pages
     if (t['post_hero_title']) {
       document.title = t['post_hero_title'] + ' — Data Lab Hell';
@@ -118,6 +125,16 @@
       applyLang(currentLang);
     });
   }
+
+  document.addEventListener('click', function (e) {
+    var badge = e.target.closest('[data-lang-switch]');
+    if (!badge) return;
+    e.preventDefault();
+    e.stopPropagation();
+    currentLang = currentLang === 'de' ? 'en' : 'de';
+    setLang(currentLang);
+    applyLang(currentLang);
+  });
 
   /* ── Footer ── */
   var footerEl = document.querySelector('footer');
@@ -247,6 +264,7 @@
               '<div class="post-card-meta">' +
                 (p.date ? '<span class="post-date" data-date="' + p.date + '">' + formatDate(p.date, currentLang) + '</span>' : '') +
                 (p.author ? '<span class="post-author" data-author="' + p.author + '"><span data-i18n="by">' + translations[currentLang].by + '</span> ' + p.author + '</span>' : '') +
+                (p.titleDe ? '<button class="lang-badge" data-lang-switch title="Also available in German / Auch auf Deutsch verfügbar">DE</button>' : '') +
               '</div>' +
             '</div>' +
             (p.image
@@ -320,6 +338,7 @@
               '<div class="post-hero-meta">' +
                 (postDate ? '<span class="post-date"' + (isIso ? ' data-date="' + postDate + '"' : '') + '>' + (isIso ? formatDate(postDate, currentLang) : postDate) + '</span>' : '') +
                 (author ? '<span class="post-author">' + author + '</span>' : '') +
+                (match.titleDe ? '<button class="lang-badge lang-badge--hero" data-lang-switch>' + (currentLang === 'de' ? 'Also available in English' : 'Auch auf Deutsch verfügbar') + '</button>' : '') +
               '</div>' +
             '</div>';
           mainEl.parentNode.insertBefore(hero, mainEl);

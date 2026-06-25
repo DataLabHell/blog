@@ -163,6 +163,37 @@ header {
   margin-bottom: 1rem;
 }
 
+.lang-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--mid-gray);
+  background: none;
+  border: 1px solid var(--light-gray);
+  border-radius: 2px;
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+  margin-left: auto;
+}
+
+.lang-badge:hover {
+  color: var(--dark);
+  border-color: var(--mid-gray);
+}
+
+.lang-badge--hero {
+  color: rgba(255,255,255,0.4);
+  border-color: rgba(255,255,255,0.2);
+  margin-left: 0;
+}
+
+.lang-badge--hero:hover {
+  color: rgba(255,255,255,0.9);
+  border-color: rgba(255,255,255,0.5);
+}
+
 .post-tag {
   font-size: 0.68rem;
   font-weight: 600;
