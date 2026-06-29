@@ -1,5 +1,20 @@
 [
   {
+    "path": "posts/ddevd-extreme-value-distribution.html",
+    "title": "An Extreme Value Distribution That Knows Its Own Uncertainty",
+    "titleDe": "Eine Extremwertverteilung, die ihre eigene Unsicherheit kennt",
+    "date": "2026-06-29",
+    "tags": [
+      "Research",
+      "Mathematics",
+      "Statistics"
+    ],
+    "author": "Tobias Hell",
+    "image": "static/posts/ddevd-extreme-value-distribution.png",
+    "desc": "Two new papers introduce DDEVD — a non-parametric extreme value distribution that also provides a mathematically derived criterion for when its estimates can be trusted.",
+    "descDe": "Zwei neue Arbeiten stellen DDEVD vor — eine nicht-parametrische Extremwertverteilung, die zugleich ein mathematisch hergeleitetes Kriterium liefert, wann ihrer Schätzung vertraut werden kann."
+  },
+  {
     "path": "posts/introducing-the-dlh-blog.html",
     "title": "Introducing the Data Lab Hell Blog",
     "titleDe": "Einführung in den Data Lab Hell Blog",

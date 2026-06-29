@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/blog.css" />
+    <script>
+      window.POST_TRANSLATIONS = {
+        de: {
+          subtitle:    'Wie DDEVD Extremwerte schätzt — und erkennt, wann ihre Ergebnisse belastbar sind',
+          intro1:      'Seltene Ereignisse sind oft die teuersten. Extremniederschläge, Materialversagen oder kritische Prozessabweichungen treten nur selten auf. Genau deshalb fehlen die Daten, die man eigentlich bräuchte, um ihr Risiko zuverlässig abzuschätzen.',
+          intro2:      'Zwei neue Arbeiten aus dem Data Lab Hell beschäftigen sich mit dieser Frage. Beide stellen die Data-Driven Extreme Value Distribution (DDEVD) vor, einen Ansatz zur Extremwertschätzung, der ohne parametrische Tail-Annahmen auskommt und gleichzeitig mathematisch herleitet, wann seine Ergebnisse belastbar sind.',
+          intro3:      '<strong>Kurz gesagt:</strong> DDEVD schätzt Extremwerte aus kleinen oder nicht-stationären Datensätzen, ohne eine parametrische Tail-Verteilung vorauszusetzen — und liefert zugleich ein mathematisch hergeleitetes Kriterium dafür, wann dieser Schätzung vertraut werden kann.',
+          h_why:       'Wozu das gut ist',
+          why1:        'Überall dort, wo seltene, folgenreiche Ereignisse aus dünnen oder nicht-stationären Daten eingeschätzt werden müssen, stellt sich dieselbe Frage — und das betrifft erstaunlich viele Felder: Hydrologie und Klimaforschung, Naturgefahren wie Starkregen, Hochwasser oder Erdbeben, Versicherungs- und Finanzwesen, Epidemiologie und öffentliche Gesundheit, ebenso wie die Zuverlässigkeit technischer Systeme.',
+          why2:        'DDEVD entstand aus einer allgemeinen methodischen Fragestellung und ist deshalb bewusst nicht auf ein bestimmtes Anwendungsgebiet zugeschnitten. Was diese Felder verbindet, ist nicht die Branche, sondern die Struktur des Problems: Der kritische Fall tritt so selten auf, dass die klassische Statistik an ihre Grenzen kommt — während die Konsequenzen zu groß sind, um ihn unbeziffert zu lassen.',
+          h_point:     'Der eigentliche Punkt',
+          point1:      'Für uns ist die spannendere Frage jedoch eine andere: Extremwerte schätzen können viele Verfahren. Kann ein Verfahren aber auch erkennen, wann seine eigene Schätzung überhaupt noch belastbar ist?',
+          point2:      'DDEVD ersetzt die klassische Extremwerttheorie nicht. Sie erweitert sie um einen Aspekt, der in vielen Anwendungen oft entscheidend ist: die Fähigkeit einzuschätzen, wann eine Schätzung überhaupt belastbar ist.',
+          point3:      'Gerade bei seltenen Ereignissen ist das oft wichtiger als die Schätzung selbst. Denn das größte Risiko entsteht nicht dort, wo man nichts weiß — sondern dort, wo man Unsicherheit mit Gewissheit verwechselt.',
+          h_classical: 'Das Problem mit der klassischen Extremwerttheorie',
+          classical1:  'Die klassische Extremwerttheorie ist mathematisch außerordentlich erfolgreich. Ihre stärksten Resultate gelten jedoch im asymptotischen Regime: große Stichproben, stabile Prozesse und ausreichend Beobachtungen im Randbereich der Verteilung. Ihr methodisches Repertoire — Block-Maxima, Peaks-over-Threshold, die Anpassung einer parametrischen Verteilungsfamilie an den Rand — ist auf diese Voraussetzungen zugeschnitten.',
+          classical2:  'Viele reale Datensätze liegen genau außerhalb dieses Regimes. Wer mit seltenen Ereignissen arbeitet, kennt das: Sie sind per Definition unterbesetzt, die zugrunde liegenden Prozesse oder Systeme verändern sich über die Zeit, Randbedingungen verschieben sich. Man zwingt der Sache dann eine Tail-Annahme auf, die man eigentlich nicht belegen kann, und hofft, dass das asymptotische Argument schon irgendwie greift.',
+          h_idea:      'Die Idee: DDEVD',
+          idea1:       'Die Data-Driven Extreme Value Distribution (DDEVD) verzichtet auf diese parametrische Tail-Annahme. Statt nur die äußersten Datenpunkte zu modellieren, nutzt sie die Information aller Beobachtungen. Diese werden metastatistisch aggregiert; daraus wird die zugrunde liegende Verteilung mithilfe einer Kernel-Dichteschätzung rekonstruiert. So entsteht eine Extremwertverteilung, deren Rand sich aus den Daten selbst entwickelt und nicht aus einer vorab gewählten mathematischen Form.',
+          idea2:       'Allein das wäre bereits ein vollständig nicht-parametrischer Ansatz. Ihre eigentliche Stärke zeigt DDEVD jedoch an zwei weiteren Punkten.',
+          idea3:       'Erstens lässt sich die entscheidende Stellschraube — die Bandbreite — nicht heuristisch wählen, sondern direkt aus der Fehlerstruktur des Verfahrens herleiten. Bei kernbasierten Methoden ist genau das der Punkt, an dem es üblicherweise unsauber wird; hier ist er sauber bestimmt (über den mittleren integrierten quadratischen Fehler, MISE).',
+          idea4:       'Zweitens — und das ist der Teil, der uns am meisten interessiert: Wir beweisen ein Stabilitätsgesetz. Es gibt an, ab welcher Datenlage die Bandbreitenoptimierung überhaupt wohldefiniert ist und das Ergebnis belastbar bleibt. Die Methode trägt damit ihr eigenes Gütekriterium mit. Sie sagt einem nicht nur, was die geschätzte Extremwertverteilung ist, sondern auch, ob man dieser Schätzung in der vorliegenden Datensituation trauen darf.',
+          idea5:       'Das ist kein kosmetisches Detail. Ein Verfahren, das im dünnen, nicht stationären Regime arbeitet, muss wissen, wann es an seine Grenze stößt — sonst liefert es genau dort die schönsten und gefährlichsten Zahlen, wo am wenigsten dahintersteht.',
+          h_papers:    'Die zwei Papers',
+          papers1:     'Beide Arbeiten liegen als Preprint auf arXiv vor und ergänzen sich.',
+          papers2:     'Der erste Preprint (<a href="https://arxiv.org/abs/2605.21416" target="_blank" rel="noopener">arXiv:2605.21416</a>) ist die mathematische Grundlage: die ausführliche Herleitung des MISE, die daraus abgeleitete optimale Bandbreite und die Stabilitätsbedingungen für das Optimierungsverfahren. Wer die vollständige Herleitung nachvollziehen möchte, findet hier alles.',
+          papers3:     'Der zweite Preprint (<a href="https://arxiv.org/abs/2606.12174" target="_blank" rel="noopener">arXiv:2606.12174</a>) ordnet das Verfahren breiter ein: die metastatistische Aggregation, die nicht-parametrische Tail-Schätzung und das Stabilitätskriterium als hergeleitetes Gesetz, aufbereitet für ein Computational-Science-Publikum. Diese Arbeit ist bei einer führenden internationalen Fachzeitschrift eingereicht.',
+          h_links:     'Links',
+        },
+        en: {
+          subtitle:    'How DDEVD estimates extreme values — and recognizes when its results can be trusted',
+          intro1:      'Rare events are often the most expensive ones. Extreme rainfall, material failure, or critical process deviations occur only rarely. That is precisely why the data you would actually need to assess their risk reliably tends to be missing.',
+          intro2:      'Two new papers from Data Lab Hell take up this question. Both introduce the Data-Driven Extreme Value Distribution (DDEVD), an approach to extreme value estimation that does without parametric tail assumptions while mathematically deriving when its results are reliable.',
+          intro3:      '<strong>In short:</strong> DDEVD estimates extreme values from small or non-stationary datasets without assuming a parametric tail distribution — and at the same time provides a mathematically derived criterion for when the estimate can be trusted.',
+          h_why:       'Why this matters',
+          why1:        'Wherever rare, consequential events have to be assessed from sparse or non-stationary data, the same question arises — and it concerns a surprising range of fields: hydrology and climate research, natural hazards such as heavy rainfall, floods, or earthquakes, insurance and finance, epidemiology and public health, as well as the reliability of technical systems.',
+          why2:        'DDEVD grew out of a general methodological question and is therefore deliberately not tailored to any particular field of application. What connects these fields is not the industry but the structure of the problem: the critical case occurs so rarely that classical statistics reaches its limits — while the consequences are too large to leave it unquantified.',
+          h_point:     'The real point',
+          point1:      'For us, though, the more interesting question is a different one: many methods can estimate extreme values. But can a method also recognize when its own estimate is still trustworthy at all?',
+          point2:      'DDEVD does not replace classical extreme value theory. It extends it by an aspect that is often decisive in many applications: the ability to judge when an estimate is reliable in the first place.',
+          point3:      'With rare events in particular, this is often more important than the estimate itself. Because the greatest risk does not arise where we know nothing — but where we mistake uncertainty for certainty.',
+          h_classical: 'The problem with classical extreme value theory',
+          classical1:  'Classical extreme value theory is mathematically extraordinarily successful. Its strongest results, however, hold in the asymptotic regime: large samples, stable processes, and enough observations in the tail of the distribution. Its methodological repertoire — block maxima, peaks-over-threshold, fitting a parametric distribution family to the tail — is built for these conditions.',
+          classical2:  'Many real datasets lie precisely outside this regime. Anyone working with rare events knows the situation: they are by definition under-sampled, the underlying processes or systems change over time, boundary conditions shift. You then force a tail assumption onto the data that you cannot really justify, and hope that the asymptotic argument somehow holds.',
+          h_idea:      'The idea: DDEVD',
+          idea1:       'The Data-Driven Extreme Value Distribution (DDEVD) dispenses with this parametric tail assumption. Instead of modelling only the most extreme data points, it uses the information in all observations. These are aggregated metastatistically; from this, the underlying distribution is reconstructed using kernel density estimation. The result is an extreme value distribution whose tail develops from the data itself rather than from a pre-selected mathematical form.',
+          idea2:       'That alone would already be a fully non-parametric approach. But DDEVD shows its real strength at two further points.',
+          idea3:       'First, the decisive lever — the bandwidth — need not be chosen heuristically; it can be derived directly from the error structure of the method. For kernel-based methods this is exactly where things usually become messy; here it is cleanly determined (via the mean integrated squared error, MISE).',
+          idea4:       'Second — and this is the part that interests us most — we prove a stability law. It specifies from what data situation onward the bandwidth optimization is well-defined at all and the result remains reliable. In doing so, the method carries its own quality criterion. It tells you not only what the estimated extreme value distribution is, but also whether the estimate can be trusted in the given data situation.',
+          idea5:       'This is no cosmetic detail. A method that operates in the sparse, non-stationary regime must know when it reaches its limit — otherwise it produces its nicest, and most dangerous, numbers precisely where there is least to back them up.',
+          h_papers:    'The two papers',
+          papers1:     'Both papers are available as preprints on arXiv and complement each other.',
+          papers2:     'The first preprint (<a href="https://arxiv.org/abs/2605.21416" target="_blank" rel="noopener">arXiv:2605.21416</a>) is the mathematical foundation: the detailed derivation of the MISE, the optimal bandwidth derived from it, and the stability conditions for the optimization procedure. Anyone who wants to follow the full derivation will find everything here.',
+          papers3:     'The second preprint (<a href="https://arxiv.org/abs/2606.12174" target="_blank" rel="noopener">arXiv:2606.12174</a>) places the method in a broader context: the metastatistical aggregation, the non-parametric tail estimation, and the stability criterion as a derived law, prepared for a computational-science audience. This paper has been submitted to a leading international journal.',
+          h_links:     'Links',
+        },
+      };
+    </script>
+    <script src="/components.js" defer></script>
+    <script src="https://datalabhell.ac.at/cookie-consent.js" defer></script>
+  </head>
+  <body data-post>
+    <header></header>
+    <main>
+      <p data-i18n="subtitle"><em>How DDEVD estimates extreme values — and recognizes when its results can be trusted</em></p>
+
+      <p data-i18n="intro1">
+        Rare events are often the most expensive ones. Extreme rainfall, material failure, or
+        critical process deviations occur only rarely. That is precisely why the data you would
+        actually need to assess their risk reliably tends to be missing.
+      </p>
+      <p data-i18n="intro2">
+        Two new papers from Data Lab Hell take up this question. Both introduce the Data-Driven
+        Extreme Value Distribution (DDEVD), an approach to extreme value estimation that does
+        without parametric tail assumptions while mathematically deriving when its results are
+        reliable.
+      </p>
+      <p class="callout" data-i18n-html="intro3">
+        <strong>In short:</strong> DDEVD estimates extreme values from small or non-stationary
+        datasets without assuming a parametric tail distribution — and at the same time provides
+        a mathematically derived criterion for when the estimate can be trusted.
+      </p>
+
+      <h2 data-i18n="h_why">Why this matters</h2>
+      <p data-i18n="why1">
+        Wherever rare, consequential events have to be assessed from sparse or non-stationary
+        data, the same question arises — and it concerns a surprising range of fields: hydrology
+        and climate research, natural hazards such as heavy rainfall, floods, or earthquakes,
+        insurance and finance, epidemiology and public health, as well as the reliability of
+        technical systems.
+      </p>
+      <p data-i18n="why2">
+        DDEVD grew out of a general methodological question and is therefore deliberately not
+        tailored to any particular field of application. What connects these fields is not the
+        industry but the structure of the problem: the critical case occurs so rarely that
+        classical statistics reaches its limits — while the consequences are too large to leave
+        it unquantified.
+      </p>
+
+      <h2 data-i18n="h_point">The real point</h2>
+      <p data-i18n="point1">
+        For us, though, the more interesting question is a different one: many methods can
+        estimate extreme values. But can a method also recognize when its own estimate is still
+        trustworthy at all?
+      </p>
+      <p data-i18n="point2">
+        DDEVD does not replace classical extreme value theory. It extends it by an aspect that
+        is often decisive in many applications: the ability to judge when an estimate is reliable
+        in the first place.
+      </p>
+      <p data-i18n="point3">
+        With rare events in particular, this is often more important than the estimate itself.
+        Because the greatest risk does not arise where we know nothing — but where we mistake
+        uncertainty for certainty.
+      </p>
+
+      <h2 data-i18n="h_classical">The problem with classical extreme value theory</h2>
+      <p data-i18n="classical1">
+        Classical extreme value theory is mathematically extraordinarily successful. Its strongest
+        results, however, hold in the asymptotic regime: large samples, stable processes, and
+        enough observations in the tail of the distribution. Its methodological repertoire —
+        block maxima, peaks-over-threshold, fitting a parametric distribution family to the tail
+        — is built for these conditions.
+      </p>
+      <p data-i18n="classical2">
+        Many real datasets lie precisely outside this regime. Anyone working with rare events
+        knows the situation: they are by definition under-sampled, the underlying processes or
+        systems change over time, boundary conditions shift. You then force a tail assumption
+        onto the data that you cannot really justify, and hope that the asymptotic argument
+        somehow holds.
+      </p>
+
+      <h2 data-i18n="h_idea">The idea: DDEVD</h2>
+      <p data-i18n="idea1">
+        The Data-Driven Extreme Value Distribution (DDEVD) dispenses with this parametric tail
+        assumption. Instead of modelling only the most extreme data points, it uses the
+        information in all observations. These are aggregated metastatistically; from this, the
+        underlying distribution is reconstructed using kernel density estimation. The result is
+        an extreme value distribution whose tail develops from the data itself rather than from
+        a pre-selected mathematical form.
+      </p>
+      <p data-i18n="idea2">
+        That alone would already be a fully non-parametric approach. But DDEVD shows its real
+        strength at two further points.
+      </p>
+      <p data-i18n="idea3">
+        First, the decisive lever — the bandwidth — need not be chosen heuristically; it can be
+        derived directly from the error structure of the method. For kernel-based methods this is
+        exactly where things usually become messy; here it is cleanly determined (via the mean
+        integrated squared error, MISE).
+      </p>
+      <p data-i18n="idea4">
+        Second — and this is the part that interests us most — we prove a stability law. It
+        specifies from what data situation onward the bandwidth optimization is well-defined at
+        all and the result remains reliable. In doing so, the method carries its own quality
+        criterion. It tells you not only what the estimated extreme value distribution is, but
+        also whether the estimate can be trusted in the given data situation.
+      </p>
+      <p data-i18n="idea5">
+        This is no cosmetic detail. A method that operates in the sparse, non-stationary regime
+        must know when it reaches its limit — otherwise it produces its nicest, and most
+        dangerous, numbers precisely where there is least to back them up.
+      </p>
+
+      <h2 data-i18n="h_papers">The two papers</h2>
+      <p data-i18n="papers1">Both papers are available as preprints on arXiv and complement each other.</p>
+      <p data-i18n-html="papers2">
+        The first preprint (<a href="https://arxiv.org/abs/2605.21416" target="_blank" rel="noopener">arXiv:2605.21416</a>) is the mathematical foundation: the detailed
+        derivation of the MISE, the optimal bandwidth derived from it, and the stability
+        conditions for the optimization procedure. Anyone who wants to follow the full derivation
+        will find everything here.
+      </p>
+      <p data-i18n-html="papers3">
+        The second preprint (<a href="https://arxiv.org/abs/2606.12174" target="_blank" rel="noopener">arXiv:2606.12174</a>) places the method in a broader context: the
+        metastatistical aggregation, the non-parametric tail estimation, and the stability
+        criterion as a derived law, prepared for a computational-science audience. This paper
+        has been submitted to a leading international journal.
+      </p>
+
+      <hr />
+
+      <h2 data-i18n="h_links">Links</h2>
+      <ul>
+        <li>Preprint 1 (methodology): <a href="https://arxiv.org/abs/2605.21416" target="_blank" rel="noopener">arXiv:2605.21416</a></li>
+        <li>Preprint 2 (submitted): <a href="https://arxiv.org/abs/2606.12174" target="_blank" rel="noopener">arXiv:2606.12174</a></li>
+      </ul>
+    </main>
+    <footer></footer>
+  </body>
+</html>
