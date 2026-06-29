@@ -66,7 +66,11 @@
     }
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       var key = el.getAttribute('data-i18n');
-      if (t[key] !== undefined) el.textContent = t[key];
+      if (t[key] !== undefined) {
+        var anchor = el.querySelector('.heading-anchor');
+        el.textContent = t[key];
+        if (anchor) el.appendChild(anchor);
+      }
     });
     document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
       var key = el.getAttribute('data-i18n-html');
@@ -299,6 +303,24 @@
         '<div class="article-wrap">' +
           '<article class="article-content">' + content + '</article>' +
         '</div>';
+
+      // Auto-anchor all headings
+      mainEl.querySelectorAll('.article-content h2, .article-content h3').forEach(function (h) {
+        var slug = h.textContent.trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+        h.id = slug;
+        h.style.cursor = 'pointer';
+        h.addEventListener('click', function (e) {
+          if (!e.target.closest('a')) {
+            window.location.hash = slug;
+          }
+        });
+        var a = document.createElement('a');
+        a.className = 'heading-anchor';
+        a.href = '#' + slug;
+        a.setAttribute('aria-hidden', 'true');
+        a.textContent = '#';
+        h.appendChild(a);
+      });
 
       // Build hero from posts.json (single source of truth; cached after first visit)
       fetchPosts()

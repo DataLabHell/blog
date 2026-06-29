@@ -335,10 +335,36 @@ header {
   line-height: 1.75;
 }
 
+.heading-anchor {
+  margin-left: 0.5em;
+  font-size: 0.75em;
+  font-weight: 400;
+  color: var(--light-gray);
+  text-decoration: none;
+  border-bottom: none;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+h2:hover .heading-anchor,
+h3:hover .heading-anchor {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--accent);
+  border-bottom: none;
+}
+
 .article-content:not(:has(> .post-subtitle, > .post-subtitle-row)) h2:first-of-type {
   border-top: 1px solid var(--light-gray);
   padding-top: 1.75rem;
   margin-top: 1.75rem;
+}
+
+.article-content h2,
+.article-content h3 {
+  scroll-margin-top: 5rem;
 }
 
 .article-content h2 {
