@@ -1,5 +1,19 @@
 [
   {
+    "path": "posts/from-okd-to-k3s.html",
+    "title": "Less Platform, More Research",
+    "date": "2026-06-29",
+    "tags": [
+      "Engineering",
+      "Kubernetes",
+      "Open Source",
+      "Infrastructure"
+    ],
+    "author": "Daniel Baldauf",
+    "image": "static/posts/from-okd-to-k3s.png",
+    "desc": "GPU drivers that required custom OS images, research software that fought Security Context Constraints, and 400 platform pods before a single workload scheduled. Why our research cluster moved from OKD to k3s."
+  },
+  {
     "path": "posts/ddevd-extreme-value-distribution.html",
     "title": "An Extreme Value Distribution That Knows Its Own Uncertainty",
     "titleDe": "Eine Extremwertverteilung, die ihre eigene Unsicherheit kennt",

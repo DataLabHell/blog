@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/blog.css" />
+    <script src="/components.js" defer></script>
+    <script src="https://datalabhell.ac.at/cookie-consent.js" defer></script>
+  </head>
+  <body data-post>
+    <header></header>
+    <main>
+      <p class="post-subtitle">
+        A small research-and-industrial cluster outgrows a batteries-included
+        platform — why we moved from OpenShift OKD to k3s.
+      </p>
+
+      <p>
+        When we started building our platform,
+        <a href="https://okd.io/" target="_blank" rel="noopener"
+          >OpenShift OKD</a
+        >
+        looked like the obvious choice. It promised an enterprise-grade
+        Kubernetes distribution with integrated authentication, an internal
+        registry, Operators, Routes, monitoring, logging, and GitOps support —
+        all in one coherent package. Instead of assembling a platform from a
+        dozen independent projects, we'd get an ecosystem that already fit
+        together.
+      </p>
+      <p>
+        We ran OKD for a good while. Then we moved off it, onto
+        <a href="https://k3s.io/" target="_blank" rel="noopener">k3s</a>.
+      </p>
+      <p>
+        This isn't an "OpenShift is bad" article. It isn't. OKD is a genuinely
+        impressive piece of engineering, and for the right organization it is
+        worth every CPU cycle it costs. It simply stopped being the right fit
+        for <em>our</em> environment — a relatively small cluster running
+        scientific and industrial workloads, with GPUs at the center of it. The
+        GPU story ended up being the clearest signal: NVIDIA officially supports
+        OpenShift, not OKD, and what followed from that single fact captured
+        almost everything wrong with the fit.
+      </p>
+
+      <h2>What we actually run</h2>
+      <p>Our requirements were never exotic:</p>
+      <ul>
+        <li>Kubernetes as the foundation, with everything else portable on top</li>
+        <li>GPU compute for AI/ML and scientific workloads, on a mixed set of cards</li>
+        <li>GitOps management through Argo CD</li>
+        <li>Data and ML tooling: JupyterHub, MLflow, Flyte, KubeRay</li>
+        <li>Grafana and an OpenTelemetry-based observability stack</li>
+      </ul>
+      <p>
+        Almost all of that targets <em>upstream</em> Kubernetes first. That
+        turns out to matter more than we expected.
+      </p>
+
+      <h2>What OKD does well</h2>
+      <p>
+        Authentication via OpenShift OAuth is excellent — arguably the single
+        thing we missed most after leaving. The Route API is nicer to work with
+        than hand-managing Ingress. The OpenShift Console is genuinely
+        well-built, giving you useful visibility into the cluster out of the box
+        — though its integrations with the broader open-source ecosystem have
+        limits, as we'll get to. If your organization has standardized on Red
+        Hat, OKD gives you a consistent, well-supported experience that's hard
+        to beat.
+      </p>
+      <p>
+        None of that was the problem. The problem was the bill — paid in
+        hardware, in complexity, and in engineering time.
+      </p>
+
+      <h2>Where it stopped fitting</h2>
+      <p>
+        The friction we hit maps onto a few principles we now try to make
+        explicit before adopting any platform: simplicity beats complexity, own
+        only what you actually need, upstream first, and understand every layer
+        you operate. OKD challenged each of them.
+      </p>
+
+      <h3>Day 0: getting it installed at all</h3>
+      <p>
+        OKD's install, for a self-managed deployment, is genuinely hard. The
+        sentiment turns up regularly in the community — one r/openshift thread
+        is titled simply
+        <a
+          href="https://www.reddit.com/r/openshift/comments/1efwcwv/trying_to_install_okd_has_the_most_difficult/"
+          target="_blank"
+          rel="noopener"
+          >"Trying to install OKD has the most difficult thing I've ever tried
+          to do."</a
+        >
+      </p>
+      <p>
+        Before the installer will run: DNS records, load balancers for the API
+        and ingress, and a <em>temporary bootstrap node</em> that exists only to
+        stand the control plane up before being torn down. The nodes run SCOS
+        (CentOS Stream CoreOS) — an immutable, image-based OS configured through
+        Ignition at first boot; the root filesystem is read-only by design.
+        Every "I'll just SSH in and fix it" instinct has to be unlearned. This
+        sets the tone: this is a platform you operate <em>its</em> way.
+      </p>
+
+      <h3>The control plane was too heavy</h3>
+      <p>
+        OKD's HA footprint is three control-plane nodes at roughly 4 vCPU and
+        16 GB RAM each. Provision below that floor and a number of components
+        simply won't start — we found this out directly. For a large fleet,
+        dedicating that much hardware to the control plane is a rounding error.
+        On our cluster, where every node carries real research workload and GPUs
+        are the expensive resource, burning three sizeable VMs before a single
+        user pod schedules was hard to justify. k3s collapses this: a single
+        binary, embedded etcd, server nodes that comfortably co-exist with light
+        workloads.
+      </p>
+
+      <h3>GPUs on an immutable OS</h3>
+      <p>
+        This one was close to a dealbreaker. NVIDIA's GPU Operator officially
+        supports OpenShift — not OKD. OpenShift ships with a RHEL-based kernel;
+        OKD runs SCOS with a CentOS Stream kernel, and that difference puts you
+        outside the supported configuration from the start. Practically, this
+        means NVIDIA provides no prebuilt driver install images for OKD — those
+        images, which package the compiled driver and install it via MachineConfig
+        onto the nodes, exist only for RHEL/OpenShift. On OKD, you are on your
+        own.
+      </p>
+      <p>
+        We ended up building our own ostree-native container image that bakes in
+        the NVIDIA open kernel modules and the necessary userspace libraries,
+        pinning the newest available CS10 kernel at build time so the DKMS
+        modules compile cleanly. A side effect: every node runs the same driver
+        version — fine for a homogeneous fleet, a constraint when it isn't. The
+        documentation and build instructions are public:
+        <a
+          href="https://github.com/DataLabHell/okd-nvidia-image"
+          target="_blank"
+          rel="noopener"
+          >github.com/DataLabHell/okd-nvidia-image</a
+        >.
+      </p>
+      <p>
+        On k3s with PCIe passthrough and the GPU Operator, we assign whichever
+        card we like to whichever node we like, and the OS image gymnastics go
+        away entirely.
+      </p>
+
+      <h3>The CentOS Stream 9 → 10 transition</h3>
+      <p>
+        OKD's SCOS base moved onto a CentOS Stream 10 foundation. With that, the
+        low-level container runtime changed: <code>runc</code> is removed and
+        <code>crun</code> becomes the default. The Machine Config Operator
+        reconfigured every node accordingly during the upgrade, and the nodes
+        rolled.
+      </p>
+      <p>
+        A change that far down the stack is invisible — until a reboot
+        reschedules your entire cluster onto a runtime your workloads were never
+        validated against. For us, the transition took out a number of internal
+        components in one pass. The fix wasn't complicated once we understood
+        what had happened, but understanding it meant peeling back several layers
+        of platform automation to find a runtime swap we never chose. In a
+        rapidly changing research environment, unplanned downtime has real costs
+        beyond just the outage itself. With a batteries-included distribution,
+        the batteries get swapped on the vendor's schedule.
+      </p>
+
+      <h3>A platform that abstracts away Kubernetes</h3>
+      <p>
+        Our team has deep Kubernetes knowledge — and most of it simply didn't
+        apply to OKD. The platform adds its own abstraction layer thick enough
+        that knowing Kubernetes well didn't help us debug OpenShift.
+      </p>
+      <p>
+        Problems would surface and the investigation would lead to pods we didn't
+        recognize — platform internals we knew existed but couldn't easily
+        reason about. Before we had scheduled a single research workload, OKD had
+        already deployed around 30 namespaces and roughly 400 pods across our
+        control planes and workers. All of that was the platform running itself.
+      </p>
+      <p>
+        The Operator pattern compounds this. An Operator enforces its author's
+        opinion through a reconciliation loop: when your requirements match, it's
+        magic; when they differ, you're arguing with a control loop that will
+        patiently undo your changes. The sharpest day-to-day version of this was
+        Security Context Constraints — most community Helm charts assume they can
+        run the way upstream Kubernetes allows, and under OKD's default SCCs they
+        couldn't. In a research environment the software landscape changes
+        constantly; trying a new tool should take minutes. With OKD, deploying
+        experimental software meant a recurring tax: patch
+        <code>securityContext</code>, rework <code>runAsUser</code> and
+        <code>fsGroup</code>, or author a custom SCC — for software that ran
+        unmodified everywhere else.
+      </p>
+      <p>
+        Our cluster serves internal users only. We value flexibility in how the
+        cluster looks and behaves over strict opinions about how it should —
+        while still enforcing what matters: access control through Azure group
+        permissions, restricted namespaces per team, and other Kubernetes best
+        practices. OKD's defaults encode assumptions about org size that simply
+        don't apply to us.
+      </p>
+
+      <h3>Components we never used</h3>
+      <p>
+        The internal registry, ImageStreams, the build subsystem, large parts of
+        the integrated monitoring and logging stack — all consuming CPU, memory,
+        and <em>attention</em>. Every idle component is something that can break,
+        something that shows up in logs, something that needs to be reasoned
+        about during an upgrade, something whose CVEs you now own. Idle features
+        aren't free; they're standing complexity.
+      </p>
+      <p>
+        What our research workloads genuinely required was a short list:
+        Kubernetes, GitOps, storage, networking, monitoring, and authentication.
+        Everything else could be added deliberately, if and when we needed it.
+      </p>
+
+      <h3>What is actually open source?</h3>
+      <p>
+        OKD markets itself as the open-source upstream of OpenShift, and that's
+        broadly true — but the boundary wasn't always clear. Open Data Hub, the service mesh, and others exist in open-source form, but
+        the fully integrated experience often requires a Red Hat subscription,
+        and it's not immediately obvious which tier you're on. For a research organization
+        where open-source provenance matters on principle and for reproducibility,
+        that ambiguity was friction we hadn't anticipated.
+      </p>
+
+      <h2>What we run now</h2>
+      <p>
+        Moving off OKD forced us to be explicit: own only what you actually
+        need, understand everything you run, and keep every component
+        independently replaceable. In brief: k3s HA on a heterogeneous mix of
+        bare-metal and Proxmox nodes, Ansible for node management, PCIe
+        passthrough with the NVIDIA GPU Operator, Argo CD for GitOps, the LGTM
+        observability stack, and our ML tooling — JupyterHub, MLflow, Flyte,
+        KubeRay — all running as plain upstream Helm charts, without security
+        context patches.
+      </p>
+      <p>
+        The difference from OKD is felt every day: documentation applies without
+        translation, Helm charts install without fighting the platform, and when
+        something breaks it's in a component we chose to run — not a platform
+        internal we didn't know existed.
+      </p>
+      <p><em>(We cover the full stack in a dedicated post.)</em></p>
+
+      <h2>What we traded</h2>
+      <p>
+        Leaving a batteries-included platform means rebuilding the batteries. We
+        stood up our own authentication, ingress conventions, certificate
+        handling, and observability wiring — things OKD provided out of the box.
+        If we hadn't already been comfortable assembling cloud-native components,
+        that effort could easily have outweighed the savings.
+      </p>
+      <p>
+        The migration itself was easier than expected. We backed up the data that
+        mattered, tore down every OKD component, and redeployed on k3s from
+        scratch — restoring workloads as we went. The whole thing took a few
+        days. And because most of our software targets upstream Kubernetes, we
+        could reuse the bulk of our existing configuration and drop all the
+        OKD-specific patching we'd accumulated.
+      </p>
+      <p>
+        Every abstraction has a cost — the question is whether it solves your
+        problems. For our research environment, OKD's abstractions solved
+        problems we didn't have while creating complexity we didn't need.
+      </p>
+
+      <h2>Final thoughts</h2>
+      <p>
+        We don't regret running OKD. It taught us an enormous amount about
+        Kubernetes, Operators, security, and what enterprise platform engineering
+        actually involves. But our priorities today are different: we value
+        simplicity over completeness, prefer upstream projects over
+        platform-specific integrations, and would rather spend our engineering
+        time on our GPU workloads and research applications than on another layer
+        of platform abstraction.
+      </p>
+      <p>For our environment, moving from OKD to k3s was the right call.</p>
+      <p>It won't be the right call for everyone — but it was the right one for us.</p>
+    </main>
+    <footer></footer>
+  </body>
+</html>
