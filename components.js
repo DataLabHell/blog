@@ -297,7 +297,6 @@
       var content = mainEl.innerHTML;
       mainEl.innerHTML =
         '<div class="article-wrap">' +
-          '<a class="article-back" href="' + blogRoot + 'index.html" data-i18n="back_to_posts">&larr; All Posts</a>' +
           '<article class="article-content">' + content + '</article>' +
         '</div>';
 
@@ -333,6 +332,7 @@
           hero.className = 'post-hero';
           hero.innerHTML =
             '<div class="container">' +
+              '<a class="article-back" href="' + blogRoot + 'index.html" data-i18n="back_to_posts">&larr; All Posts</a>' +
               (tagsHtml ? '<div class="post-hero-tags">' + tagsHtml + '</div>' : '') +
               '<h1 data-i18n="post_hero_title">' + match.title + '</h1>' +
               '<div class="post-hero-meta">' +
