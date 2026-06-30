@@ -46,14 +46,34 @@ header {
   align-items: stretch;
   flex-wrap: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
   background: var(--white);
   border-bottom: 2px solid var(--light-gray);
   margin-bottom: 0;
+  box-shadow: inset -3rem 0 1.5rem -1rem var(--white);
 }
 
 .tag-filter::-webkit-scrollbar {
   display: none;
+}
+
+@media (hover: hover) {
+  .tag-filter {
+    scrollbar-width: thin;
+    scrollbar-color: var(--light-gray) transparent;
+  }
+  .tag-filter::-webkit-scrollbar {
+    display: block;
+    height: 3px;
+  }
+  .tag-filter::-webkit-scrollbar-track {
+    background: var(--light-gray);
+  }
+  .tag-filter::-webkit-scrollbar-thumb {
+    background: var(--mid-gray);
+    border-radius: 2px;
+  }
 }
 
 .tag-filter-btn {
