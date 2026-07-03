@@ -1,6 +1,6 @@
 /* ── Blog shared components ─────────────────────────────────────── */
 (function () {
-  var MAIN_SITE = 'https://datalabhell.at';
+  var MAIN_SITE = 'https://datalabhell.ac.at';
 
   /* ── Resolve static base path (works from / and /posts/) ── */
   var depth = window.location.pathname.split('/').filter(Boolean).length;
@@ -41,7 +41,7 @@
     return m ? m[1] : localStorage.getItem('dlh_lang');
   }
   function setLang(lang) {
-    document.cookie = 'dlh_lang=' + lang + '; path=/; domain=.datalabhell.at; max-age=31536000; SameSite=Lax';
+    document.cookie = 'dlh_lang=' + lang + '; path=/; domain=.datalabhell.ac.at; max-age=31536000; SameSite=Lax';
     localStorage.setItem('dlh_lang', lang);
   }
 
@@ -66,7 +66,11 @@
     }
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       var key = el.getAttribute('data-i18n');
-      if (t[key] !== undefined) el.textContent = t[key];
+      if (t[key] !== undefined) {
+        var anchor = el.querySelector('.heading-anchor');
+        el.textContent = t[key];
+        if (anchor) el.appendChild(anchor);
+      }
     });
     document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
       var key = el.getAttribute('data-i18n-html');
@@ -78,6 +82,13 @@
     document.documentElement.lang = lang;
     var langBtn = document.getElementById('lang-toggle');
     if (langBtn) langBtn.textContent = lang === 'de' ? 'EN' : 'DE';
+    document.querySelectorAll('[data-lang-switch]').forEach(function (el) {
+      if (el.classList.contains('lang-badge--hero')) {
+        el.textContent = lang === 'de' ? 'Also available in English' : 'Auch auf Deutsch verfügbar';
+      } else {
+        el.textContent = lang === 'de' ? 'EN' : 'DE';
+      }
+    });
     // Update <title> and <meta description> on post pages
     if (t['post_hero_title']) {
       document.title = t['post_hero_title'] + ' — Data Lab Hell';
@@ -118,6 +129,16 @@
       applyLang(currentLang);
     });
   }
+
+  document.addEventListener('click', function (e) {
+    var badge = e.target.closest('[data-lang-switch]');
+    if (!badge) return;
+    e.preventDefault();
+    e.stopPropagation();
+    currentLang = currentLang === 'de' ? 'en' : 'de';
+    setLang(currentLang);
+    applyLang(currentLang);
+  });
 
   /* ── Footer ── */
   var footerEl = document.querySelector('footer');
@@ -185,7 +206,9 @@
             tagCounts[tag] = (tagCounts[tag] || 0) + 1;
           });
         });
-        var allTags = Object.keys(tagCounts).sort(function (a, b) {
+        var allTags = Object.keys(tagCounts).filter(function (tag) {
+          return tagCounts[tag] > 1;
+        }).sort(function (a, b) {
           return tagCounts[b] - tagCounts[a];
         });
 
@@ -245,6 +268,7 @@
               '<div class="post-card-meta">' +
                 (p.date ? '<span class="post-date" data-date="' + p.date + '">' + formatDate(p.date, currentLang) + '</span>' : '') +
                 (p.author ? '<span class="post-author" data-author="' + p.author + '"><span data-i18n="by">' + translations[currentLang].by + '</span> ' + p.author + '</span>' : '') +
+                (p.titleDe ? '<button class="lang-badge" data-lang-switch title="Also available in German / Auch auf Deutsch verfügbar">DE</button>' : '') +
               '</div>' +
             '</div>' +
             (p.image
@@ -269,7 +293,7 @@
 
   /* ── Post layout injection ── */
   if (document.body.hasAttribute('data-post')) {
-    var currentPath = window.location.pathname.replace(/^\//, '');
+    var currentPath = window.location.pathname.replace(/^\//, '').replace(/\.html$/, '');
     var mainEl = document.querySelector('main');
 
     if (mainEl) {
@@ -277,15 +301,33 @@
       var content = mainEl.innerHTML;
       mainEl.innerHTML =
         '<div class="article-wrap">' +
-          '<a class="article-back" href="' + blogRoot + 'index.html" data-i18n="back_to_posts">&larr; All Posts</a>' +
           '<article class="article-content">' + content + '</article>' +
         '</div>';
+
+      // Auto-anchor all headings
+      mainEl.querySelectorAll('.article-content h2, .article-content h3').forEach(function (h) {
+        var slug = h.textContent.trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+        h.id = slug;
+        h.style.cursor = 'pointer';
+        h.addEventListener('click', function (e) {
+          if (!e.target.closest('a')) {
+            window.location.hash = slug;
+          }
+        });
+        var a = document.createElement('a');
+        a.className = 'heading-anchor';
+        a.href = '#' + slug;
+        a.setAttribute('aria-hidden', 'true');
+        a.textContent = '#';
+        h.appendChild(a);
+      });
 
       // Build hero from posts.json (single source of truth; cached after first visit)
       fetchPosts()
         .then(function (posts) {
           var match = posts.filter(function (p) {
-            return p.path === currentPath || p.path.split('/').pop() === currentPath.split('/').pop();
+            var pPath = p.path.replace(/\.html$/, '');
+            return pPath === currentPath || pPath.split('/').pop() === currentPath.split('/').pop();
           })[0];
           if (!match) return;
 
@@ -312,11 +354,13 @@
           hero.className = 'post-hero';
           hero.innerHTML =
             '<div class="container">' +
+              '<a class="article-back" href="' + blogRoot + 'index.html" data-i18n="back_to_posts">&larr; All Posts</a>' +
               (tagsHtml ? '<div class="post-hero-tags">' + tagsHtml + '</div>' : '') +
               '<h1 data-i18n="post_hero_title">' + match.title + '</h1>' +
               '<div class="post-hero-meta">' +
                 (postDate ? '<span class="post-date"' + (isIso ? ' data-date="' + postDate + '"' : '') + '>' + (isIso ? formatDate(postDate, currentLang) : postDate) + '</span>' : '') +
                 (author ? '<span class="post-author">' + author + '</span>' : '') +
+                (match.titleDe ? '<button class="lang-badge lang-badge--hero" data-lang-switch>' + (currentLang === 'de' ? 'Also available in English' : 'Auch auf Deutsch verfügbar') + '</button>' : '') +
               '</div>' +
             '</div>';
           mainEl.parentNode.insertBefore(hero, mainEl);
