@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/><link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Faraday — scientific context for AI</title>
+<meta content="Faraday turns fragmented scientific reference data into machine-readable context, enabling AI systems to reason over scientific data transparently, with full provenance." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#080b11; --bg2:#0b111b; --panel:#111824; --panel2:#0d131c;
+  --ink:#dde6f0; --muted:#8a96a6; --faint:#7e8ca6;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.15);
+  --accent:#2dd4bf;          /* teal — Faraday primary  */
+  --accent2:#f5a83b;         /* amber — secondary       */
+  --fusion:#62a8ff;          /* case study: fusion      */
+  --flame:#ffb454;           /* case study: flame       */
+  --green:#56d98b;           /* case study: greenhouse  */
+  --good:#56d98b; --bad:#ff6b6b;
+  --serif:"Source Serif 4",Georgia,serif;
+  --sans:"Space Grotesk",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --prose:760px; --wide:1100px;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+p,ul,ol,h2,h3,.lead,.note,blockquote,.eq{max-width:var(--prose);margin-left:auto;margin-right:auto}
+h1,h2,h3,.kicker,.eyebrow,th,.kpi .v,.kpi .l,.tag,.legend,.brand,nav.top a,.cardttl,.metablk b{font-family:var(--sans)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(45,212,191,.32)}
+a:hover{border-bottom-color:var(--accent)}
+code{font-size:.86em;background:#0c1320;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#cfe8e3}
+sup a{border:none;color:var(--accent);font-size:.72em;padding:0 1px}
+.fdtoggle{display:none}
+.fdprogress{width:0}
+.fdtop{position:fixed;right:22px;bottom:22px;z-index:90;width:42px;height:42px;border-radius:50%;font-size:1.05rem;cursor:pointer;opacity:0;transform:translateY(8px);transition:.18s;pointer-events:none}
+.fdtop.show{opacity:1;transform:none;pointer-events:auto}
+.fdtop:hover{border-color:var(--accent)}
+.ms-chip{display:inline-block}
+.dl-meta{margin:5px 0 10px}
+.dl-btn.ghost{color:var(--muted)!important}
+@media(max-width:760px){
+ .fdtoggle{display:block}
+ .fdlinks{display:none;flex-basis:100%;flex-direction:column;align-items:stretch;gap:2px;margin:0 0 10px}
+ .fdnav.open .fdlinks{display:flex}
+ .fdlinks a.here::after{display:none}
+}
+header.hero{position:relative;overflow:hidden}
+.kicker{color:var(--accent);letter-spacing:.24em;text-transform:uppercase;font-size:.7rem;font-weight:600}
+h1{margin:.55rem 0 .2rem}
+h1 .glow{color:#fff;text-shadow:0 0 28px rgba(45,212,191,.5)}
+.sub{margin:.85rem 0 0;font-style:italic}
+.byline{margin-top:22px}
+.byline .pill.live{color:var(--good);border-color:rgba(86,217,139,.3)}
+.kpi{background:var(--panel2);padding:16px 18px}
+.kpi .v{font-family:var(--mono);font-size:1.55rem;color:#fff;font-weight:600;line-height:1}
+.kpi .v small{font-size:.62rem;color:var(--muted);font-weight:400}
+.kpi .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:8px;line-height:1.35}
+section{padding:8px 0}
+h2{scroll-margin-top:70px}
+p{margin:.95rem auto}
+.lead{font-size:1.16rem;color:#cdd6e2}
+.abstract b{color:#fff}
+.pull{color:var(--accent2);font-weight:600}
+.tk{color:var(--accent);font-family:var(--mono);font-size:.92em}
+.note{margin:22px auto;padding:15px 20px;border-radius:11px;font-size:.97rem;background:#0f1a16;border:1px solid #1d3a2c;border-left:3px solid var(--good);color:#cfe7d8}
+.note.amber{background:#1a140c;border-color:#3a2c1a;border-left-color:var(--accent2);color:#ecd9b8}
+.note .h{font-family:var(--sans);font-weight:600;color:#fff;font-size:.86rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
+.fig{margin:34px auto;padding:18px 18px 12px;scroll-margin-top:70px}
+.fig .ttl{font-family:var(--sans);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:2px 4px 10px;font-weight:600}
+.fig svg{display:block;width:100%;height:auto}
+.fig figcaption{font-size:.84rem;color:var(--muted);margin-top:10px;padding-top:11px;border-top:1px solid var(--line);line-height:1.55}
+.arch text{font-family:var(--sans)}
+.arch .m{font-family:var(--mono)}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+td.src{color:#fff;font-weight:600;font-family:var(--sans);white-space:nowrap}
+td .tools{font-family:var(--mono);font-size:.78rem;color:var(--accent)}
+.status{font-family:var(--mono);font-size:.72rem;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.status.live{color:var(--good);background:rgba(86,217,139,.1);border:1px solid rgba(86,217,139,.25)}
+.status.osc{color:var(--accent2);background:rgba(245,168,59,.1);border:1px solid rgba(245,168,59,.25)}
+.cards{max-width:var(--wide);margin:26px auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:15px;padding:0;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s ease,border-color .15s ease}
+.card:hover{transform:translateY(-3px);border-color:var(--line2)}
+.card .top{padding:18px 20px 14px;border-top:3px solid var(--cc)}
+.card .idx{font-family:var(--mono);font-size:.72rem;color:var(--cc);letter-spacing:.1em}
+.cardttl{font-size:1.18rem;color:#fff;margin:6px 0 2px;line-height:1.18;font-weight:600}
+.card .topic{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.card .body{padding:4px 20px 16px;font-size:.92rem;color:#c3cdda;flex:1}
+.card .kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.card .kpis div{background:var(--panel2);padding:11px 14px}
+.card .kpis .v{font-family:var(--mono);font-size:1.12rem;color:var(--cc);font-weight:600}
+.card .kpis .l{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.35}
+.card .foot{padding:13px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card .foot .srcs{font-family:var(--mono);font-size:.68rem;color:var(--faint)}
+.card .read{font-family:var(--sans);font-size:.82rem;font-weight:600;color:var(--cc);border:none;display:inline-flex;align-items:center;gap:5px}
+.card .read:hover{gap:9px}
+.companions{max-width:var(--prose);margin:14px auto 0;font-size:.86rem;color:var(--muted)}
+.companions a{font-family:var(--mono);font-size:.82rem}
+ol.refs{max-width:var(--prose);margin:18px auto;padding-left:0;counter-reset:r;list-style:none;font-size:.84rem;color:#b7c2d2}
+ol.refs li{counter-increment:r;padding:8px 0 8px 34px;position:relative;border-bottom:1px solid var(--line);line-height:1.5}
+ol.refs li::before{content:"["counter(r)"]";position:absolute;left:0;color:var(--accent);font-family:var(--mono);font-size:.78rem}
+ol.refs li:last-child{border-bottom:none}
+.prov{max-width:var(--prose);margin:0 auto;padding:34px 26px}
+.prov .badge{font-family:var(--sans);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.prov p{font-size:.92rem;color:#b7c2d2}
+@media (max-width:860px){
+  h1{font-size:2.3rem}
+  .readout{grid-template-columns:repeat(2,1fr)}
+  .cards{grid-template-columns:1fr}
+}
+:root{--fb-card:linear-gradient(180deg,rgba(17,24,36,.96),rgba(13,19,28,.70));
+  --fb-border:rgba(255,255,255,.10);
+  --fb-soft:rgba(255,255,255,.045);}
+header.hero{padding-top:72px;padding-bottom:30px}
+header.hero .wrap{position:relative}
+.ms-chip{display:inline-block}
+.tbl, details.app, .fig, .diagram, .abstract, .stats .stat, .stat, .readout, .callout, .note{box-shadow:0 20px 60px -48px #000}
+.tbl table{margin:0}
+.tbl th,.tbl td{border-color:var(--line,var(--fb-border))}
+.tbl thead th, table thead th{background:#0c1320;color:var(--accent,#2dd4bf)}
+.layerrow td,tr.divider td{background:rgba(45,212,191,.07)!important;color:var(--accent,#2dd4bf)!important;font-family:"Space Grotesk",system-ui,sans-serif!important;letter-spacing:.10em;text-transform:uppercase;font-weight:700}
+.dlbtn,.dl-btn,.dlcell a,a[data-file]{font-family:"JetBrains Mono",ui-monospace,monospace!important}
+details.app summary{cursor:pointer;list-style:none;padding:15px 18px;font-family:"Space Grotesk",system-ui,sans-serif;color:#fff;border-bottom:1px solid var(--line,var(--fb-border))}
+details.app summary::-webkit-details-marker{display:none}
+details.app .small{color:var(--muted,#8a96a6);font-size:.9rem}
+@media(max-width:760px){
+  header.hero{padding-top:56px;}
+  h1{font-size:clamp(2.1rem,10vw,3rem)!important;}
+  .stats,.readout{grid-template-columns:1fr!important;}
+  .tbl{border-radius:10px;}
+}
+.authorcard{max-width:var(--prose);margin:22px auto 0;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;justify-content:space-between}
+.authorcard .who{font-family:"Space Grotesk",system-ui,sans-serif;font-size:.92rem;color:var(--muted);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.authorcard .who .nm{color:#fff;font-weight:700}
+.authorcard .who .co{color:var(--ink);font-weight:600}
+.authorcard .who .rl{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-family:"JetBrains Mono",ui-monospace,monospace}
+.authorcard .lk{display:flex;gap:8px;flex-wrap:wrap}
+.authorcard .lk a{display:inline-flex;align-items:center;gap:6px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.76rem;color:var(--muted);border:1px solid var(--line)!important;border-radius:8px;padding:5px 11px;text-decoration:none}
+.authorcard .lk a:hover{color:var(--accent);border-color:var(--accent)!important;background:rgba(255,255,255,.03)}
+.authorcard .lk svg{width:15px;height:15px;fill:currentColor;flex:none}
+.authorline .social{display:inline-flex;gap:16px;margin-left:16px;flex-wrap:wrap;vertical-align:middle}
+.authorline .social a{display:inline-flex;align-items:center;gap:5px;color:var(--muted);border:none!important;text-decoration:none;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.78rem}
+.authorline .social a:hover{color:var(--accent)}
+.authorline .social svg{width:15px;height:15px;fill:currentColor}
+sup.cite{font-family:var(--mono);font-size:.68em;line-height:0;margin-left:1px}
+sup.cite a{border:none!important;color:var(--accent)!important;text-decoration:none}
+ol.refs li:target{background:rgba(45,212,191,.08);border-radius:6px}
+#sources td a{border:none!important;font-family:var(--mono)}
+</style>
+<link href="faraday-shared.css" rel="stylesheet"/><script src="https://datalabhell.at/cookie-consent.js" defer></script></head>
+<body>
+<nav class="fdnav"><div class="fdbar">
+<a class="fdbrand" href="index.html"><span class="d"></span>FARADAY</a>
+<button aria-label="Toggle menu" class="fdtoggle" onclick="this.closest('.fdnav').classList.toggle('open')">☰</button>
+<div class="fdlinks"><a href="/">&larr; Blog</a>
+<a href="index.html">Overview</a>
+<a href="Faraday_fusion_spectroscopy.html">Fusion</a>
+<a href="Faraday_methane_flame_emission.html">Flame</a>
+<a href="Faraday_CO2_vs_CH4_radiative_efficiency.html">Greenhouse</a>
+<a href="https://github.com/DataLabHell/faraday" rel="noopener" target="_blank">github.com/DataLabHell/faraday ↗</a>
+</div>
+</div><div class="fdprogress" id="fdprog"></div></nav>
+<button aria-label="Back to top" class="fdtop" id="fdtop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>(function(){var pr=document.getElementById('fdprog'),tp=document.getElementById('fdtop'),
+de=document.documentElement,pg=(location.pathname.split('/').pop()||'index.html');
+document.querySelectorAll('.fdlinks a').forEach(function(a){var h=a.getAttribute('href')||'';
+ if(h===pg||((pg===''||pg==='index.html')&&h==='index.html'))a.classList.add('here');});
+function u(){var s=de.scrollTop||document.body.scrollTop,m=(de.scrollHeight-de.clientHeight)||1;
+ if(pr)pr.style.width=(s/m*100)+'%';if(tp)tp.classList.toggle('show',s>600);}
+addEventListener('scroll',u,{passive:true});addEventListener('load',u);u();})();</script>
+<a id="top"></a>
+<header class="hero"><div class="wrap">
+<div class="kicker">Open source · Model Context Protocol · Scientific reference data</div>
+<h1>Science has a context problem. <span class="glow">Faraday makes it machine-readable.</span></h1>
+<p class="sub">Faraday turns fragmented scientific reference data into machine-readable context — so AI agents can retrieve authoritative constants, spectra, thermochemistry, identifiers, and line lists, then reason from them with provenance instead of speculation. It is an open-source project that everyone can inspect, use, and contribute to through GitHub.</p>
+<div class="byline"><div class="authorline">By <strong>Daniel Hauser</strong><span class="social"><a aria-label="LinkedIn" href="https://www.linkedin.com/in/daniel-hauser-77259a159" rel="noopener" target="_blank"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>LinkedIn</a><a aria-label="GitHub" href="https://github.com/dugi42" rel="noopener" target="_blank"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>GitHub</a><a aria-label="Email" href="mailto:daniel.hauser@datalabhell.at"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path></svg>daniel.hauser@datalabhell.at</a></span></div>
+</div></div></header>
+<div class="wrap">
+<p class="lead">The bottleneck for AI in science is often not reasoning. It is context. The constants, spectra, thermochemistry, molecular identifiers, and line lists needed to answer quantitative questions already exist — but they are scattered across legacy databases with different portals, identifiers, units, and file formats. Faraday gives AI systems access to that authoritative scientific context through one typed, transparent interface.</p>
+<div class="abstract">
+<b>What this page is.</b> A short tour of why Faraday exists and how it works, followed by three
+  investigations an agent ran end-to-end — a fusion energy ledger, a methane flame's spectrum, and a
+  molecule-by-molecule comparison of CO₂ and CH₄ — each drawing its data from Faraday alone and
+  shipping downloadable data, scripts where present, and provenance notes. Every headline figure below traces to a specific Faraday tool call.
+</div>
+<!-- ============================ PROBLEM ============================ -->
+<section id="problem">
+<h2><span class="s">01</span>The scientific context problem</h2>
+<p>Six bodies of reference data are widely used across the physical sciences. CODATA<sup class="cite"><a href="#ref_codata">[3]</a></sup> provides the
+internationally recommended values of the fundamental constants. HITRAN<sup class="cite"><a href="#ref_hitran">[2]</a></sup> gives per-transition molecular
+line parameters for radiative-transfer work. The NIST Chemistry WebBook<sup class="cite"><a href="#ref_webbook">[4]</a></sup> supplies Shomate thermochemistry,
+vapour pressures, and measured spectra. The NIST Atomic Spectra Database<sup class="cite"><a href="#ref_asd">[7]</a></sup> holds observed lines and energy
+levels for a wide range of elements and ions. PubChem<sup class="cite"><a href="#ref_pubchem">[6]</a></sup> carries structures, identifiers, and safety data
+for on the order of a hundred million compounds. MassBank of North America<sup class="cite"><a href="#ref_mona">[8]</a></sup> archives experimental mass
+spectra. Each is the product of decades of careful, curated measurement, and each is independently
+maintained and widely cited.</p>
+<p>They simply do not speak to one another. Every source has its own portal, its own query grammar,
+its own identifier scheme — a HITRAN molecule number here, a CAS registry number there, a NIST
+species ID somewhere else — and its own file format: 160-character HITRAN records, JCAMP-DX spectral
+files, blocks of Shomate coefficients, CODATA constant keys. Units collide too: a band centre is
+quoted in wavenumbers by one source, microns by another, electronvolts by a third. A scientist has
+learned how to navigate this fragmentation. An AI agent sees disconnected systems. Faraday closes
+that gap by turning fragmented reference data into shared scientific context.</p>
+</section>
+<!-- ============================ ERROR-PRONE ============================ -->
+<section id="errorprone">
+<h2><span class="s">02</span>Error-prone, because the infrastructure assumes a human</h2>
+<p>These interfaces were built for a person at a keyboard. You copy a constant and paste it into a
+script. You transcribe sixteen Shomate coefficients from a table. You convert 667 cm⁻¹ to 14.98 µm
+by hand. You match an isotopologue index in HITRAN to an isotope peak in a mass spectrum. Every one of
+those hops is a silent opportunity for error — a transposed digit, a dropped factor of ten, the wrong
+isotopologue — and none of them is the science. The databases are carefully maintained; the integration
+layer is often a person doing it by hand, and people mistype.</p>
+<p>This is a quiet tax on legacy scientific infrastructure: often the data is not missing, but turning
+it into an answer is manual, frequently unaudited, and hard to retrace later. The spreadsheet that
+produced last year's figure may be gone; the constant someone pasted in, a version nobody recorded.</p>
+</section>
+<!-- ============================ PRECISION GAP ============================ -->
+<section id="precision">
+<h2><span class="s">03</span>An API wants precision; a question starts vague</h2>
+<p>A REST endpoint cannot answer <em>“what's in air?”</em> It answers
+<code>molecule=2, isotopologue=1, numin=667, numax=672</code>. To get there you must already know that
+the species of interest is CO₂, that CO₂ is HITRAN molecule 2, that its principal isotopologue is
+index 1, and that the 15-micron greenhouse feature is the ν₂ bending fundamental near
+667 cm⁻¹. The distance between a scientific question and a well-formed query <em>is</em> the
+expertise that makes the data hard to reach in the first place.</p>
+<p>An agent closes that distance. Ask it about the infrared opacity of air and it does what a
+spectroscopist would: it decomposes <span class="pull">“air”</span> into N₂, O₂, Ar, CO₂, H₂O, CH₄…,
+recognises that the radiatively active species are the polar and asymmetric ones, resolves each to its
+HITRAN identifier, picks the relevant bands and windows, retrieves the lines, and reassembles them
+into an answer — pulling the constants it needs from CODATA and the molecular masses from PubChem along
+the way. The vague question survives contact with the precise interface, because the agent supplies the
+missing translation.</p>
+<div class="note amber">
+<div class="h">The translation, concretely</div>
+  “How hot is a methane flame, and why is it blue then orange?” becomes: resolve CH₄, CO₂, H₂O and N₂
+  in the WebBook → pull their Shomate enthalpies → solve an adiabatic flame balance → resolve Na, K, Li
+  in the ASD → get their resonance lines and energy levels → weight them by a Boltzmann factor at the
+  flame temperature → fetch CO₂/H₂O bands from HITRAN for the infrared. One sentence in; a dozen typed,
+  precise tool calls underneath.
+</div>
+</section>
+<!-- ============================ HOW IT WORKS ============================ -->
+<section id="how">
+<h2><span class="s">04</span>How Faraday works</h2>
+<p>The Model Context Protocol (MCP)<sup class="cite"><a href="#ref_mcp">[1]</a></sup> is a thin, typed contract between an agent and a tool server. Faraday
+advertises <b>15 tools across the six sources</b>; the agent calls them by name with structured arguments
+and receives structured data back — no agent-side scraping, no agent-side HTML parsing, no scripting against six different
+APIs. Faraday owns the provider-specific parsing where an upstream still exposes legacy HTML or CGI forms. Two conventions make it ergonomic. First, a <span class="tk">search → get</span> pattern: resolve a
+human name to a stable identifier (<code>pubchem_search("caffeine")</code> → a CID), then fetch by that
+identifier. Second, <b>uniform returns</b>: the server normalises each upstream's idiosyncratic format —
+JCAMP-DX, HITRAN records, Shomate blocks — into clean, typed JSON, so a wavenumber is always a number and
+a line list is always a table.</p>
+<p>The whole stack is introspectable. An agent can list the available tools, read each one's schema, and
+plan a multi-source query without anything hard-coded in advance. The diagram below traces one question
+from the top of the stack to the upstream databases and back.</p>
+<figure class="fig" id="architecture">
+<div class="ttl">Figure 1 · Call path — one question, many precise calls, a traceable artifact back</div>
+<svg aria-label="Faraday architecture: scientist question to agent to MCP protocol to Faraday server to six upstream databases, with a return path and a self-discovery loop" class="arch" role="img" viewBox="0 0 1100 600">
+<defs>
+<marker id="aT" markerheight="10" markerwidth="10" orient="auto" refx="7" refy="3"><path d="M0,0 L7,3 L0,6 Z" fill="#2dd4bf"></path></marker>
+<marker id="aA" markerheight="10" markerwidth="10" orient="auto" refx="7" refy="3"><path d="M0,0 L7,3 L0,6 Z" fill="#f5a83b"></path></marker>
+<marker id="aB" markerheight="10" markerwidth="10" orient="auto" refx="7" refy="3"><path d="M0,0 L7,3 L0,6 Z" fill="#62a8ff"></path></marker>
+</defs>
+<!-- self-discovery loop (left, blue dashed) -->
+<polyline fill="none" marker-end="url(#aB)" opacity="0.8" points="310,324 50,324 50,150 338,150" stroke="#62a8ff" stroke-dasharray="5 5" stroke-width="1.6"></polyline>
+<text class="m" fill="#62a8ff" font-size="11" opacity="0.95" text-anchor="middle" transform="rotate(-90 40 240)" x="40" y="240">self-discovery · search→get · availability probed at runtime</text>
+<!-- return path (right, amber) -->
+<polyline fill="none" marker-end="url(#aA)" opacity="0.85" points="790,324 1052,324 1052,150 762,150" stroke="#f5a83b" stroke-width="1.6"></polyline>
+<text class="m" fill="#f5a83b" font-size="11" opacity="0.95" text-anchor="middle" transform="rotate(-90 1064 240)" x="1064" y="240">typed JSON → scipy · pyarrow → Parquet + HTML + audit log</text>
+<!-- scientist / question -->
+<rect fill="#0e1726" height="66" rx="12" stroke="#26344a" width="660" x="220" y="20"></rect>
+<text fill="#8a96a6" font-size="11" letter-spacing="2" text-anchor="middle" x="550" y="44">THE SCIENTIST · A PLAIN QUESTION</text>
+<text fill="#dde6f0" font-size="15" font-style="italic" text-anchor="middle" x="550" y="68">“Why does CO₂ trap heat?   How hot is a flame?   What runs a fusion reactor?”</text>
+<line marker-end="url(#aT)" stroke="#2dd4bf" stroke-width="2" x1="550" x2="550" y1="86" y2="116"></line>
+<!-- agent -->
+<rect fill="#0c1a1a" height="64" rx="12" stroke="#2dd4bf" stroke-width="1.6" width="424" x="338" y="118"></rect>
+<text fill="#fff" font-size="15" font-weight="600" text-anchor="middle" x="550" y="144">AI AGENT</text>
+<text fill="#9fb0c2" font-size="12" text-anchor="middle" x="550" y="166">decomposes one question into many precise, typed tool calls</text>
+<line marker-end="url(#aT)" stroke="#2dd4bf" stroke-width="2" x1="550" x2="550" y1="182" y2="210"></line>
+<!-- MCP bar -->
+<rect fill="#0d131c" height="40" rx="8" stroke="#26344a" width="600" x="250" y="212"></rect>
+<text class="m" fill="#9fb0c2" font-size="12.5" text-anchor="middle" x="550" y="237">MCP · named tool calls + typed arguments over a JSON-RPC transport</text>
+<line marker-end="url(#aT)" stroke="#2dd4bf" stroke-width="2" x1="550" x2="550" y1="252" y2="284"></line>
+<!-- faraday server -->
+<rect fill="#10202b" height="66" rx="12" stroke="#2dd4bf" stroke-width="2" width="476" x="312" y="286"></rect>
+<text fill="#2dd4bf" font-size="15" font-weight="700" letter-spacing="1" text-anchor="middle" x="550" y="312">FARADAY MCP SERVER</text>
+<text fill="#9fb0c2" font-size="12" text-anchor="middle" x="550" y="334">route · normalise units · serialise — 15 tools, 6 sources</text>
+<!-- fan to sources -->
+<g opacity="0.55" stroke="#2dd4bf" stroke-width="1.4">
+<line marker-end="url(#aT)" x1="550" x2="145" y1="352" y2="432"></line>
+<line marker-end="url(#aT)" x1="550" x2="307" y1="352" y2="432"></line>
+<line marker-end="url(#aT)" x1="550" x2="469" y1="352" y2="432"></line>
+<line marker-end="url(#aT)" x1="550" x2="631" y1="352" y2="432"></line>
+<line marker-end="url(#aT)" x1="550" x2="793" y1="352" y2="432"></line>
+<line marker-end="url(#aT)" x1="550" x2="955" y1="352" y2="432"></line>
+</g>
+<text fill="#5a6678" font-size="10.5" letter-spacing="3" text-anchor="middle" x="550" y="416">UPSTREAM REFERENCE DATABASES — decades of curated measurement</text>
+<!-- six source boxes -->
+<g font-size="11">
+<!-- CODATA -->
+<rect fill="#0e1726" height="96" rx="10" stroke="#26344a" width="150" x="70" y="434"></rect>
+<rect fill="#2dd4bf" height="4" rx="2" width="150" x="70" y="434"></rect>
+<text fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle" x="145" y="462">CODATA 2022</text>
+<text class="m" fill="#2dd4bf" text-anchor="middle" x="145" y="482">2 tools</text>
+<text fill="#8a96a6" text-anchor="middle" x="145" y="502">physical</text>
+<text fill="#8a96a6" text-anchor="middle" x="145" y="517">constants</text>
+<!-- PubChem -->
+<rect fill="#0e1726" height="96" rx="10" stroke="#26344a" width="150" x="232" y="434"></rect>
+<rect fill="#2dd4bf" height="4" rx="2" width="150" x="232" y="434"></rect>
+<text fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle" x="307" y="462">PubChem</text>
+<text class="m" fill="#2dd4bf" text-anchor="middle" x="307" y="482">4 tools</text>
+<text fill="#8a96a6" text-anchor="middle" x="307" y="502">structures · IDs</text>
+<text fill="#8a96a6" text-anchor="middle" x="307" y="517">safety</text>
+<!-- WebBook -->
+<rect fill="#0e1726" height="96" rx="10" stroke="#26344a" width="150" x="394" y="434"></rect>
+<rect fill="#2dd4bf" height="4" rx="2" width="150" x="394" y="434"></rect>
+<text fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle" x="469" y="462">NIST WebBook</text>
+<text class="m" fill="#2dd4bf" text-anchor="middle" x="469" y="482">3 tools</text>
+<text fill="#8a96a6" text-anchor="middle" x="469" y="502">thermochem</text>
+<text fill="#8a96a6" text-anchor="middle" x="469" y="517">Shomate · Antoine</text>
+<!-- ASD -->
+<rect fill="#0e1726" height="96" rx="10" stroke="#26344a" width="150" x="556" y="434"></rect>
+<rect fill="#2dd4bf" height="4" rx="2" width="150" x="556" y="434"></rect>
+<text fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle" x="631" y="462">NIST ASD</text>
+<text class="m" fill="#2dd4bf" text-anchor="middle" x="631" y="482">2 tools</text>
+<text fill="#8a96a6" text-anchor="middle" x="631" y="502">atomic lines</text>
+<text fill="#8a96a6" text-anchor="middle" x="631" y="517">energy levels</text>
+<!-- spectra -->
+<rect fill="#0e1726" height="96" rx="10" stroke="#26344a" width="150" x="718" y="434"></rect>
+<rect fill="#2dd4bf" height="4" rx="2" width="150" x="718" y="434"></rect>
+<text fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle" x="793" y="462">NIST · MoNA</text>
+<text class="m" fill="#2dd4bf" text-anchor="middle" x="793" y="482">2 tools</text>
+<text fill="#8a96a6" text-anchor="middle" x="793" y="502">measured</text>
+<text fill="#8a96a6" text-anchor="middle" x="793" y="517">IR · MS spectra</text>
+<!-- HITRAN -->
+<rect fill="#0e1726" height="96" rx="10" stroke="#26344a" width="150" x="880" y="434"></rect>
+<rect fill="#2dd4bf" height="4" rx="2" width="150" x="880" y="434"></rect>
+<text fill="#fff" font-size="12.5" font-weight="600" text-anchor="middle" x="955" y="462">HITRANonline</text>
+<text class="m" fill="#2dd4bf" text-anchor="middle" x="955" y="482">2 tools</text>
+<text fill="#8a96a6" text-anchor="middle" x="955" y="502">line-by-line</text>
+<text fill="#8a96a6" text-anchor="middle" x="955" y="517">radiative transfer</text>
+</g>
+<text fill="#5a6678" font-size="10.5" text-anchor="middle" x="550" y="560">forward path — teal · return of data &amp; products — amber · runtime self-discovery — blue</text>
+</svg>
+<figcaption>One plain-language question enters at the top. The agent decomposes it and issues named
+  MCP tool calls (teal); Faraday routes each to the right upstream database, normalises units, and
+  returns typed JSON. That data flows back up (amber) into a <span class="mono">scipy</span> /
+  <span class="mono">pyarrow</span> analysis that emits Parquet data, an HTML report, and a
+  complete call log. The blue loop is self-discovery: the agent probes which tools and identifiers
+  exist — and whether the data it needs is actually present — at runtime rather than assuming it.</figcaption>
+</figure>
+</section>
+<!-- ============================ SELF-DISCOVERY ============================ -->
+<section id="discovery">
+<h2><span class="s">05</span>Self-discovery, not pre-programming</h2>
+<p>Because the tool list and every schema are introspectable, the agent is not a fixed script bolted
+onto known endpoints. It discovers what the server offers, what each tool returns, and — the part that
+matters most for trust — <b>what data is actually available for a given query</b>. Availability is
+something you learn at runtime, not assume.</p>
+<p>A real example from the flame investigation: asked for the heat of combustion of methanol, the agent
+called <code>nist_get_thermo</code>, found that the WebBook has no gas-phase Shomate table for it, and
+rather than fabricate a value, pivoted to <b>methane</b> — the literal Bunsen-burner gas — whose
+coefficients <em>are</em> present, and recorded the gap as a finding. Self-discovery turns a missing
+dataset from a silent, answer-corrupting failure into an explicit, logged decision. The same mechanism
+lets the agent notice when a source is intermittently unreachable and say so, instead of quietly
+returning less than it claims.</p>
+</section>
+<!-- ============================ AUDITABILITY ============================ -->
+<section id="auditability">
+<h2><span class="s">06</span>Transparent and auditable by construction</h2>
+<p>In these investigations, every scientific value the agent uses arrives through a named call with
+explicit arguments, so the entire derivation is a log you can replay. The investigations ship the available derived data — raw upstream data regenerates on demand from the logged calls,
+plus analysis or validation scripts where those scripts are checked in. The artifact layout is not identical across all three case studies,
+so provenance is described per article rather than as a single universal raw-JSON contract. When a result disagrees with the prose,
+the prose is corrected and the correction is recorded — not hidden.</p>
+<p>The constants get a second, independent check. Faraday's CODATA values are compared against
+<code>scipy.constants</code>, which carries the same internationally adopted CODATA 2022 set, and
+they agree numerically within the precision checked by the scripts. The point is not that an
+agent can compute; it is that the agent hands you the number <em>and the receipt</em>: which database,
+which call, which arguments, cross-checked against an independent implementation. That is the difference
+between an answer you trust because it sounds right and one you trust because you can re-run it.</p>
+</section>
+<!-- ============================ RECALLED VS RETRIEVED ============================ -->
+<section id="grounding">
+<h2><span class="s">07</span>Recalled vs. retrieved</h2>
+<p>A fair question from anyone who works with these databases: a frontier model already “knows” the
+speed of light — what does fetching it add? It depends entirely on the kind of number. Memory and
+retrieval fail differently: memory fails as a <em>silently plausible</em> value, retrieval fails as a
+visible error. In scientific work those costs are not symmetric.</p>
+<table>
+<thead><tr><th>What an agent needs</th><th>From model memory</th><th>Through Faraday</th></tr></thead>
+<tbody>
+<tr><td class="src">SI-defined and famous constants (h, c, k<sub>B</sub>, N<sub>A</sub>)</td>
+<td>Reliable — exact by definition since the 2019 SI redefinition, heavily represented in training data.</td>
+<td>The same digits, plus uncertainty, unit, and the CODATA adjustment cycle pinned in the response. Grounding adds provenance here, not correction.</td></tr>
+<tr><td class="src">Curated single facts (boiling points, Antoine validity ranges, GHS classes)</td>
+<td>Usually close, but editions and conditions blur — which pressure, which table revision, which source.</td>
+<td>The NIST WebBook or PubChem record itself, with compound ID and table context, quotable as retrieved.</td></tr>
+<tr><td class="src">Dense numerical tables (HITRAN line intensities, ASD transition probabilities, Shomate coefficients)</td>
+<td>Not reliably recallable: thousands of six-plus-digit parameters per molecule. Plausible-looking confabulation is the failure mode.</td>
+<td>The exact records — e.g. the 90 CO₂ ν₂ lines (651–682 cm⁻¹) behind the Greenhouse analysis, intensities spanning four orders of magnitude, retrieved live via <code>hitran_get_lines</code> and summarised in its appendix; the raw line list regenerates on demand (see the Data availability notice).</td></tr>
+<tr><td class="src">Versioned and post-cutoff data (HITRAN2024 updates, new CODATA cycles)</td>
+<td>Frozen at the training cutoff; adjacent editions blend together.</td>
+<td>A live fetch that names its edition in the payload (<code>database_edition: HITRAN2024</code>).</td></tr>
+</tbody>
+</table>
+<div class="note amber">This table is an argument from structure, not a measured benchmark — no accuracy
+percentages are claimed here. It is also testable: the available retrieved tables ship beside the articles, and
+raw line lists regenerate on demand via the documented tool calls, so you can ask any model for the same
+records from memory and diff the answer against what Faraday returns.</div>
+</section>
+
+<!-- ============================ SOURCES TABLE ============================ -->
+<section id="sources">
+<h2><span class="s">08</span>The six sources, behind one protocol</h2>
+<p>Fifteen tools, grouped by upstream. Availability is probed each run; the two atomic/MS archives have
+been observed to oscillate between reachable and rate-limited, which is reported honestly rather than
+worked around.</p>
+<div class="tbl"><table>
+<thead><tr><th>Source</th><th>Faraday tools</th><th>What it serves</th><th>Ref</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td class="src">CODATA 2022</td><td class="tools">codata_search · codata_get</td><td>Internationally recommended physical constants — h, c, k<sub>B</sub>, N<sub>A</sub>, R, Wien b, c₂</td><td><a href="#ref_codata">[3]</a></td><td><span class="status live">live</span></td></tr>
+<tr><td class="src">PubChem</td><td class="tools">pubchem_search · _get_properties · _get_synonyms · _get_safety</td><td>Structures, CAS numbers, molecular &amp; exact masses, synonyms, GHS safety — 119M+ compounds</td><td><a href="#ref_pubchem">[6]</a></td><td><span class="status live">live</span></td></tr>
+<tr><td class="src">NIST Chemistry WebBook</td><td class="tools">nist_search_compound · _get_thermo · _get_phase_change</td><td>Shomate C<sub>p</sub>/H/S, Antoine vapour pressure, boiling/critical points</td><td><a href="#ref_webbook">[4]</a>, <a href="#ref_janaf">[5]</a></td><td><span class="status live">live</span></td></tr>
+<tr><td class="src">NIST Atomic Spectra DB</td><td class="tools">asd_get_lines · asd_get_energy_levels</td><td>Observed lines (λ, A<sub>ki</sub>, intensity) and energy-level tables for any element or ion</td><td><a href="#ref_asd">[7]</a></td><td><span class="status osc">oscillates</span></td></tr>
+<tr><td class="src">NIST &amp; MoNA spectra</td><td class="tools">nist_get_spectrum · mona_get_spectrum</td><td>JCAMP-DX IR / THz / UV-Vis / MS from the WebBook; experimental mass spectra from MassBank</td><td><a href="#ref_webbook">[4]</a>, <a href="#ref_mona">[8]</a></td><td><span class="status osc">live / by-ID</span></td></tr>
+<tr><td class="src">HITRANonline</td><td class="tools">hitran_search_molecule · hitran_get_lines</td><td>Per-transition line parameters (ν̃, S, A, γ, E″, quanta) for 60+ molecules — current HITRAN2024 data in HITRAN .par records</td><td><a href="#ref_hitran">[2]</a></td><td><span class="status live">live</span></td></tr>
+</tbody>
+</table></div>
+<h3>What the “Status” column means — and where it needs work</h3>
+<p>Every tool fetches from its upstream service at call time; there is no local
+mirror, so a tool is only as available as the database behind it. Requests are
+spaced by a polite per-host rate limit (PubChem up to 5 per second, the others
+1 per second), cached in memory for one hour, and routed through a
+robots.txt-aware client. The column reports what we observe, not a promise:</p>
+<ul>
+<li><span class="status live">live</span> — the upstream offers a stable, documented interface (a static file, or a versioned REST/HTTP API). Within the rate limit and cache, calls succeed reliably. Covers CODATA constants, PubChem, NIST WebBook thermochemistry, and HITRANonline.</li>
+<li><span class="status osc">oscillates</span> — the NIST Atomic Spectra Database. Its tools drive ASD’s legacy CGI forms (<span class="mono">lines1.pl</span>, <span class="mono">energy1.pl</span>) and parse tab-delimited text. Two things make it flap between reachable and not: under load NIST rate-limits and sometimes returns an HTML error page instead of data, and the CGI field names have been renamed upstream before (e.g. <span class="mono">low_wl → low_w</span>), which silently breaks requests until the form mapping is updated. robots.txt is honoured here; transient robots 5xx/429 responses disallow the current request but are not cached for the full robots window.</li>
+<li><span class="status">live / by-ID</span> — the spectra tools (NIST WebBook JCAMP-DX, MoNA mass spectra). Retrieval is reliable <em>once you hold the exact record ID</em> — a WebBook compound ID or a MoNA accession. There is no fuzzy spectrum search, so discovery, not delivery, is the limit: you resolve an ID first (via <span class="mono">nist_search_compound</span> or by browsing MoNA), then fetch.</li>
+</ul>
+<div class="note amber"><div class="h">Where stability would improve</div>
+<ul>
+<li><b>ASD scraping is brittle.</b> It rides an undocumented CGI form and an HTML/TSV layout NIST can change without notice. Hardening: detect the error-page response and retry with backoff, validate the returned column schema before parsing, and auto-discover the form fields instead of hard-coding them.</li>
+<li><b>No spectrum discovery.</b> “by-ID” retrieval should sit behind a name→ID resolver, so a caller can ask for a spectrum by molecule rather than needing the accession up front.</li>
+<li><b>The cache is in-memory only.</b> The one-hour response cache is lost on restart and is not shared across processes; a persistent or shared cache would carry the oscillating sources across runs and absorb most transient outages.</li>
+<li><b>No cross-process circuit breaker.</b> Transient 429, 5xx, and network-layer request failures are retried with bounded backoff, but outage state is not shared across processes and failing hosts are not temporarily suppressed. A per-host circuit breaker would make repeated “oscillates” episodes quieter for callers.</li>
+</ul></div>
+</section>
+<!-- ============================ INVESTIGATIONS ============================ -->
+<section id="investigations">
+<h2><span class="s">09</span>Three investigations</h2>
+<p>To show the gap between <em>reachable</em> data and <em>usable</em> answers, the agent ran three
+investigations end to end. Each begins with a plain question, draws every number from Faraday alone, and
+ships an openly documented pipeline with downloadable data and full appendices. They span three corners of the
+physical sciences — a star's energy source, a candle flame, and the planet's heat balance — and together
+they exercise all six databases.</p>
+<div class="cards">
+<!-- FUSION -->
+<article class="card" style="--cc:var(--fusion)">
+<div class="top">
+<div class="idx">INVESTIGATION 01 · ATOMIC</div>
+<div class="cardttl">The Light That Runs the Reactor</div>
+<div class="topic">Fusion plasma spectroscopy</div>
+</div>
+<div class="body">The same atomic line radiation that lets you <em>measure</em> a tokamak plasma also
+    decides whether it survives. A deuterium–tritium energy ledger built from CODATA mass–energy
+    equivalents, plus Doppler and isotope-shift diagnostics from the ASD.</div>
+<div class="kpis">
+<div><div class="v">17.589<small> MeV</small></div><div class="l">D–T reaction Q, from CODATA masses</div></div>
+<div><div class="v">1/5 : 4/5</div><div class="l">α : neutron energy split</div></div>
+<div><div class="v">1.807<small> nm</small></div><div class="l">He II line width @ 10 keV</div></div>
+<div><div class="v">checked</div><div class="l">CODATA vs scipy.constants</div></div>
+</div>
+<div class="foot">
+<span class="srcs">ASD · CODATA · PubChem</span>
+<a class="read" href="Faraday_fusion_spectroscopy.html">Read →</a>
+</div>
+</article>
+<!-- FLAME -->
+<article class="card" style="--cc:var(--flame)">
+<div class="top">
+<div class="idx">INVESTIGATION 02 · COMBUSTION</div>
+<div class="cardttl">What a Flame Radiates</div>
+<div class="topic">Combustion &amp; emission</div>
+</div>
+<div class="body">A methane flame's light, split into its visible half (seeded alkali atomic lines,
+    populated by a Boltzmann factor) and its invisible half (CO₂/H₂O thermal-IR bands). It draws on
+    six legacy archives, including a MoNA connectivity demonstration.</div>
+<div class="kpis">
+<div><div class="v">2327<small> K</small></div><div class="l">adiabatic flame T, from Shomate enthalpies</div></div>
+<div><div class="v">1 : 11,987</div><div class="l">Na atoms excited — the orange you see</div></div>
+<div><div class="v">1.25<small> µm</small></div><div class="l">Wien peak — in the near-IR, invisible</div></div>
+<div><div class="v">802<small> kJ/mol</small></div><div class="l">heating value ≡ 50.0 MJ/kg</div></div>
+</div>
+<div class="foot">
+<span class="srcs">six legacy archives</span>
+<a class="read" href="Faraday_methane_flame_emission.html">Read →</a>
+</div>
+</article>
+<!-- GREENHOUSE -->
+<article class="card" style="--cc:var(--green)">
+<div class="top">
+<div class="idx">INVESTIGATION 03 · MOLECULAR</div>
+<div class="cardttl">Two molecules, one thermal-infrared spectrum</div>
+<div class="topic">Greenhouse gases · CO₂ vs CH₄</div>
+</div>
+<div class="body">Why methane is far more potent <em>per molecule</em> than CO₂, yet CO₂ still
+    dominates total forcing — resolved from primary line lists, thermochemistry, and measured IR
+    spectra, with no climate model in the loop.</div>
+<div class="kpis">
+<div><div class="v">~7,000×</div><div class="l">strongest single CH₄ line vs strongest CO₂ line</div></div>
+<div><div class="v">222×</div><div class="l">more CO₂ than CH₄ in today's air column</div></div>
+<div><div class="v">5.0×</div><div class="l">more outgoing radiation at the CO₂ band</div></div>
+<div><div class="v">≈33×</div><div class="l">CH₄ radiative efficiency per added molecule</div></div>
+</div>
+<div class="foot">
+<span class="srcs">CODATA · PubChem · WebBook · spectra · HITRAN</span>
+<a class="read" href="Faraday_CO2_vs_CH4_radiative_efficiency.html">Read →</a>
+</div>
+</article>
+</div>
+<div class="note">
+<div class="h">Read the difference</div>
+  Each report opens from a single question and ends with the same thing a referee would want: every
+  figure traceable to a tool call, the available derived data downloadable beside the article (raw regenerates on demand),
+  available scripts or validation notes, and an honest list of what failed. That auditability — more than the prose —
+  is the point.
+</div>
+<div class="note">
+<div class="h">Data availability &amp; legal notice</div>
+  Some raw upstream data these reports draw on — full HITRAN line lists, full NIST Chemistry WebBook IR
+  spectra, and raw NIST Atomic Spectra Database (ASD) line/level data — is <b>not redistributed here</b>, to
+  respect the providers' terms: those compilations are not licensed for redistribution under this project's
+  Apache-2.0 licence. Only small derived and figure tables ship; the raw data regenerates on demand via the
+  Faraday MCP tool calls shown in each article. See <a href="data/DATA_NOTICE.md">data/DATA_NOTICE.md</a>.
+</div>
+</section>
+<!-- ============================ REFERENCES ============================ -->
+<section id="references">
+<h2><span class="s">10</span>Primary data sources</h2>
+<p>The reference editions Faraday draws on. Each investigation carries its own additional,
+domain-specific citations.</p>
+<ol class="refs">
+<li id="ref_mcp">Anthropic, “Model Context Protocol” specification (2024). <span class="mono">modelcontextprotocol.io</span>.</li>
+<li id="ref_hitran">I. E. Gordon, L. S. Rothman, R. J. Hargreaves, <i>et al.</i>, “The HITRAN2024 molecular spectroscopic database,” <i>J. Quant. Spectrosc. Radiat. Transfer</i> 109807 (2026). doi:10.1016/j.jqsrt.2026.109807. HITRANonline states the current website data correspond to HITRAN2024.</li>
+<li id="ref_codata">P. J. Mohr, D. B. Newell, B. N. Taylor, E. Tiesinga, “CODATA recommended values of the fundamental physical constants: 2022,” <i>Rev. Mod. Phys.</i> <b>97</b>, 025002 (2025); <i>J. Phys. Chem. Ref. Data</i> <b>54</b>, 033105 (2025). <span class="mono">physics.nist.gov/constants</span>.</li>
+<li id="ref_webbook">P. J. Linstrom &amp; W. G. Mallard, Eds., <i>NIST Chemistry WebBook</i>, NIST Standard Reference Database No. 69. doi:10.18434/T4D303. <span class="mono">webbook.nist.gov</span>.</li>
+<li id="ref_janaf">M. W. Chase, Jr., <i>NIST-JANAF Thermochemical Tables</i>, 4th ed., <i>J. Phys. Chem. Ref. Data</i>, Monograph 9 (1998).</li>
+<li id="ref_pubchem">S. Kim, J. Chen, T. Cheng, <i>et al.</i>, “PubChem 2025 update,” <i>Nucleic Acids Res.</i> <b>53</b>(D1), D1516–D1525 (2025). doi:10.1093/nar/gkae1059.</li>
+<li id="ref_asd">A. Kramida, Yu. Ralchenko, J. Reader &amp; NIST ASD Team, <i>NIST Atomic Spectra Database</i> (ver. 5.12; data content last updated November 2024), National Institute of Standards and Technology. doi:10.18434/T4W30F. <span class="mono">physics.nist.gov/asd</span>.</li>
+<li id="ref_mona">H. Horai, M. Arita, S. Kanaya, <i>et al.</i>, “MassBank: a public repository for sharing mass spectral data for life sciences,” <i>J. Mass Spectrom.</i> <b>45</b>, 703–714 (2010); MassBank of North America (MoNA), Fiehn Lab, UC Davis. <span class="mono">mona.fiehnlab.ucdavis.edu</span>.</li>
+</ol>
+</section>
+</div><!-- /wrap -->
+<!-- ============================ FOOTER / PROVENANCE ============================ -->
+<footer>
+<div class="prov">
+<div class="badge">Provenance</div>
+<p>Overview and project by Daniel Hauser (DataLabHell). The three investigations linked here were generated autonomously by Claude (Opus) running in
+    Cowork mode in the Claude desktop app with the highest-effort reasoning setting available in that UI. For each, the only context
+    provided was the open-source Faraday repository, and every scientific value was retrieved
+    <b>exclusively through Faraday MCP tool calls</b> — no direct database queries, no web scraping, no
+    hand-supplied datasets. Each report embeds its prompt, MCP calls, available derived data,
+    and available analysis or validation code. This overview surfaces only
+    headline figures, each of which is traceable to — and was re-checked against — its source report.</p>
+</div>
+<div class="authorcard"><div class="who"><span class="nm">Daniel Hauser</span><span class="rl">author</span></div><div class="lk"><a aria-label="LinkedIn" href="https://www.linkedin.com/in/daniel-hauser-77259a159" rel="noopener" target="_blank"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>LinkedIn</a><a aria-label="GitHub" href="https://github.com/dugi42" rel="noopener" target="_blank"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>GitHub</a><a aria-label="Email" href="mailto:daniel.hauser@datalabhell.at"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path></svg>daniel.hauser@datalabhell.at</a></div></div><div class="foot-end">
+<span>FARADAY · open-source MCP server for scientific reference data</span>
+<span>six databases · one protocol · every figure traceable to a call</span>
+</div>
+</footer>
+</body>
+</html>

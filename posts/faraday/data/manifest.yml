@@ -1,0 +1,219 @@
+# Copyright 2026 Data Lab Hell GmbH
+# SPDX-License-Identifier: Apache-2.0
+
+version: 1
+scope: "Tracked artifacts under assets/blog/data"
+note: >
+  This manifest describes the shipped blog data and metadata artifacts. It does
+  not grant redistribution rights. Third-party-derived scientific data remains
+  subject to provider terms documented in DATA_NOTICE.md.
+
+redistribution_statuses:
+  project_metadata: "Project-authored metadata/instructions; Apache-2.0 applies unless noted otherwise."
+  codata_attribution: "NIST CODATA-derived constants/factual calculations; attribute NIST CODATA 2022."
+  nist_srd_restricted: "Derived from NIST Standard Reference Data; illustrative only, not cleared for broad redistribution."
+  pubchem_policy: "Derived from PubChem/NCBI molecular data; NCBI places no restrictions on molecular data but cannot grant third-party rights."
+  hitran_aggregate: "Aggregate derived from HITRAN; cite HITRAN2024, do not redistribute raw line lists."
+
+artifacts:
+  - path: assets/blog/data/co2_vs_ch4/codata_constants.parquet
+    article: co2_vs_ch4
+    source: NIST CODATA 2022
+    rows: 8
+    kind: constants
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/co2_vs_ch4/manifest.json
+    article: co2_vs_ch4
+    source: Faraday project
+    rows: 4
+    kind: product manifest
+    redistribution_status: project_metadata
+  - path: assets/blog/data/co2_vs_ch4/nist_phase_change_summary.parquet
+    article: co2_vs_ch4
+    source: NIST Chemistry WebBook SRD 69
+    rows: 20
+    kind: derived phase-change summary
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/co2_vs_ch4/nist_shomate_thermo.parquet
+    article: co2_vs_ch4
+    source: NIST Chemistry WebBook SRD 69
+    rows: 4
+    kind: Shomate coefficient subset
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/co2_vs_ch4/project_instruction.txt
+    article: co2_vs_ch4
+    source: Faraday project
+    rows: 283
+    kind: generation instruction
+    redistribution_status: project_metadata
+    note: "Superseded by DATA_NOTICE.md where it asks for raw upstream data redistribution."
+  - path: assets/blog/data/co2_vs_ch4/provenance.txt
+    article: co2_vs_ch4
+    source: Faraday project
+    rows: 9
+    kind: provenance note
+    redistribution_status: project_metadata
+  - path: assets/blog/data/co2_vs_ch4/pubchem_CO2_CH4_properties.parquet
+    article: co2_vs_ch4
+    source: PubChem / NCBI
+    rows: 2
+    kind: molecular properties
+    redistribution_status: pubchem_policy
+
+  - path: assets/blog/data/fusion_spectroscopy/codata_constants.json
+    article: fusion_spectroscopy
+    source: NIST CODATA 2022
+    rows: 25
+    kind: constants
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/fusion_spectroscopy/fig1_dt_energy_ledger.csv
+    article: fusion_spectroscopy
+    source: NIST CODATA 2022
+    rows: 7
+    kind: derived figure table
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/fusion_spectroscopy/fig1_dt_energy_ledger.parquet
+    article: fusion_spectroscopy
+    source: NIST CODATA 2022
+    rows: 7
+    kind: derived figure table
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/fusion_spectroscopy/fig2_diagnostic_lines.csv
+    article: fusion_spectroscopy
+    source: NIST ASD SRD 78
+    rows: 28
+    kind: derived diagnostic-line figure table
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/fusion_spectroscopy/fig2_diagnostic_lines.parquet
+    article: fusion_spectroscopy
+    source: NIST ASD SRD 78
+    rows: 28
+    kind: derived diagnostic-line figure table
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/fusion_spectroscopy/fig3_doppler_fwhm_vs_T.csv
+    article: fusion_spectroscopy
+    source: NIST ASD SRD 78 and NIST CODATA 2022
+    rows: 7
+    kind: derived Doppler-width figure table
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/fusion_spectroscopy/fig3_doppler_fwhm_vs_T.parquet
+    article: fusion_spectroscopy
+    source: NIST ASD SRD 78 and NIST CODATA 2022
+    rows: 7
+    kind: derived Doppler-width figure table
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/fusion_spectroscopy/pubchem_materials.json
+    article: fusion_spectroscopy
+    source: PubChem / NCBI
+    rows: 2
+    kind: molecular/material properties
+    redistribution_status: pubchem_policy
+  - path: assets/blog/data/fusion_spectroscopy/raw_codata_constants.csv
+    article: fusion_spectroscopy
+    source: NIST CODATA 2022
+    rows: 25
+    kind: constants
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/fusion_spectroscopy/raw_codata_constants.parquet
+    article: fusion_spectroscopy
+    source: NIST CODATA 2022
+    rows: 25
+    kind: constants
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/fusion_spectroscopy/raw_pubchem_materials.csv
+    article: fusion_spectroscopy
+    source: PubChem / NCBI
+    rows: 2
+    kind: molecular/material properties
+    redistribution_status: pubchem_policy
+  - path: assets/blog/data/fusion_spectroscopy/raw_pubchem_materials.parquet
+    article: fusion_spectroscopy
+    source: PubChem / NCBI
+    rows: 2
+    kind: molecular/material properties
+    redistribution_status: pubchem_policy
+
+  - path: assets/blog/data/methane_flame/alkali_boltzmann.csv
+    article: methane_flame
+    source: NIST ASD SRD 78 and NIST CODATA 2022
+    rows: 6
+    kind: derived alkali-line Boltzmann table
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/alkali_boltzmann.parquet
+    article: methane_flame
+    source: NIST ASD SRD 78 and NIST CODATA 2022
+    rows: 6
+    kind: derived alkali-line Boltzmann table
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/boltzmann_vs_T.csv
+    article: methane_flame
+    source: NIST ASD SRD 78 and NIST CODATA 2022
+    rows: 120
+    kind: derived Boltzmann population curve
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/boltzmann_vs_T.parquet
+    article: methane_flame
+    source: NIST ASD SRD 78 and NIST CODATA 2022
+    rows: 120
+    kind: derived Boltzmann population curve
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/codata_constants.csv
+    article: methane_flame
+    source: NIST CODATA 2022
+    rows: 8
+    kind: constants
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/methane_flame/codata_constants.parquet
+    article: methane_flame
+    source: NIST CODATA 2022
+    rows: 8
+    kind: constants
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/methane_flame/flame_enthalpy_balance.csv
+    article: methane_flame
+    source: NIST Chemistry WebBook SRD 69 and NIST CODATA 2022
+    rows: 80
+    kind: derived enthalpy-balance curve
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/flame_enthalpy_balance.parquet
+    article: methane_flame
+    source: NIST Chemistry WebBook SRD 69 and NIST CODATA 2022
+    rows: 80
+    kind: derived enthalpy-balance curve
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/hitran_band_summary.csv
+    article: methane_flame
+    source: HITRAN2024
+    rows: 4
+    kind: derived aggregate band summary
+    redistribution_status: hitran_aggregate
+  - path: assets/blog/data/methane_flame/hitran_band_summary.parquet
+    article: methane_flame
+    source: HITRAN2024
+    rows: 4
+    kind: derived aggregate band summary
+    redistribution_status: hitran_aggregate
+  - path: assets/blog/data/methane_flame/planck_curve.csv
+    article: methane_flame
+    source: NIST CODATA 2022
+    rows: 240
+    kind: derived blackbody curve
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/methane_flame/planck_curve.parquet
+    article: methane_flame
+    source: NIST CODATA 2022
+    rows: 240
+    kind: derived blackbody curve
+    redistribution_status: codata_attribution
+  - path: assets/blog/data/methane_flame/shomate_coefficients.csv
+    article: methane_flame
+    source: NIST Chemistry WebBook SRD 69
+    rows: 12
+    kind: Shomate coefficient subset
+    redistribution_status: nist_srd_restricted
+  - path: assets/blog/data/methane_flame/shomate_coefficients.parquet
+    article: methane_flame
+    source: NIST Chemistry WebBook SRD 69
+    rows: 12
+    kind: Shomate coefficient subset
+    redistribution_status: nist_srd_restricted
