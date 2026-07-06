@@ -4,8 +4,10 @@
 
   /* ── Resolve static base path (works from / and /posts/) ── */
   var depth = window.location.pathname.split('/').filter(Boolean).length;
-  var staticBase = depth <= 1 ? '/static/' : '../static/';
-  var blogRoot   = depth <= 1 ? '/'        : '../';
+  // Reach the blog root from any nesting depth (root, /posts/, /posts/<slug>/…)
+  var up         = depth <= 1 ? '/' : '../'.repeat(depth - 1);
+  var staticBase = up + 'static/';
+  var blogRoot   = up;
 
   /* ── UI translations ── */
   var translations = {

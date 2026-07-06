@@ -1,0 +1,345 @@
+/* ============================================================================
+   Faraday sub-pages — blog light theme override.
+   Loaded LAST (after the page's inline <style> and faraday-shared.css) so it
+   wins by cascade order. Strategy: a two-zone model.
+     • LIGHT zone  — prose, hero, tables, callouts, KPI tiles, download cards,
+                     nav and footer flip to the blog's light palette.
+     • DARK  zone  — charts, code, equations and diagrams stay dark technical
+                     insets (their contents render light-on-dark and must),
+                     matching the single dark diagram on the overview page.
+   Fonts unify to the blog stack via the --fd-* / local font variables, which
+   faraday-shared.css applies everywhere with !important.
+   Blog palette: white #fff · off-white #f5f5f5 · light-gray #e8e8e8 ·
+   mid-gray #666 · dark #1f2124 · accent #2d6ff5.
+   ========================================================================== */
+
+/* ── 1 · Light palette + blog fonts (beats the inline :root by load order) ── */
+:root,
+body.fd-light {
+  /* faraday-shared.css variables */
+  --fd-bg:#ffffff; --fd-bg2:#f5f5f5; --fd-panel:#f5f5f5; --fd-panel2:#fafafa;
+  --fd-ink:#1f2124; --fd-muted:#666666; --fd-faint:#7a7a7a;
+  --fd-line:#e8e8e8; --fd-line2:#dcdcdc;
+  --fd-serif:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --fd-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --fd-mono:"SF Mono","Fira Code","Cascadia Code",ui-monospace,monospace;
+  /* per-page inline :root variables (shared names across the three files) */
+  --bg:#ffffff; --bg2:#f5f5f5; --panel:#f5f5f5; --panel2:#fafafa;
+  --ink:#1f2124; --muted:#666666; --faint:#7a7a7a;
+  --line:#e8e8e8; --line2:#dcdcdc; --grid:#e8e8e8;
+  --serif:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono","Fira Code","Cascadia Code",ui-monospace,monospace;
+}
+
+/* per-page accent identities, darkened to read on white (matches overview cards) */
+body.fd-fusion { --fd-accent:#2563eb; --accent:#2563eb; --he:#2563eb; --accent2:#b45309; --fd-accent2:#b45309; }
+body.fd-flame  { --fd-accent:#b45309; --accent:#b45309; --amber:#b45309; --amber2:#b45309; --accent2:#b45309; --fd-accent2:#b45309;
+                 --na:#b8860b; --k:#7c3aed; --li:#dc2626; --co2:#c2410c; --h2o:#0369a1; --green:#15803d; --good:#15803d; }
+body.fd-greenhouse { --fd-accent:#16a34a; --accent:#16a34a; --ch4:#0d9488; --co2:#c2410c; --hot:#dc2626;
+                     --ok:#15803d; --accent2:#b45309; --fd-accent2:#b45309; }
+
+/* ── 2 · Page shell ── */
+body.fd-light {
+  background:var(--white,#fff)!important;
+  color:var(--dark,#1f2124)!important;
+  font-family:var(--fd-sans)!important;
+  /* CRITICAL for mobile: the blog's global `body{display:flex;flex-direction:column}`
+     (footer-pinning) turns every Faraday content block (.wrap, hero, switcher…) into a
+     flex item. A `.wrap{margin:0 auto}` flex item does NOT stretch to the viewport — it
+     grows to its max-content width (up to max-width:1100) and overflows narrow screens,
+     which on a phone blows the document out to ~1100px and shoves all content off-screen
+     to the right. These articles are long, so the sticky footer buys nothing; revert to
+     normal block flow so `.wrap` fills and centres like a standard document. */
+  display:block!important;
+}
+/* Content links carry the (darkened) page accent via faraday-shared's a{}.
+   The injected DLH header + footer keep the blog's own link styling — strip
+   only the Faraday underline that bleeds into them. */
+body.fd-light > header:not(.hero) a,
+body.fd-light > footer a { border-bottom:none!important; }
+
+/* ── 3 · Top Faraday tab bar removed — sibling navigation now lives at the
+   end of each article (.fd-more). Hide the legacy top nav + its widgets. ── */
+body.fd-light .fdnav,
+body.fd-light .fdtop,
+body.fd-light .fdprogress { display:none!important; }
+
+/* ── 4 · Hero → dark masthead with light text (matches the blog's post-hero;
+   the blog's bare `header{background:var(--dark)}` already darkens it). Its own
+   top padding clears the fixed DLH header, so the dark hero reads continuous
+   with the dark header above it. ── */
+body.fd-light header.hero {
+  background:var(--dark,#1f2124)!important; border-bottom:none!important;
+  padding-top:96px!important;
+  /* the original Faraday design made the hero a full-screen masthead
+     (min-height:100vh); the blog post-hero hugs its content, so collapse it */
+  min-height:0!important;
+  /* the blog's `header{z-index:100}` also lands here; without this the hero
+     (a later sibling) paints over the fixed DLH header and hides it */
+  z-index:1!important;
+  /* the blog's `header{display:flex}` also lands here, which shrink-wraps the
+     inner .wrap to the title width (so every hero was a different width);
+     force block so .wrap fills to a consistent measure on every page */
+  display:block!important;
+}
+body.fd-light header.hero::before { display:none!important; }        /* drop the accent glow */
+body.fd-light header.hero h1,
+body.fd-light header.hero h1 .glow {
+  color:#fff!important; text-shadow:none!important;
+  -webkit-text-fill-color:#fff!important; background:none!important;
+}
+body.fd-light header.hero .kicker, body.fd-light header.hero .eyebrow { color:#6f9dff!important; }
+body.fd-light header.hero .sub, body.fd-light header.hero .dek,
+body.fd-light header.hero .lede { color:rgba(255,255,255,.74)!important; }
+body.fd-light header.hero .byline,
+body.fd-light header.hero .authorline { color:rgba(255,255,255,.6)!important; }
+body.fd-light header.hero .authorline strong,
+body.fd-light header.hero strong { color:#fff!important; }
+
+/* left-align the hero to match the blog post-hero (kill the centered
+   760px blocks) and give it a comfortable measure */
+body.fd-light header.hero .wrap { text-align:left!important; }
+body.fd-light header.hero .kicker, body.fd-light header.hero .eyebrow,
+body.fd-light header.hero h1, body.fd-light header.hero .sub,
+body.fd-light header.hero .dek, body.fd-light header.hero .lede,
+body.fd-light header.hero .authorline, body.fd-light header.hero .byline {
+  margin-left:0!important; margin-right:0!important; text-align:left!important;
+}
+body.fd-light header.hero h1 { max-width:780px!important; }
+body.fd-light header.hero .sub, body.fd-light header.hero .dek,
+body.fd-light header.hero .lede { max-width:720px!important; }
+/* "← Faraday overview" back-link, mirroring the blog's "← All Posts" */
+body.fd-light header.hero .fd-hero-back {
+  display:inline-block; margin:0 0 1rem; font-size:.78rem; font-weight:500;
+  color:rgba(255,255,255,.55)!important; text-decoration:none; border-bottom:none!important;
+}
+body.fd-light header.hero .fd-hero-back:hover { color:#fff!important; }
+
+/* body-zone intros (outside the hero) stay in the light palette */
+body.fd-light .lead, body.fd-light .lede, body.fd-light .sub, body.fd-light .dek {
+  color:var(--mid-gray,#666)!important;
+}
+
+/* ── 5 · Prose text: catch the hard-coded light colours ── */
+body.fd-light h2, body.fd-light h3 { color:var(--dark,#1f2124)!important; }
+body.fd-light h2 .s { color:var(--accent)!important; }
+body.fd-light p, body.fd-light li { color:var(--mid-gray,#666)!important; }
+body.fd-light strong, body.fd-light b,
+body.fd-light .abstract b, body.fd-light .cap b { color:var(--dark,#1f2124)!important; }
+/* Prose lists had their padding reset to 0; with list-style-position:outside the
+   bullets/numbers then render in the far-left margin, detached from the text.
+   Restore a hanging indent so markers sit just inside the prose column.
+   (ol.refs keeps its own 2em indent; nav lists aren't affected.) */
+body.fd-light .wrap ul:not(.refs), body.fd-light .wrap ol:not(.refs) {
+  padding-inline-start:1.4em!important;
+}
+body.fd-light .wrap li { margin:.4em 0!important; }
+body.fd-light .key, body.fd-light .kna, body.fd-light .kk, body.fd-light .kli,
+body.fd-light .kco2, body.fd-light .kh2o { font-weight:600; }
+
+/* ── 6 · Abstract / method strip → light card ── */
+body.fd-light .abstract, body.fd-light .unified-abstract, body.fd-light .methodstrip {
+  background:var(--off-white,#f5f5f5)!important;
+  border:1px solid var(--light-gray,#e8e8e8)!important;
+  border-left:3px solid var(--accent)!important;
+  color:var(--mid-gray,#666)!important; box-shadow:none!important;
+}
+body.fd-light .abslabel, body.fd-light .methodstrip .h { color:var(--accent)!important; }
+body.fd-light .ms-chip { color:#fff!important; background:var(--accent)!important; }
+
+/* ── 7 · Callouts / notes → light ── */
+body.fd-light .callout, body.fd-light .note, body.fd-light .warn, body.fd-light .correction {
+  background:var(--off-white,#f5f5f5)!important;
+  border:1px solid var(--light-gray,#e8e8e8)!important;
+  border-left:3px solid var(--accent)!important;
+  color:var(--mid-gray,#666)!important; box-shadow:none!important;
+}
+body.fd-light .callout.ok, body.fd-light .note { border-left-color:#15803d!important; }
+body.fd-light .warn, body.fd-light .callout:not(.ok):not(.prov) { border-left-color:#b45309!important; }
+body.fd-light .correction { border-left-color:#7c3aed!important; }
+body.fd-light .callout.prov { border-left-color:var(--accent)!important; }
+body.fd-light .callout .h, body.fd-light .callout h4 { color:var(--dark,#1f2124)!important; }
+
+/* ── 8 · KPI / readout / stat tiles → light ── */
+body.fd-light .readout, body.fd-light .stats {
+  background:var(--light-gray,#e8e8e8)!important; border:1px solid var(--light-gray,#e8e8e8)!important;
+  box-shadow:none!important;
+}
+body.fd-light .readout>div, body.fd-light .stats>.stat, body.fd-light .stat,
+body.fd-light .readout div, body.fd-light .kbar .k {
+  background:var(--white,#fff)!important; border-color:var(--light-gray,#e8e8e8)!important;
+}
+body.fd-light .readout .v, body.fd-light .stats .v, body.fd-light .stat .v,
+body.fd-light .kbar .k .v { color:var(--dark,#1f2124)!important; }
+body.fd-light .readout .l, body.fd-light .stats .l, body.fd-light .stat .l,
+body.fd-light .kbar .k .l, body.fd-light .stats .k, body.fd-light .stat .k { color:var(--mid-gray,#666)!important; }
+
+/* ── 9 · Tables → light (data tables; charts are handled in the dark zone) ── */
+body.fd-light .tbl, body.fd-light .srctbl {
+  background:var(--white,#fff)!important; border:1px solid var(--light-gray,#e8e8e8)!important;
+  box-shadow:none!important;
+}
+/* `.tbl` is meant to be a wrapping <div> (its overflow-x:auto scrolls a wide
+   table). The greenhouse page puts the class on the <table> itself, and
+   overflow on a table *box* is ignored — so a wide table forced the whole page
+   to scroll sideways. Make a table.tbl a block scroll container itself. */
+body.fd-light table.tbl, body.fd-light table.srctbl {
+  display:block!important; overflow-x:auto!important; max-width:100%!important;
+  -webkit-overflow-scrolling:touch;
+}
+body.fd-light table { color:var(--mid-gray,#666)!important; }
+body.fd-light th, body.fd-light td, body.fd-light .tbl th, body.fd-light .tbl td,
+body.fd-light .srctbl th, body.fd-light .srctbl td {
+  border-color:var(--light-gray,#e8e8e8)!important; color:var(--mid-gray,#666)!important;
+}
+body.fd-light thead th, body.fd-light table thead th,
+body.fd-light .tbl thead th, body.fd-light .srctbl thead th, body.fd-light th {
+  background:var(--off-white,#f5f5f5)!important; color:var(--dark,#1f2124)!important;
+}
+body.fd-light td.src, body.fd-light .srctbl td.src,
+body.fd-light .tbl td.mono, body.fd-light .dlrow .meta b { color:var(--dark,#1f2124)!important; }
+body.fd-light tbody tr:hover td { background:var(--off-white,#f5f5f5)!important; }
+body.fd-light .layerrow td, body.fd-light tr.divider td {
+  background:rgba(45,111,245,.07)!important; color:var(--accent)!important; border-top-color:var(--accent)!important;
+}
+body.fd-light .badge.used { color:#fff!important; background:var(--accent)!important; }
+body.fd-light .badge.avail { color:var(--mid-gray,#666)!important; background:var(--off-white,#f5f5f5)!important; border:1px solid var(--light-gray,#e8e8e8)!important; }
+
+/* ── 10 · Appendix / details / download cards → light ── */
+body.fd-light details.app, body.fd-light .dl-card {
+  background:var(--white,#fff)!important; border:1px solid var(--light-gray,#e8e8e8)!important;
+  box-shadow:none!important;
+}
+body.fd-light details.app>summary, body.fd-light details.app summary {
+  color:var(--dark,#1f2124)!important; border-bottom-color:var(--light-gray,#e8e8e8)!important;
+}
+body.fd-light details.app .app-body { background:var(--white,#fff)!important; }
+body.fd-light .appendix-hub>h2, body.fd-light .appendix-hub section>h2 {
+  background:var(--off-white,#f5f5f5)!important; border-color:var(--light-gray,#e8e8e8)!important; color:var(--dark,#1f2124)!important;
+}
+body.fd-light .appendix-hub>p, body.fd-light .appendix-hub section>p {
+  background:var(--white,#fff)!important; border-color:var(--light-gray,#e8e8e8)!important;
+}
+body.fd-light .dl-name { color:var(--dark,#1f2124)!important; }
+body.fd-light .dl-desc { color:var(--mid-gray,#666)!important; }
+body.fd-light .dl-meta { color:var(--faint,#7a7a7a)!important; }
+body.fd-light .dlbtn, body.fd-light .dl-btn, body.fd-light .dlcell a, body.fd-light a[data-file] {
+  color:var(--accent)!important; border:1px solid var(--light-gray,#e8e8e8)!important; background:var(--off-white,#f5f5f5)!important;
+}
+body.fd-light .dlbtn:hover, body.fd-light .dl-btn:hover, body.fd-light a[data-file]:hover {
+  border-color:var(--accent)!important; background:rgba(45,111,245,.06)!important;
+}
+body.fd-light .dlrow { border-bottom-color:var(--light-gray,#e8e8e8)!important; }
+body.fd-light .toolbar button { background:var(--off-white,#f5f5f5)!important; border-color:var(--light-gray,#e8e8e8)!important; color:var(--mid-gray,#666)!important; }
+body.fd-light .toolbar button:hover { color:var(--dark,#1f2124)!important; border-color:var(--accent)!important; background:var(--white,#fff)!important; }
+
+/* ── 11 · Inline code, references → light ── */
+body.fd-light :not(pre):not(.jsonblock)>code, body.fd-light kbd {
+  background:var(--off-white,#f5f5f5)!important; border:1px solid var(--light-gray,#e8e8e8)!important; color:#b5330b!important;
+}
+body.fd-light .refs, body.fd-light ol.refs { color:var(--mid-gray,#666)!important; }
+body.fd-light ol.refs li { border-bottom-color:var(--light-gray,#e8e8e8)!important; }
+body.fd-light ol.refs li:target { background:rgba(45,111,245,.08)!important; }
+body.fd-light sup a, body.fd-light sup.cite a { color:var(--accent)!important; }
+body.fd-light hr.sec, body.fd-light .fn { border-color:var(--light-gray,#e8e8e8)!important; }
+body.fd-light .fn { color:var(--faint,#7a7a7a)!important; }
+
+/* ── 12 · Page provenance block + footer → light ── */
+body.fd-light .pagefoot {
+  margin-top:48px; border-top:1px solid var(--light-gray,#e8e8e8)!important;
+  background:none!important; color:var(--mid-gray,#666)!important; padding:28px 0 0!important;
+}
+body.fd-light .pagefoot .prov { max-width:760px; margin:0 auto; padding:0 26px; }
+body.fd-light .pagefoot .badge, body.fd-light .pagefoot .badge2 { color:var(--accent)!important; }
+body.fd-light .metablk { background:var(--off-white,#f5f5f5)!important; border:1px solid var(--light-gray,#e8e8e8)!important; color:var(--mid-gray,#666)!important; }
+body.fd-light .metablk b { color:var(--accent)!important; }
+body.fd-light .foot-end { border-top-color:var(--light-gray,#e8e8e8)!important; color:var(--faint,#7a7a7a)!important; }
+body.fd-light .foot-end a { color:var(--mid-gray,#666)!important; }
+body.fd-light .authorcard { border-top-color:var(--light-gray,#e8e8e8)!important; }
+body.fd-light .authorcard .who { color:var(--mid-gray,#666)!important; }
+body.fd-light .authorcard .who .nm, body.fd-light .authorcard .who .co { color:var(--dark,#1f2124)!important; }
+body.fd-light .authorcard .who .rl { color:var(--accent)!important; }
+body.fd-light .authorcard .lk a { color:var(--mid-gray,#666)!important; border:1px solid var(--light-gray,#e8e8e8)!important; }
+body.fd-light .authorcard .lk a:hover { color:var(--accent)!important; border-color:var(--accent)!important; background:rgba(0,0,0,.03)!important; }
+
+/* ============================================================================
+   DARK ZONE — charts, diagrams, equations, code blocks stay dark technical
+   insets. Re-scope the theme variables back to dark INSIDE these panels so
+   their captions, labels, legends and series colours stay legible.
+   ========================================================================== */
+body.fd-light figure, body.fd-light .fig, body.fd-light .diagram,
+body.fd-light .chart-wrap, body.fd-light .eq, body.fd-light pre,
+body.fd-light pre.code, body.fd-light .jsonblock, body.fd-light .tt, body.fd-light .tooltip {
+  --ink:#dde6f0; --muted:#8a96a6; --faint:#7e8ca6;
+  --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.16);
+  --panel:#111824; --panel2:#0d131c; --bg:#080b11; --bg2:#0b1120; --grid:#1e2a38;
+  --na:#ffd23f; --k:#c08cff; --li:#ff5d6c; --co2:#ff8a5c; --h2o:#54c8f0;
+  --green:#74e0a4; --ch4:#34d6c6; --hot:#ff5d73;
+}
+/* keep the panels themselves dark */
+body.fd-light figure, body.fd-light .fig {
+  background:linear-gradient(180deg,#0f1722,#0c121b)!important; border:1px solid rgba(255,255,255,.10)!important;
+}
+body.fd-light .diagram, body.fd-light .chart-wrap { background:#0d131c!important; border:1px solid rgba(255,255,255,.10)!important; }
+body.fd-light .eq { background:#0c1320!important; border:1px solid rgba(255,255,255,.10)!important; }
+body.fd-light math { color:#eaf2fb!important; }
+body.fd-light figure figcaption, body.fd-light .fig figcaption, body.fd-light .fig .cap,
+body.fd-light .fig .ttl, body.fd-light .chart-title, body.fd-light .chart-sub,
+body.fd-light .legend, body.fd-light .fig .legend { color:#8a96a6!important; }
+body.fd-light .fig .ttl, body.fd-light .chart-title { color:#cfe0ef!important; }
+body.fd-light figcaption b, body.fd-light .fig figcaption b, body.fd-light .cap b { color:#cfe0ef!important; }
+/* code blocks keep their own dark backgrounds/hardcoded text — leave as authored */
+
+/* ── Compact article switcher, directly below the hero ── */
+body.fd-light .fd-switch {
+  display:flex!important; flex-wrap:wrap; gap:6px!important; align-items:center;
+  justify-content:center!important;
+  width:100%; max-width:812px; margin:20px auto 0; padding:0 26px;
+}
+body.fd-light .fd-switch a {
+  font-family:var(--fd-sans); font-size:.82rem; font-weight:600; line-height:1;
+  color:var(--mid-gray,#666)!important; text-decoration:none;
+  border:1px solid var(--light-gray,#e8e8e8)!important; border-radius:999px;
+  padding:6px 14px; transition:border-color .15s, color .15s, background .15s;
+}
+body.fd-light .fd-switch a:hover {
+  border-color:var(--accent)!important; color:var(--dark,#1f2124)!important;
+}
+body.fd-light .fd-switch a.on {
+  color:#fff!important; background:var(--accent)!important; border-color:var(--accent)!important;
+}
+
+/* ── End-of-article sibling navigation (replaces the old top tab bar) ── */
+body.fd-light .fd-more {
+  display:block!important;   /* override the blog's `nav { display:flex }` */
+  width:100%; max-width:812px; margin:52px auto 0; padding:24px 26px 0;
+  border-top:1px solid var(--light-gray,#e8e8e8);
+}
+body.fd-light .fd-more .fd-more-h {
+  font-family:var(--fd-sans); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent)!important; font-weight:700; margin:0 0 14px;
+}
+body.fd-light .fd-more .fd-more-grid { display:flex; flex-direction:column; gap:8px; }
+body.fd-light .fd-more .fd-more-grid a {
+  display:block; padding:12px 15px; border:1px solid var(--light-gray,#e8e8e8)!important;
+  border-radius:8px; color:var(--dark,#1f2124)!important; text-decoration:none;
+  font-weight:600; font-size:.95rem; transition:border-color .15s, background .15s;
+}
+body.fd-light .fd-more .fd-more-grid a:hover {
+  border-color:var(--accent)!important; background:var(--off-white,#f5f5f5);
+}
+body.fd-light .fd-more .fd-more-grid a small {
+  display:block; font-weight:400; font-size:.8rem; color:var(--mid-gray,#666)!important; margin:2px 0 0;
+}
+
+/* ── responsive: fixed DLH header is shorter on mobile ── */
+@media (max-width:700px) {
+  body.fd-light header.hero { padding-top:76px!important; }
+  /* The flow diagram is a schematic with boxed text labels — squeezed to phone
+     width its type becomes unreadable. Keep it at a legible size and let it
+     scroll horizontally instead (charts in .fig stay responsive and are left
+     to scale, since their axes/curves read fine when small). */
+  body.fd-light .diagram { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  body.fd-light .diagram svg { min-width:600px; }
+}

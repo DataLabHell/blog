@@ -90,7 +90,6 @@
   {
     "path": "posts/faraday/index.html",
     "title": "Faraday: Scientific Context for AI",
-    "titleDe": "Faraday: Wissenschaftlicher Kontext für KI",
     "date": "2026-07-03",
     "tags": [
       "MCP",
@@ -103,7 +102,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/faraday_logo.png",
-    "desc": "Three end-to-end autonomous investigations — a fusion energy ledger, a methane flame's spectrum, and a molecule-by-molecule CO₂ vs CH₄ comparison — each built entirely on NIST and PubChem reference data retrieved through the open-source Faraday MCP server, with every figure traceable to a tool call.",
-    "descDe": "Drei durchgängige Untersuchungen — eine Fusionsenergiebilanz, das Spektrum einer Methanflamme und ein molekülweiser Vergleich von CO₂ und CH₄ — jeweils vollständig auf Basis von NIST- und PubChem-Referenzdaten, abgerufen über den quelloffenen Faraday-MCP-Server, mit lückenloser Rückverfolgbarkeit jeder Kennzahl zu einem Tool-Aufruf."
+    "desc": "Three end-to-end autonomous investigations — a fusion energy ledger, a methane flame's spectrum, and a molecule-by-molecule CO₂ vs CH₄ comparison — each built entirely on NIST and PubChem reference data retrieved through the open-source Faraday MCP server, with every figure traceable to a tool call."
   }
 ]
