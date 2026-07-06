@@ -1,0 +1,25 @@
+{
+  "Daniel Hauser": {
+    "role": "Author",
+    "email": "daniel.hauser@datalabhell.at",
+    "linkedin": "https://www.linkedin.com/in/daniel-hauser-77259a159",
+    "github": "https://github.com/dugi42"
+  },
+  "Daniel Baldauf": {
+    "role": "Author",
+    "email": "daniel.baldauf@datalabhell.at",
+    "linkedin": "https://www.linkedin.com/in/daniel-baldauf-11b54b126",
+    "github": "https://github.com/dan-n94"
+  },
+  "Tobias Hell": {
+    "role": "Author",
+    "email": "tobias.hell@datalabhell.at",
+    "linkedin": "https://www.linkedin.com/in/tobias-hell-123661105",
+    "github": "https://github.com/Tobias-Hell"
+  },
+  "Johannes Sappl": {
+    "role": "Author",
+    "email": "johannes.sappl@datalabhell.at",
+    "github": "https://github.com/jsappl"
+  }
+}
