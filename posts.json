@@ -86,5 +86,22 @@
     "author": "Daniel Baldauf",
     "image": "static/posts/open-source-projects.png",
     "desc": "A look at some of the open-source tools we develop at Data Lab Hell — a backend-less Grafana PDF reporter, a one-file cgroups monitor, a binary ULID for Julia, and NVIDIA GPU images for OKD — plus where to find the rest."
+  },
+  {
+    "path": "posts/faraday/index.html",
+    "title": "Faraday: Scientific Context for AI",
+    "date": "2026-07-03",
+    "tags": [
+      "MCP",
+      "LLM",
+      "Agentic AI",
+      "Physics",
+      "Chemistry",
+      "Spectroscopy",
+      "Research"
+    ],
+    "author": "Daniel Hauser",
+    "image": "static/posts/faraday_logo.png",
+    "desc": "Three end-to-end autonomous investigations — a fusion energy ledger, a methane flame's spectrum, and a molecule-by-molecule CO₂ vs CH₄ comparison — each built entirely on NIST and PubChem reference data retrieved through the open-source Faraday MCP server, with every figure traceable to a tool call."
   }
 ]

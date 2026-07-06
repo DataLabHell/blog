@@ -1,0 +1,29 @@
+species,wavelength_nm,Aki_s1,intens,role
+H I (H-alpha),656.2819,4.4101e+07,,fuel recycling / edge (H)
+"D I (D-alpha, computed)",656.1034,4.4101e+07,,fuel recycling / edge (D)
+He II (ash),468.5377,9.3899e+07,,fusion ash / proof-of-burn
+He II (ash),468.5407,4.9070e+07,,fusion ash / proof-of-burn
+He II (ash),468.5568,4.9080e+07,,fusion ash / proof-of-burn
+He II (ash),468.5704,2.0605e+08,,fusion ash / proof-of-burn
+He II (ash),468.5704,1.1268e+08,,fusion ash / proof-of-burn
+He II (ash),468.5804,2.2076e+08,,fusion ash / proof-of-burn
+W I (wall),350.0272,,40,tungsten influx / impurity
+W I (wall),350.0905,,3,tungsten influx / impurity
+W I (wall),350.2880,,2,tungsten influx / impurity
+W I (wall),350.3030,,30,tungsten influx / impurity
+W I (wall),350.3554,,20,tungsten influx / impurity
+W I (wall),350.3909,,4,tungsten influx / impurity
+W I (wall),350.4244,,4,tungsten influx / impurity
+W I (wall),350.4570,,2,tungsten influx / impurity
+W I (wall),350.4643,,15,tungsten influx / impurity
+W I (wall),350.4886,,3,tungsten influx / impurity
+W I (wall),350.5240,,1,tungsten influx / impurity
+W I (wall),350.5897,,2,tungsten influx / impurity
+W I (wall),350.6634,,20,tungsten influx / impurity
+W I (wall),350.6634,,20,tungsten influx / impurity
+W I (wall),350.6850,,3,tungsten influx / impurity
+W I (wall),350.7277,,30,tungsten influx / impurity
+W I (wall),350.7918,,6,tungsten influx / impurity
+W I (wall),350.8352,,2,tungsten influx / impurity
+W I (wall),350.8732,,40,tungsten influx / impurity
+W I (wall),350.8849,,8,tungsten influx / impurity

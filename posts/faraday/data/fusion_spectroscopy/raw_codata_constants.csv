@@ -1,0 +1,26 @@
+name,value,uncertainty,unit
+deuteron mass,3.3435837768e-27,0.0000000010e-27,kg
+deuteron mass energy equivalent,3.00506323491e-10,0.00000000094e-10,J
+deuteron mass energy equivalent in MeV,1875.61294500,0.00000058,MeV
+deuteron mass in u,2.013553212544,0.000000000015,u
+triton mass,5.0073567512e-27,0.0000000016e-27,kg
+triton mass energy equivalent,4.5003878119e-10,0.0000000014e-10,J
+triton mass energy equivalent in MeV,2808.92113668,0.00000088,MeV
+triton mass in u,3.01550071597,0.00000000010,u
+alpha particle mass energy equivalent,5.9719201997e-10,0.0000000019e-10,J
+alpha particle mass energy equivalent in MeV,3727.3794118,0.0000012,MeV
+neutron mass energy equivalent,1.50534976514e-10,0.00000000076e-10,J
+neutron mass energy equivalent in MeV,939.56542194,0.00000048,MeV
+Boltzmann constant,1.380649e-23,(exact),J K^-1
+speed of light in vacuum,299792458,(exact),m s^-1
+atomic mass constant,1.66053906892e-27,0.00000000052e-27,kg
+atomic mass constant energy equivalent,1.49241808768e-10,0.00000000046e-10,J
+atomic mass constant energy equivalent in MeV,931.49410372,0.00000029,MeV
+electron volt,1.602176634e-19,(exact),J
+electron mass,9.1093837139e-31,0.0000000028e-31,kg
+electron mass energy equivalent in MeV,0.51099895069,0.00000000016,MeV
+electron mass in u,5.485799090441e-4,0.000000000097e-4,u
+proton mass in u,1.0072764665789,0.0000000000083,u
+proton-electron mass ratio,1836.152673426,0.000000032,
+deuteron-electron mass ratio,3670.482967655,0.000000063,
+alpha particle-electron mass ratio,7294.29954171,0.00000017,
