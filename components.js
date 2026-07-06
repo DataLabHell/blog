@@ -2,10 +2,19 @@
 (function () {
   var MAIN_SITE = 'https://datalabhell.ac.at';
 
-  /* ── Resolve static base path (works from / and /posts/) ── */
-  var depth = window.location.pathname.split('/').filter(Boolean).length;
-  // Reach the blog root from any nesting depth (root, /posts/, /posts/<slug>/…)
-  var up         = depth <= 1 ? '/' : '../'.repeat(depth - 1);
+  /* ── Resolve blog root from any URL shape ──
+     Count directory levels below the root, handling BOTH clean directory URLs
+     (production: /posts/faraday/) and explicit file URLs (/posts/faraday/index.html).
+     A trailing path segment that looks like a file (has an extension) is the
+     document name, not a directory, so it doesn't add a level.
+       /                          → 0   → './'
+       /index.html                → 0   → './'
+       /posts/x.html              → 1   → '../'
+       /posts/faraday/            → 2   → '../../'
+       /posts/faraday/index.html  → 2   → '../../'  */
+  var segs = window.location.pathname.split('/').filter(Boolean);
+  if (segs.length && /\.[a-z0-9]+$/i.test(segs[segs.length - 1])) segs.pop();
+  var up         = segs.length ? '../'.repeat(segs.length) : './';
   var staticBase = up + 'static/';
   var blogRoot   = up;
 
@@ -331,8 +340,17 @@
   }
 
   /* ── Post layout injection ── */
+  // Canonicalise a path so directory URLs and explicit index.html URLs compare
+  // equal: '/posts/faraday/', '/posts/faraday/index.html' and 'posts/faraday/index.html'
+  // all reduce to 'posts/faraday'.
+  function canonPath(p) {
+    return p.replace(/^\//, '')
+            .replace(/(?:^|\/)index\.html?$/i, '')
+            .replace(/\.html?$/i, '')
+            .replace(/\/+$/, '');
+  }
   if (document.body.hasAttribute('data-post')) {
-    var currentPath = window.location.pathname.replace(/^\//, '').replace(/\.html$/, '');
+    var currentPath = canonPath(window.location.pathname);
     var mainEl = document.querySelector('main');
 
     if (mainEl) {
@@ -365,8 +383,7 @@
       fetchPosts()
         .then(function (posts) {
           var match = posts.filter(function (p) {
-            var pPath = p.path.replace(/\.html$/, '');
-            return pPath === currentPath || pPath.split('/').pop() === currentPath.split('/').pop();
+            return canonPath(p.path) === currentPath;
           })[0];
           if (!match) return;
 
