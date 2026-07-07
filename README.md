@@ -33,9 +33,38 @@ Optional fields:
 
 `posts.json` is the single source of truth for all post metadata. The index page reads it to render cards; the post page reads it to render the hero.
 
+The `author` value drives the hero byline **and** is matched against `authors.json` to render the author card at the end of the post (see below).
+
 Tag filter notes:
 - Tags only appear in the filter bar once they are shared by **2 or more posts**
 - Tags are sorted by frequency (most-used first)
+
+**3. (If a new author) add them to `authors.json`**
+
+See [Authors](#authors) — needed only the first time a given person publishes.
+
+Clean directory URLs and explicit `index.html` URLs both work (e.g. `/posts/faraday/` and `/posts/faraday/index.html`); `components.js` resolves the blog root and matches the post either way.
+
+## Authors
+
+Author contact details live in `authors.json`, keyed by the **exact name string** used in `posts.json`:
+
+```json
+{
+  "Author Name": {
+    "role": "Author",
+    "email": "name@datalabhell.at",
+    "linkedin": "https://www.linkedin.com/in/…",
+    "github": "https://github.com/…"
+  }
+}
+```
+
+`components.js` injects an author card at the end of every post, matching the post's `author` against this registry. It is the single source of truth for author info — do not hardcode the card in a post.
+
+- Every field except the name key is **optional** — a person with no `github`, for example, just doesn't render that link.
+- If a post's author is **not** in `authors.json` (e.g. an autonomously AI-generated piece), **no card is shown** — the hero byline still displays the name.
+- Values are public — use company emails and public profile URLs only.
 
 ## Cookie consent
 
