@@ -103,5 +103,18 @@
     "author": "Daniel Hauser",
     "image": "static/posts/faraday_logo.png",
     "desc": "Three end-to-end autonomous investigations (a fusion energy ledger, a methane flame's spectrum, and a molecule-by-molecule CO₂ vs CH₄ comparison), each built entirely on NIST and PubChem reference data retrieved through the open-source Faraday MCP server, with every figure traceable to a tool call."
+  },
+  {
+    "path": "posts/lerobot.html",
+    "title": "TODO: LeRobot working title",
+    "date": "2026-08-20",
+    "tags": [
+      "Robotics",
+      "AI",
+      "Open Source",
+      "Research"
+    ],
+    "author": "Tobias Deutschmann",
+    "desc": "TODO: one-sentence English description shown on the card."
   }
 ]
