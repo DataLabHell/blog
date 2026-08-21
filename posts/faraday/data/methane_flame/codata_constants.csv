@@ -1,9 +1,0 @@
-symbol,value,unit,uncertainty,codata_query
-k_B,1.380649e-23,J K^-1,(exact),Boltzmann constant
-h,6.62607015e-34,J Hz^-1,(exact),Planck constant
-c,299792458.0,m s^-1,(exact),speed of light in vacuum
-N_A,6.02214076e+23,mol^-1,(exact),Avogadro constant
-R,8.314462618,J mol^-1 K^-1,(exact),molar gas constant
-b_wien,0.002897771955,m K,(exact),Wien wavelength displacement law constant
-c2,0.01438776877,m K,(exact),second radiation constant
-e,1.602176634e-19,C,(exact),elementary charge

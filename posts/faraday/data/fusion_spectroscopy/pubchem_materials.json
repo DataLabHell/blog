@@ -1,7 +1,0 @@
-{
-  "_provenance": "Faraday MCP server -> PubChem. Tool: pubchem_search. Captured verbatim 2026-06-08. Two reactor-relevant elements: tungsten (plasma-facing divertor armour) and lithium (tritium-breeding blanket feedstock, via 6Li + n -> T + 4He).",
-  "records": [
-    {"query": "tungsten", "CID": 23964, "MolecularFormula": "W", "MolecularWeight": "183.84", "ConnectivitySMILES": "[W]", "InChIKey": "WFKWXMTUELFFGS-UHFFFAOYSA-N", "IUPACName": "tungsten"},
-    {"query": "lithium", "CID": 3028194, "MolecularFormula": "Li", "MolecularWeight": "7.0", "ConnectivitySMILES": "[Li]", "InChIKey": "WHXSMMKQMYFTQS-UHFFFAOYSA-N", "IUPACName": "lithium"}
-  ]
-}
