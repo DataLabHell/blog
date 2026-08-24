@@ -88,7 +88,7 @@
     "desc": "A look at some of the open-source tools we develop at Data Lab Hell — a backend-less Grafana PDF reporter, a one-file cgroups monitor, a binary ULID for Julia, and NVIDIA GPU images for OKD — plus where to find the rest."
   },
   {
-    "path": "posts/open-faraday-agents-vs-api.html",
+    "path": "posts/open-faraday.html",
     "title": "Scientific Context as an Executable Contract",
     "date": "2026-08-21",
     "tags": [

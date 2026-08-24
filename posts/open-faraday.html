@@ -332,14 +332,14 @@
         in a predictable structure, and refuses requests that violate
         deliberately chosen validity policies. MCP's role is narrower — it
         gives agents a standardized way to consume that contract. The
-        scientific contract is open-faraday; MCP is one interface through
-        which an agent can reach it.
+        scientific contract is open-faraday; MCP is the interface it ships
+        today for reaching that contract.
       </p>
 
       <figure class="fig" id="layers">
         <div class="ttl">Figure 1 · Three layers — the contract is not the transport</div>
         <svg viewBox="0 0 1100 540" role="img"
-             aria-label="Three-layer diagram. Top: scientific databases and physics engines — HITRAN, Kurucz, NIST, CODATA, RADIS, scipy. Middle: open-faraday, scientific context as an executable contract. Bottom: two consumers — Python or a direct API for humans and scripts, and MCP as the agent interface, which an agent connects to.">
+             aria-label="Three-layer diagram. Top: scientific databases and physics engines — HITRAN, Kurucz, NIST, CODATA, RADIS, scipy. Middle: open-faraday, scientific context as an executable contract. Bottom: two consumers of that contract — a Python import returning the same envelope in-process, and MCP, the only interface the server ships, which an agent connects to.">
           <defs>
             <marker id="lyr-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0 0L10 5L0 10z" fill="#8a8f98"/></marker>
@@ -360,12 +360,12 @@
             <line x1="550" y1="265" x2="698" y2="316" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
 
             <rect x="250" y="320" width="290" height="80" rx="10" fill="#ffffff" stroke="#d0d0d0" stroke-width="1.4"/>
-            <text x="395" y="355" text-anchor="middle" fill="#1f2124" font-size="15.5" font-weight="700">Python / direct API</text>
-            <text x="395" y="378" text-anchor="middle" fill="#8a8f98" font-size="13">humans &amp; scripts</text>
+            <text x="395" y="355" text-anchor="middle" fill="#1f2124" font-size="15.5" font-weight="700">Python import</text>
+            <text x="395" y="378" text-anchor="middle" fill="#8a8f98" font-size="13">same envelope, in-process</text>
 
             <rect x="560" y="320" width="290" height="80" rx="10" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.6"/>
             <text x="705" y="355" text-anchor="middle" fill="#1f2124" font-size="15.5" font-weight="700">MCP</text>
-            <text x="705" y="378" text-anchor="middle" fill="#2d6ff5" font-size="13">agent interface</text>
+            <text x="705" y="378" text-anchor="middle" fill="#2d6ff5" font-size="13">agent interface · the shipped surface</text>
 
             <line x1="705" y1="400" x2="705" y2="436" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
 
@@ -377,7 +377,9 @@
         <figcaption>The layering behind the article. Databases and physics engines own the data and
         the physics. open-faraday wraps access to them in one executable contract — required fields,
         validation, structured refusal. MCP is just the interface that lets an agent consume that
-        contract; the same contract could equally be consumed from Python or a conventional API.</figcaption>
+        contract. MCP over stdio is the only interface the server ships today — there is no HTTP
+        API — but because the contract lives in the response envelope rather than in the transport,
+        importing the module in Python hands back exactly the same envelope.</figcaption>
       </figure>
 
       <p>
@@ -449,7 +451,7 @@
             <line x1="315" y1="151" x2="547" y2="151" stroke="rgba(0,0,0,.12)"/>
             <text x="431" y="173" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">validate args · validity gate</text>
             <text x="431" y="192" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">units · truncation · errors</text>
-            <text x="431" y="211" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">ledger entry per call</text>
+            <text x="431" y="211" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">session source ledger</text>
             <text x="431" y="245" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">no HTTP client of its own</text>
           </g>
 
@@ -504,7 +506,7 @@
           <!-- arrows: response (amber) -->
           <g data-step="4">
             <path d="M632 252 C 550 322, 340 322, 224 252" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#ar-a)"/>
-            <text x="430" y="320" text-anchor="middle" fill="#d97706" font-size="13" font-family="JetBrains Mono,monospace">envelope: data · units · provenance · truncated · notes</text>
+            <text x="418" y="320" text-anchor="middle" fill="#d97706" font-size="13" font-family="JetBrains Mono,monospace">envelope: contract · data · units · provenance · truncated</text>
           </g>
           <g data-step="5">
             <rect x="306" y="330" width="250" height="64" rx="9" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
@@ -536,8 +538,8 @@
           "3": ["RADIS — an imported LGPL library, never copied — does the physics on your CPU. On first use its documented fetchers download the line list under the database's own terms (CO2/HITRAN ≈ 38 MB) into ~/.radisdb; after that the call is offline.",
                 'fetch_hitran("CO2") → 1361 lines in 660–670 cm⁻¹ → line-by-line τ(ν)'],
           "4": ["The answer returns wrapped: values with units, decimation flagged with the true total, coverage notes, and the source with edition, citation, license and retrieval time.",
-                '{"ok": true, "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"database_version": "HITRAN2020", ...}}'],
-          "5": ["Every data-serving call also appended a ledger entry. provenance_report() returns the session's complete bibliography, ready to paste into a methods section.",
+                '{"ok": true, "contract": "0.2", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"database_version": "HITRAN2020", ...}}'],
+          "5": ["Every data-serving call feeds the session ledger (repeated identical queries are recorded once — a bibliography needs each source once). provenance_report() returns the session's complete bibliography, ready to paste into a methods section.",
                 '{"entries": [{"tool": "spectrum_calculate", "citation": "Pannier & Laux (2019) ...;\n   line data: Gordon et al. (2022) ..."}], "entry_count": 4}']
         };
         var current = null;
@@ -743,7 +745,7 @@
 
       <div class="callout">
         <strong>What travelled with the numbers.</strong> Each value arrived
-        with
+        in a versioned envelope (<code>contract: "0.2"</code>) with
         <code>units: {"wavenumber": "cm-1 (vacuum)", "values": "dimensionless (0-1)"}</code>,
         the provenance record
         <code>"HITRAN line-by-line calculation via RADIS 0.17.1"</code> with
@@ -780,8 +782,10 @@
         plausible but wrong spectrum. The same principle applies elsewhere in
         the tool surface: every atomic response carries three coverage caveats
         (the NIST backend's <code>line_out=1</code> filter, the absence of
-        energy-level data, and the CPU-only atomic path with its hydrogen
-        default diluent). Limitations are reported rather than worked around.
+        energy-level data, and the CPU-only atomic path, whose broadening
+        partners are limited to H, He, H₂ and free electrons — atomic
+        hydrogen by default, air broadening not available for atoms).
+        Limitations are reported rather than worked around.
       </p>
 
       <h2>What this doesn't do</h2>
@@ -802,7 +806,10 @@
         refuses HITRAN above ~700 K and HITEMP above ~2000 K as engineering
         guardrails; the practical range of each database is molecule- and
         spectral-region-dependent.</li>
-        <li><strong>Incubating.</strong> Version 0.1; interfaces may change. No
+        <li><strong>Incubating.</strong> Version 0.2; the response contract is
+        itself versioned — every envelope is stamped
+        <code>contract: "0.2"</code> so agents can detect shape changes while
+        the project is 0.x. No
         hosted service exists — you run it locally, and no data is bundled or
         redistributed.</li>
       </ul>
@@ -867,7 +874,7 @@
       </blockquote>
       <p>
         The numbers and the figure on this page are the unedited output of the
-        resulting tool calls, with these exact parameters (Python ≥ 3.13,
+        resulting tool calls, with these exact parameters (Python 3.13–3.14,
         <code>pip install '.[spectroscopy]'</code>):
       </p>
       <pre><code><span class="c"># the lines, with honest truncation</span>
