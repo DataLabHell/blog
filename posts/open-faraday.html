@@ -53,6 +53,36 @@
       .article-content .tbl tr:last-child td {
         border-bottom: none;
       }
+      /* ── display equations ── */
+      .article-content .eq {
+        text-align: center;
+        font-family: "STIX Two Text", "Cambria Math", "Times New Roman", Georgia, serif;
+        font-size: 1.08rem;
+        color: var(--dark);
+        margin: 1.4rem 0;
+        line-height: 1.6;
+        overflow-x: auto;
+      }
+      .eq var, .article-content .eq {
+        font-style: normal;
+      }
+      .eq var {
+        font-style: italic;
+        font-family: inherit;
+      }
+      .eq sub, .eq sup {
+        font-size: 0.72em;
+      }
+      .eq sub var, .eq sub {
+        font-style: normal;
+      }
+      .eq sub var { font-style: italic; }
+      .article-content p var {
+        font-style: italic;
+        font-family: "STIX Two Text", "Cambria Math", "Times New Roman", Georgia, serif;
+        font-size: 1.04em;
+      }
+
       /* ── citations ── */
       sup.cite a {
         border-bottom: none;
@@ -276,30 +306,63 @@
           github.com/DataLabHell/open-faraday
         </a>
       </p>
+      <div class="callout">
+        <strong>TL;DR.</strong> open-faraday is a small open-source MCP server
+        that exposes spectroscopic reference data (HITRAN, HITEMP, ExoMol,
+        Kurucz, NIST via RADIS) and CODATA constants to AI agents. Every
+        response is a versioned envelope carrying units, provenance,
+        truncation flags and coverage notes; requests outside a databank's
+        validity limits get a structured refusal instead of a plausible
+        number. The idea worth keeping is scientific context as an executable
+        contract, enforced at runtime rather than left to the agent; MCP is
+        just the transport. One worked example carries the argument: the CO₂
+        ν₂ band at 15&nbsp;µm, where one metre of air at 420&nbsp;ppm
+        transmits 1.13% at 667.53&nbsp;cm⁻¹ and the same gas reaches
+        τ&nbsp;≈&nbsp;4487 over a kilometre, every number an unedited,
+        reproducible tool output. The endgame is agents inside instrument
+        loops, with scientific assumptions machine-enforceable.
+      </div>
+
       <h2>Motivation</h2>
       <p>
-        Curated reference data for spectroscopy already exists: HITRAN's
-        molecular line lists, Kurucz's atomic tables, the CODATA constants —
-        among many others. What fails in practice is the step between that
-        data and an agent's answer. Retrieving a value does not establish its
-        units, physical convention, completeness, validity regime, database
-        edition or citation. Closing that gap requires no new science — it requires
-        interface constraints, enforced at a protocol boundary rather than
-        left to the agent's discretion.
+        AI agents are moving into scientific work, and the question has
+        shifted from whether an agent can call a tool to whether it can be
+        trusted with one. Anyone who has tried knows the failure modes: a
+        physical value supplied from model memory, a unit convention lost
+        between response and answer, a partial result treated as a complete
+        one. None of these failures announces itself, and that silence is
+        what makes them dangerous in scientific use.
+      </p>
+      <p>
+        The data itself is not the problem. Curated reference data for
+        spectroscopy already exists: HITRAN's molecular line
+        lists,<sup class="cite"><a href="#ref_hitran">[1]</a></sup> Kurucz's
+        atomic tables,<sup class="cite"><a href="#ref_kurucz">[2]</a></sup>
+        the CODATA constants,<sup class="cite"><a href="#ref_codata">[3]</a></sup>
+        among many others. What fails
+        in practice is the step between that data and an agent's answer.
+        Retrieving a value does not establish its units, physical convention,
+        completeness, validity regime, database edition or citation. Closing
+        that gap requires no new science, just interface constraints,
+        enforced at a protocol boundary rather than left to the agent's
+        discretion.
         <a href="https://github.com/DataLabHell/open-faraday" target="_blank" rel="noopener">open-faraday</a>
-        addresses this step and only this step: it exposes RADIS and
-        scipy.constants to agents through a fixed response contract. The
+        addresses this step and only this step: it exposes
+        RADIS<sup class="cite"><a href="#ref_radis">[4]</a></sup> and
+        scipy.constants<sup class="cite"><a href="#ref_codata">[3]</a></sup>
+        to agents through a fixed response contract. The
         durable idea is not the protocol — it is scientific context as an
         executable contract: units, conventions, completeness, provenance,
         validity regimes and explicit failure, travelling with every value.
-        MCP is simply how that contract is delivered to the agent.
+        MCP delivers that contract to the agent, and the server is
+        deliberately small: a proof of the pattern, not a platform.
       </p>
 
       <div class="callout">
-        <strong>Scope.</strong> One worked example, run end-to-end through the
-        open-faraday MCP server on 2026-08-21 (RADIS 0.17.1, HITRAN line data).
-        The example deliberately preserves the HITRAN2020 data returned by the
-        recorded session; newer HITRAN and HITEMP releases exist.
+        <strong>Scope.</strong> One worked example, run end-to-end through
+        open-faraday 0.2.0 on 2026-08-24 (RADIS 0.17.1, HITRAN line data
+        fetched via HAPI; RADIS requests the latest release and does not
+        record the exact edition — the provenance notes say so explicitly).
         All numbers below are unedited tool output; the calls needed to
         reproduce them are listed at the end. The radiative-transfer
         computation is done by
@@ -310,9 +373,9 @@
       <h2>Scientific context has to cross the interface</h2>
       <p>
         Scientific databases already expose excellent programmatic interfaces,
-        and none of what follows requires MCP: typed values and units,
+        and none of what follows requires MCP. Typed values and units,
         truncation metadata, provenance and citations, structured errors,
-        validity checks — all of it can be implemented with REST, GraphQL,
+        validity checks: all of it can be implemented with REST, GraphQL,
         gRPC or a plain Python library, and machine-readable tool discovery
         has existed in OpenAPI for years. The problem we are interested in is
         different: <em>what information has to cross the boundary together
@@ -329,11 +392,10 @@
       <p>
         open-faraday makes these properties an executable scientific
         contract: the interface requires them, validates them, returns them
-        in a predictable structure, and refuses requests that violate
-        deliberately chosen validity policies. MCP's role is narrower — it
-        gives agents a standardized way to consume that contract. The
-        scientific contract is open-faraday; MCP is the interface it ships
-        today for reaching that contract.
+        in a predictable structure, and refuses requests that violate its
+        chosen validity policies. MCP's role is narrower: it gives agents a
+        standardized way to consume that contract. The scientific contract is
+        open-faraday; MCP is the interface it ships today for reaching it.
       </p>
 
       <figure class="fig" id="layers">
@@ -375,40 +437,31 @@
           </g>
         </svg>
         <figcaption>The layering behind the article. Databases and physics engines own the data and
-        the physics. open-faraday wraps access to them in one executable contract — required fields,
-        validation, structured refusal. MCP is just the interface that lets an agent consume that
-        contract. MCP over stdio is the only interface the server ships today — there is no HTTP
-        API — but because the contract lives in the response envelope rather than in the transport,
-        importing the module in Python hands back exactly the same envelope.</figcaption>
+        the physics. open-faraday wraps access to them in one executable contract: required fields,
+        validation, structured refusal. MCP over stdio is the only interface the server ships today
+        (there is no HTTP API), but because the contract lives in the response envelope rather than
+        in the transport, importing the module in Python hands back exactly the same envelope.</figcaption>
       </figure>
 
       <p>
-        The question underneath is: what does a scientific software interface
-        have to guarantee before an autonomous agent can be trusted to use
-        it? Our working answer: units, conventions, provenance, completeness,
-        assumptions, validity regimes and explicit failure.
+        What does a scientific software interface have to guarantee before an
+        autonomous agent can be trusted to use it? Our working answer: units,
+        conventions, provenance, completeness, assumptions, validity regimes
+        and explicit failure.
       </p>
 
-      <h2>One typed boundary — where the discipline lives</h2>
       <p>
-        In the local configuration used for this session, Claude Code launches
-        open-faraday as a subprocess and speaks the
+        In the setup used here, Claude Code launches open-faraday locally and
+        talks to it over the
         <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a>
-        with it over stdio. (MCP also supports remote deployments; this post
-        describes the setup actually used.) The client obtains the server's
-        tools — each with a name, a description and a typed parameter schema —
-        and tool calls are exchanged as structured JSON-RPC messages.
-      </p>
-      <p>
-        Within this data layer the agent therefore sees a deliberately narrow
-        tool surface rather than raw webpages or arbitrary HTTP responses: the
-        declared schemas define the interface. That is what makes the contract
-        <em>executable</em> rather than advisory — the context an agent needs
-        is not documentation it is expected to remember. Typed schemas,
-        mandatory response envelopes, validation guardrails and structured
-        refusals enforce it on every call, independent of what the agent does.
-        The figure below shows the path of one tool call; the buttons
-        highlight each stage.
+        (stdio); the agent discovers five typed tools. The schemas alone are
+        not the contract. What makes it <em>executable</em> is runtime
+        enforcement: validated arguments, mandatory response metadata, checked
+        validity policies, and structured refusals instead of plausible
+        results. Context stops being documentation the agent is expected to
+        remember and becomes part of the behavior of the interface. The
+        figure below shows the path of one tool call; the buttons highlight
+        each stage.
       </p>
 
       <figure class="fig" id="dataflow">
@@ -538,9 +591,9 @@
           "3": ["RADIS — an imported LGPL library, never copied — does the physics on your CPU. On first use its documented fetchers download the line list under the database's own terms (CO2/HITRAN ≈ 38 MB) into ~/.radisdb; after that the call is offline.",
                 'fetch_hitran("CO2") → 1361 lines in 660–670 cm⁻¹ → line-by-line τ(ν)'],
           "4": ["The answer returns wrapped: values with units, decimation flagged with the true total, coverage notes, and the source with edition, citation, license and retrieval time.",
-                '{"ok": true, "contract": "0.2", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"database_version": "HITRAN2020", ...}}'],
+                '{"ok": true, "contract": "0.2", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"source": "HITRAN ... via RADIS 0.17.1", ...}}'],
           "5": ["Every data-serving call feeds the session ledger (repeated identical queries are recorded once — a bibliography needs each source once). provenance_report() returns the session's complete bibliography, ready to paste into a methods section.",
-                '{"entries": [{"tool": "spectrum_calculate", "citation": "Pannier & Laux (2019) ...;\n   line data: Gordon et al. (2022) ..."}], "entry_count": 4}']
+                '{"entries": [{"tool": "spectrum_calculate", "citation": "Pannier & Laux (2019) ...;\n   line data: Gordon et al. (2022) ..."}], "entry_count": 3}']
         };
         var current = null;
         buttons.forEach(function(b){
@@ -565,25 +618,37 @@
       });
       </script>
 
-      <h2>The CO₂ contribution in one metre of air</h2>
+      <h2>Use case: The CO₂ contribution in one metre of air</h2>
       <p>
         The example question: <em>how strongly does the CO₂ in ordinary air absorb
         thermal infrared near 15&nbsp;µm?</em> This spectral region is dominated by the
         ν₂ bending mode of CO₂, a central absorption feature of the greenhouse
-        effect. The calculation isolates CO₂ — the spectrum contains no other
-        constituent of air. The session ran as follows.
+        effect. The calculation isolates CO₂: the spectrum contains no other
+        constituent of air. The session was run from Claude Code with
+        open-faraday registered as a local MCP server, driven by this prompt:
       </p>
+      <blockquote>
+        Using only the open-faraday tools, no values from memory: fetch the CO₂
+        line list between 660 and 670 cm⁻¹ from HITRAN. Then compute the CO₂
+        contribution to transmittance in air at a CO₂ mole fraction of
+        420 ppm (296 K, 1.01325 bar) over a 1 m path between 655 and
+        680 cm⁻¹, and the optical depth (RADIS quantity "absorbance") of the
+        same homogeneous gas over 1 km. Try the same calculation at 1500 K.
+        Finally, give me the provenance report. Report every value with its
+        units and truncation flags.
+      </blockquote>
 
       <p>
         <strong>Line data.</strong>
         <code>lines_fetch_molecular("CO2", 660, 670)</code> returns the first
-        10 line records together with
+        40 line records (the default cap) together with
         <code>truncated: true, total_available: 1361</code> — 1361 lines of the
         main isotopologue (the tool's <code>isotope="1"</code> default) in a
-        10&nbsp;cm⁻¹ window.<sup class="cite"><a href="#ref_hitran">[2]</a></sup>
-        The flag is the point: a raw paginated response, taken at face value,
-        could hand the agent those same 10 records with nothing forcing it to
-        notice that 99% of the band had not been retrieved.
+        10&nbsp;cm⁻¹ window.<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
+        The flag is the point: returning only the first 40 records without
+        machine-readable completeness metadata would leave the agent free to
+        mistake a partial result for the full line list. The envelope makes
+        that state explicit.
       </p>
 
       <p>
@@ -591,36 +656,89 @@
         <code>spectrum_calculate("CO2", 655–680 cm⁻¹, Tgas=296 K, p=1.01325
         bar, x=420 ppm, L=1 m)</code> — a CO₂ mole fraction
         x<sub>CO₂</sub>&nbsp;=&nbsp;420&nbsp;×&nbsp;10⁻⁶. RADIS performs the
-        line-by-line calculation locally, on HITRAN2020 data fetched under
-        HITRAN's own terms.<sup class="cite"><a href="#ref_hitran">[2]</a></sup>
-        A note on conventions: RADIS calls τ&nbsp;=&nbsp;−ln&nbsp;T
-        "absorbance"; this post calls it optical depth throughout, to avoid
-        confusion with the base-10 absorbance of analytical spectroscopy.
+        line-by-line calculation locally, on HITRAN data fetched under
+        HITRAN's own terms.<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
+        RADIS calls τ&nbsp;=&nbsp;−ln&nbsp;T "absorbance"; this post calls it
+        optical depth throughout, to avoid confusion with the base-10
+        absorbance of analytical spectroscopy.
+      </p>
+
+      <h3>The physics in three equations</h3>
+      <p>
+        The quantity the tool returns is governed by the Beer–Lambert law.
+        Monochromatic radiation of intensity <var>I</var>₀ entering a
+        homogeneous absorbing column of length <var>L</var> leaves it with
+        intensity <var>I</var>, and the transmittance at wavenumber
+        <var>ν</var> is
+      </p>
+      <div class="eq">
+        <var>T</var>(<var>ν</var>) =
+        <var>I</var>(<var>ν</var>)&thinsp;/&thinsp;<var>I</var>₀(<var>ν</var>) =
+        <var>e</var><sup>−<var>τ</var>(<var>ν</var>)</sup>
+      </div>
+      <p>
+        so the optical depth <var>τ</var> counts the
+        <var>e</var>-foldings of attenuation: at <var>τ</var>&nbsp;=&nbsp;1
+        the intensity has dropped to 1/<var>e</var>&nbsp;≈&nbsp;37%, at
+        <var>τ</var>&nbsp;=&nbsp;4.49 to 1.13%. For a uniform gas it grows
+        linearly with the amount of absorber along the path,
+      </p>
+      <div class="eq">
+        <var>τ</var>(<var>ν</var>) =
+        <var>σ</var>(<var>ν</var>)&thinsp;<var>n</var>&thinsp;<var>L</var>,
+        &emsp;
+        <var>n</var> = <var>x</var><sub>CO₂</sub>&thinsp;<var>p</var>&thinsp;/&thinsp;(<var>k</var><sub>B</sub>&thinsp;<var>T</var><sub>gas</sub>)
+      </div>
+      <p>
+        where <var>σ</var>(<var>ν</var>) is the monochromatic absorption
+        cross-section per molecule (cm²), <var>n</var> the CO₂ number density
+        (cm⁻³) from the ideal-gas law, and <var>L</var> the path length (cm).
+        The units cancel, so <var>τ</var> is dimensionless, which is also why
+        the two path lengths in the example are mutually checkable: within
+        this homogeneous-gas model, increasing the path from 1&nbsp;m to
+        1&nbsp;km gives exactly 1000&nbsp;× the optical depth.
+        The cross-section itself is what RADIS assembles line by line from
+        the HITRAN records,
+      </p>
+      <div class="eq">
+        <var>σ</var>(<var>ν</var>) = Σ<sub><var>i</var></sub>&nbsp;<var>S</var><sub><var>i</var></sub>(<var>T</var><sub>gas</sub>)&thinsp;<var>φ</var><sub><var>i</var></sub>(<var>ν</var> − <var>ν</var><sub><var>i</var></sub>)
+      </div>
+      <p>
+        a sum over every transition <var>i</var> in the window: the line
+        intensity <var>S</var><sub><var>i</var></sub> from the database
+        (rescaled to <var>T</var><sub>gas</sub> via the lower-state energy
+        and partition function), and a normalized line-shape function
+        <var>φ</var><sub><var>i</var></sub>, in practice a Voigt profile
+        combining pressure broadening by air with Doppler broadening. This is
+        why the 1361-line count from the truncation flag matters physically:
+        drop lines from the sum and <var>σ</var>(<var>ν</var>) is simply
+        wrong.
       </p>
 
       <div class="stats">
         <div><div class="v">667.53<small> cm⁻¹</small></div><div class="l">optical-depth maximum, near the ν₂ Q branch</div></div>
-        <div><div class="v">1.15<small> %</small></div><div class="l">CO₂ transmittance through 1 m at that wavenumber</div></div>
-        <div><div class="v">τ ≈ 4466</div><div class="l">CO₂ optical depth over 1 km, same homogeneous gas</div></div>
+        <div><div class="v">1.13<small> %</small></div><div class="l">CO₂ transmittance through 1 m at that wavenumber</div></div>
+        <div><div class="v">τ ≈ 4487<small> (dimensionless)</small></div><div class="l">CO₂ optical depth over 1 km, same homogeneous gas</div></div>
         <div><div class="v">420<small> ppm</small></div><div class="l">CO₂ mole fraction assumed, 296 K, 1 atm</div></div>
       </div>
 
       <figure class="fig" id="spectrumfig">
-        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN2020 via RADIS 0.17.1)</div>
+        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.2.0)</div>
         <div class="chartbtns" role="group" aria-label="Select displayed quantity">
           <button type="button" data-series="t1m" aria-pressed="true" style="--sc:#0d9488"><i style="background:#0d9488"></i>Transmittance, 1 m path</button>
           <button type="button" data-series="od1km" aria-pressed="false" style="--sc:#d97706"><i style="background:#d97706"></i>Optical depth, 1 km path (log)</button>
         </div>
         <div class="chart-wrap"><canvas id="speccanvas" role="img"
-          aria-label="Line chart of the CO2 nu2 band between 655 and 680 inverse centimetres. CO2 transmittance through one metre drops from near 1 in the wings to 0.0115 at the optical-depth maximum at 667.53; CO2 optical depth over one kilometre of the same homogeneous gas, on a log scale, rises from about 5 to 4466 at the same wavenumber."></canvas></div>
+          aria-label="Line chart of the CO2 nu2 band between 655 and 680 inverse centimetres. CO2 transmittance through one metre drops from near 1 in the wings to 0.0113 at the optical-depth maximum at 667.53; CO2 optical depth over one kilometre of the same homogeneous gas, on a log scale, rises from about 5 to 4487 at the same wavenumber."></canvas></div>
         <div class="chart-readout" id="specreadout">hover the curve for exact values</div>
         <figcaption>Verbatim output of two <span class="mono">spectrum_calculate</span> calls, identical
         conditions, path lengths 1&nbsp;m and 1&nbsp;km. Both responses were decimated for transport and
-        flagged (<span class="mono">truncated: true, total_available: 2501</span>; 501 points shown). The
+        flagged (<span class="mono">truncated: true, total_available: 2501</span>; 500 points shown,
+        <span class="mono">max_points=501</span>, extrema preserved per bucket). The
         marked point is the optical-depth maximum near the ν₂ Q branch, at 667.53&nbsp;cm⁻¹ on
         this sampled spectrum (the conventional band centre lies near 667.4&nbsp;cm⁻¹; the exact
         Q-branch shape is sensitive to pressure broadening and line mixing): CO₂ transmittance
-        0.0115 over one metre, optical depth 4466 over one kilometre of the same homogeneous gas. Hover (or tap) for values; the buttons switch quantity.</figcaption>
+        0.0113 over one metre, optical depth 4487 over one kilometre of the same homogeneous gas. Hover (or tap) for values; the buttons switch quantity.</figcaption>
         <details class="dtable"><summary>Data as table (every 25th point)</summary>
           <div class="tbl"><table id="spectable"><thead><tr><th>wavenumber (cm⁻¹, vac)</th><th>transmittance, 1 m</th><th>optical depth, 1 km</th></tr></thead><tbody></tbody></table></div>
         </details>
@@ -628,7 +746,7 @@
 
       <script>
       document.addEventListener('DOMContentLoaded', function(){
-        var DATA = {"w":[655.0,655.05,655.1,655.15,655.2,655.25,655.3,655.35,655.4,655.45,655.5,655.55,655.6,655.65,655.7,655.75,655.8,655.85,655.9,655.95,656.0,656.05,656.1,656.15,656.2,656.25,656.3,656.35,656.4,656.45,656.5,656.55,656.6,656.65,656.7,656.75,656.8,656.85,656.9,656.95,657.0,657.05,657.1,657.15,657.2,657.25,657.3,657.35,657.4,657.45,657.5,657.55,657.6,657.65,657.7,657.75,657.8,657.85,657.9,657.95,658.0,658.05,658.1,658.15,658.2,658.25,658.3,658.35,658.4,658.45,658.5,658.55,658.6,658.65,658.7,658.75,658.8,658.85,658.9,658.95,659.0,659.05,659.1,659.15,659.2,659.25,659.3,659.35,659.4,659.45,659.5,659.55,659.6,659.65,659.7,659.75,659.8,659.85,659.9,659.95,660.0,660.05,660.1,660.15,660.2,660.25,660.3,660.35,660.4,660.45,660.5,660.55,660.6,660.65,660.7,660.75,660.8,660.85,660.9,660.95,661.0,661.05,661.1,661.15,661.2,661.25,661.3,661.35,661.4,661.45,661.5,661.55,661.6,661.65,661.7,661.75,661.8,661.85,661.9,661.95,662.0,662.05,662.1,662.15,662.2,662.25,662.3,662.35,662.4,662.45,662.5,662.55,662.6,662.65,662.7,662.75,662.8,662.85,662.9,662.95,663.0,663.05,663.1,663.15,663.2,663.25,663.3,663.35,663.4,663.45,663.5,663.55,663.6,663.65,663.7,663.75,663.8,663.85,663.9,663.95,664.0,664.05,664.1,664.15,664.2,664.25,664.3,664.35,664.4,664.45,664.5,664.55,664.6,664.65,664.7,664.75,664.8,664.85,664.9,664.95,665.0,665.05,665.1,665.15,665.2,665.25,665.3,665.35,665.4,665.45,665.5,665.55,665.6,665.65,665.7,665.75,665.8,665.85,665.9,665.95,666.0,666.05,666.1,666.15,666.2,666.25,666.3,666.35,666.4,666.45,666.5,666.55,666.6,666.65,666.7,666.75,666.8,666.85,666.9,666.95,667.0,667.05,667.1,667.15,667.2,667.25,667.3,667.35,667.4,667.45,667.5,667.55,667.6,667.65,667.7,667.75,667.8,667.85,667.9,667.95,668.0,668.05,668.1,668.15,668.2,668.25,668.3,668.35,668.4,668.45,668.5,668.55,668.6,668.65,668.7,668.75,668.8,668.85,668.9,668.95,669.0,669.05,669.1,669.15,669.2,669.25,669.3,669.35,669.4,669.45,669.5,669.55,669.6,669.65,669.7,669.75,669.8,669.85,669.9,669.95,670.0,670.05,670.1,670.15,670.2,670.25,670.3,670.35,670.4,670.45,670.5,670.55,670.6,670.65,670.7,670.75,670.8,670.85,670.9,670.95,671.0,671.05,671.1,671.15,671.2,671.25,671.3,671.35,671.4,671.45,671.5,671.55,671.6,671.65,671.7,671.75,671.8,671.85,671.9,671.95,672.0,672.05,672.1,672.15,672.2,672.25,672.3,672.35,672.4,672.45,672.5,672.55,672.6,672.65,672.7,672.75,672.8,672.85,672.9,672.95,673.0,673.05,673.1,673.15,673.2,673.25,673.3,673.35,673.4,673.45,673.5,673.55,673.6,673.65,673.7,673.75,673.8,673.85,673.9,673.95,674.0,674.05,674.1,674.15,674.2,674.25,674.3,674.35,674.4,674.45,674.5,674.55,674.6,674.65,674.7,674.75,674.8,674.85,674.9,674.95,675.0,675.05,675.1,675.15,675.2,675.25,675.3,675.35,675.4,675.45,675.5,675.55,675.6,675.65,675.7,675.75,675.8,675.85,675.9,675.95,676.0,676.05,676.1,676.15,676.2,676.25,676.3,676.35,676.4,676.45,676.5,676.55,676.6,676.65,676.7,676.75,676.8,676.85,676.9,676.95,677.0,677.05,677.1,677.15,677.2,677.25,677.3,677.35,677.4,677.45,677.5,677.55,677.6,677.65,677.7,677.75,677.8,677.85,677.9,677.95,678.0,678.05,678.1,678.15,678.2,678.25,678.3,678.35,678.4,678.45,678.5,678.55,678.6,678.65,678.7,678.75,678.8,678.85,678.9,678.95,679.0,679.05,679.1,679.15,679.2,679.25,679.3,679.35,679.4,679.45,679.5,679.55,679.6,679.65,679.7,679.75,679.8,679.85,679.9,679.95,680.0],"t1m":[0.9953,0.9945,0.994,0.9931,0.9912,0.987,0.9792,0.9768,0.9836,0.9869,0.9867,0.9864,0.9881,0.9886,0.9883,0.9882,0.9884,0.9883,0.9877,0.9864,0.9844,0.9814,0.9769,0.9695,0.9571,0.9421,0.9325,0.9116,0.8642,0.7678,0.618,0.5916,0.7379,0.8489,0.9056,0.9339,0.9468,0.95,0.9572,0.9681,0.9742,0.9762,0.976,0.9781,0.9805,0.9813,0.9826,0.984,0.9842,0.9837,0.9826,0.9807,0.9774,0.972,0.9625,0.9504,0.9446,0.934,0.9079,0.8544,0.7507,0.6146,0.6379,0.7781,0.8698,0.9163,0.9396,0.9499,0.9529,0.9606,0.9703,0.9756,0.9776,0.9769,0.9763,0.9794,0.9811,0.9822,0.9836,0.984,0.9834,0.9822,0.9802,0.9766,0.97,0.9601,0.9548,0.9506,0.9376,0.9103,0.8565,0.7548,0.6413,0.689,0.8124,0.8883,0.9269,0.9465,0.955,0.9578,0.9649,0.9731,0.9777,0.9797,0.9797,0.9777,0.9783,0.9811,0.9824,0.9835,0.9842,0.984,0.9828,0.9807,0.9769,0.9703,0.964,0.9623,0.9572,0.9445,0.9197,0.8712,0.7812,0.6905,0.7414,0.8444,0.9062,0.9378,0.9539,0.9613,0.9639,0.9693,0.9759,0.9798,0.9817,0.9821,0.9806,0.978,0.9797,0.982,0.9826,0.9834,0.9833,0.9821,0.9796,0.9753,0.9684,0.9622,0.9566,0.9491,0.9381,0.919,0.8822,0.8145,0.7475,0.7865,0.8646,0.9122,0.9373,0.9508,0.9577,0.9611,0.9655,0.9706,0.9742,0.9765,0.9776,0.9776,0.9756,0.974,0.9769,0.9789,0.9799,0.981,0.9811,0.9801,0.978,0.9753,0.9741,0.9734,0.9706,0.9643,0.9522,0.9289,0.8862,0.8404,0.8606,0.911,0.9425,0.9587,0.9672,0.9714,0.9732,0.9749,0.9767,0.9773,0.9773,0.9771,0.9768,0.9754,0.9723,0.9709,0.9732,0.9741,0.9748,0.9752,0.9747,0.9736,0.9723,0.9715,0.9709,0.9694,0.9666,0.9618,0.9535,0.9389,0.9212,0.9233,0.9392,0.9493,0.9537,0.955,0.9549,0.954,0.9523,0.9499,0.947,0.9435,0.9393,0.9343,0.9284,0.9211,0.9115,0.903,0.8958,0.8856,0.8734,0.8585,0.8397,0.8159,0.7861,0.7483,0.6988,0.6326,0.5429,0.422,0.2696,0.12,0.0387,0.0165,0.0117,0.0115,0.0131,0.0156,0.019,0.0215,0.0241,0.031,0.0361,0.0513,0.0574,0.081,0.0847,0.1129,0.123,0.1572,0.194,0.2007,0.2686,0.2685,0.3073,0.3698,0.3513,0.416,0.467,0.4388,0.5132,0.5606,0.5254,0.5902,0.6458,0.6129,0.6448,0.7125,0.7015,0.6849,0.7464,0.7684,0.7431,0.763,0.8038,0.7958,0.7529,0.7423,0.7135,0.7072,0.7441,0.8134,0.8611,0.8729,0.8655,0.8866,0.9054,0.9115,0.9049,0.9183,0.9373,0.9426,0.9352,0.9335,0.9474,0.9541,0.9524,0.945,0.9507,0.9563,0.954,0.9438,0.9346,0.9414,0.9438,0.9368,0.9184,0.8882,0.8369,0.7487,0.697,0.7656,0.8473,0.8989,0.9276,0.9418,0.9464,0.9462,0.9524,0.9626,0.9693,0.9726,0.9738,0.9757,0.9765,0.9769,0.9777,0.9775,0.9771,0.9767,0.9748,0.971,0.9644,0.954,0.9482,0.9487,0.9437,0.9292,0.9005,0.8457,0.748,0.6389,0.6684,0.7862,0.8659,0.9087,0.9323,0.9439,0.9472,0.9478,0.9573,0.9672,0.9731,0.9762,0.9776,0.9787,0.9794,0.9796,0.9801,0.98,0.9791,0.9772,0.9742,0.9692,0.9606,0.9478,0.9413,0.9401,0.9302,0.9066,0.8614,0.775,0.6372,0.5711,0.6873,0.8103,0.8785,0.9139,0.9336,0.9425,0.9423,0.9463,0.9595,0.9685,0.9731,0.9763,0.9785,0.9795,0.9795,0.9796,0.9799,0.9794,0.9781,0.9759,0.9725,0.9667,0.9565,0.9409,0.9318,0.9284,0.914,0.8811,0.8149,0.6912,0.5407,0.5668,0.7239,0.833,0.8895,0.9189,0.9352,0.9402,0.9382,0.9476,0.961,0.9694,0.9745,0.9775,0.9791,0.9796,0.9793,0.9794,0.9795,0.9789,0.9775,0.9752,0.9713,0.9651,0.9542,0.9363,0.9221,0.9172,0.8984,0.8537,0.7638,0.607,0.4883,0.601,0.7597,0.8523,0.8998,0.9244,0.9367,0.9379,0.9365,0.9509,0.9646,0.9721,0.9762,0.9787,0.9801,0.9804,0.9798,0.9797,0.98,0.9795,0.9781,0.9755,0.9715,0.9649,0.9548,0.9381,0.9169,0.9061,0.8834,0.8276,0.7143,0.5383,0.4833,0.6454,0.7912,0.8702,0.911,0.9315,0.9401,0.9388,0.9416,0.9588,0.9713,0.9782,0.9824,0.9852,0.9872,0.9888,0.9901],"od1km":[4.677,5.483,6.039,6.896,8.817,13.076,21.056,23.445,16.538,13.157,13.43,13.691,11.941,11.423,11.811,11.897,11.667,11.719,12.385,13.67,15.709,18.763,23.399,30.932,43.825,59.637,69.884,92.552,145.953,264.249,481.192,524.922,303.879,163.816,99.173,68.364,54.698,51.254,43.753,32.424,26.178,24.086,24.262,22.095,19.674,18.912,17.543,16.158,15.904,16.446,17.532,19.501,22.819,28.42,38.238,50.913,57.037,68.293,96.624,157.383,286.768,486.778,449.535,250.945,139.543,87.439,62.352,51.373,48.204,40.16,30.198,24.714,22.642,23.387,23.946,20.854,19.048,17.976,16.579,16.146,16.69,17.912,19.992,23.726,30.454,40.674,46.231,50.635,64.423,93.998,154.957,281.27,444.211,372.466,207.789,118.418,75.857,55.034,46.048,43.157,35.755,27.298,22.54,20.473,20.537,22.532,21.904,19.04,17.765,16.68,15.904,16.176,17.391,19.486,23.337,30.126,36.667,38.474,43.754,57.057,83.66,137.929,246.897,370.323,299.172,169.149,98.483,64.222,47.152,39.479,36.753,31.155,24.434,20.39,18.424,18.04,19.604,22.265,20.476,18.16,17.517,16.719,16.811,18.074,20.608,25.001,32.082,38.541,44.351,52.24,63.86,84.447,125.304,205.127,291.075,240.178,145.489,91.853,64.769,50.489,43.181,39.717,35.114,29.794,26.182,23.825,22.604,22.699,24.715,26.386,23.366,21.373,20.324,19.205,19.107,20.128,22.272,25.019,26.195,26.955,29.836,36.393,49.021,73.748,120.867,173.855,150.083,93.249,59.271,42.131,33.325,29.028,27.15,25.405,23.57,22.952,22.983,23.124,23.512,24.93,28.045,29.515,27.12,26.236,25.531,25.12,25.63,26.768,28.063,28.877,29.553,31.114,33.985,38.903,47.589,63.063,82.103,79.803,62.78,52.055,47.422,46.038,46.128,47.105,48.909,51.391,54.465,58.171,62.607,67.963,74.271,82.185,92.717,102.086,110.085,121.512,135.312,152.551,174.68,203.404,240.691,289.939,358.421,457.954,610.781,862.657,1310.799,2120.503,3251.565,4106.659,4447.452,4466.083,4336.278,4162.709,3960.889,3838.674,3725.603,3474.459,3321.163,2970.841,2858.012,2513.697,2469.012,2181.365,2095.347,1849.973,1639.939,1606.048,1314.35,1314.847,1179.787,994.852,1046.025,876.988,761.53,823.692,667.055,578.773,643.631,527.275,437.233,489.585,438.881,339.019,354.547,378.516,292.559,263.502,296.904,270.541,218.398,228.377,283.841,298.04,337.613,346.429,295.525,206.521,149.542,135.895,144.427,120.412,99.363,92.697,99.938,85.182,64.748,59.13,66.979,68.86,54.05,47.034,48.741,56.617,50.585,44.647,47.058,57.84,67.652,60.416,57.822,65.254,85.094,118.521,178.096,289.412,360.981,267.049,165.731,106.545,75.178,59.973,55.092,55.324,48.798,38.119,31.138,27.742,26.552,24.615,23.752,23.343,22.579,22.721,23.154,23.587,25.544,29.388,36.28,47.081,53.141,52.633,57.946,73.389,104.804,167.561,290.356,448.007,402.895,240.552,143.976,95.785,70.094,57.763,54.222,53.584,43.646,33.324,27.276,24.061,22.647,21.544,20.866,20.642,20.149,20.224,21.168,23.083,26.17,31.241,40.22,53.644,60.484,61.74,72.363,98.056,149.191,254.848,450.627,560.252,374.998,210.296,129.537,90.006,68.658,59.258,59.413,55.208,41.383,31.997,27.236,23.961,21.697,20.744,20.681,20.587,20.287,20.782,22.186,24.386,27.87,33.841,44.448,60.922,70.675,74.314,89.885,126.597,204.639,369.291,614.89,567.7,323.068,182.684,117.066,84.605,67.017,61.697,63.78,53.798,39.782,31.085,25.786,22.728,21.1,20.602,20.883,20.851,20.665,21.33,22.708,25.119,29.073,35.545,46.845,65.797,81.049,86.399,107.181,158.206,269.489,499.238,716.728,509.239,274.784,159.853,105.58,78.614,65.395,64.134,65.629,50.376,36.036,28.266,24.05,21.551,20.141,19.803,20.364,20.475,20.211,20.673,22.13,24.755,28.956,35.697,46.202,63.893,86.8,98.645,124.0,189.215,336.471,619.418,727.137,437.854,234.231,139.088,93.182,70.973,61.802,63.179,60.204,42.054,29.136,22.032,17.774,14.928,12.854,11.279,9.973]};
+        var DATA = {"w":[655.0,655.09,655.1,655.19,655.2,655.29,655.33,655.39,655.4,655.47,655.53,655.59,655.6,655.64,655.75,655.79,655.82,655.89,655.9,655.99,656.0,656.09,656.1,656.19,656.2,656.29,656.3,656.39,656.4,656.49,656.53,656.59,656.6,656.69,656.7,656.79,656.8,656.89,656.9,656.99,657.0,657.06,657.1,657.19,657.2,657.29,657.3,657.39,657.4,657.49,657.5,657.59,657.6,657.69,657.7,657.79,657.8,657.89,657.9,657.99,658.0,658.07,658.1,658.19,658.2,658.29,658.3,658.39,658.4,658.49,658.5,658.59,658.61,658.68,658.7,658.79,658.8,658.89,658.9,658.94,659.0,659.09,659.1,659.19,659.2,659.29,659.3,659.39,659.4,659.49,659.5,659.59,659.61,659.69,659.7,659.79,659.8,659.89,659.9,659.99,660.0,660.09,660.1,660.17,660.2,660.27,660.3,660.39,660.4,660.49,660.51,660.59,660.6,660.69,660.7,660.79,660.8,660.89,660.9,660.99,661.0,661.09,661.1,661.16,661.2,661.29,661.3,661.39,661.4,661.49,661.5,661.59,661.6,661.69,661.74,661.79,661.8,661.86,661.9,661.99,662.0,662.07,662.1,662.19,662.2,662.29,662.3,662.39,662.4,662.49,662.5,662.59,662.6,662.69,662.71,662.79,662.8,662.89,662.9,662.99,663.0,663.09,663.1,663.19,663.2,663.29,663.32,663.39,663.44,663.49,663.5,663.59,663.6,663.68,663.7,663.79,663.8,663.89,663.9,663.99,664.0,664.09,664.1,664.19,664.2,664.26,664.3,664.39,664.4,664.49,664.5,664.59,664.6,664.69,664.7,664.77,664.8,664.89,664.9,664.99,665.04,665.09,665.1,665.19,665.2,665.25,665.3,665.39,665.4,665.49,665.5,665.59,665.6,665.69,665.7,665.79,665.82,665.89,665.9,665.99,666.0,666.07,666.1,666.19,666.2,666.29,666.3,666.39,666.4,666.49,666.5,666.59,666.6,666.69,666.7,666.79,666.8,666.89,666.9,666.99,667.0,667.09,667.1,667.19,667.2,667.29,667.3,667.39,667.4,667.49,667.53,667.59,667.6,667.69,667.7,667.79,667.8,667.89,667.9,667.99,668.0,668.07,668.1,668.18,668.2,668.29,668.33,668.39,668.46,668.49,668.5,668.55,668.6,668.69,668.75,668.79,668.8,668.84,668.9,668.99,669.0,669.06,669.1,669.17,669.24,669.29,669.3,669.34,669.41,669.49,669.52,669.59,669.6,669.69,669.73,669.79,669.8,669.89,669.9,669.94,670.0,670.09,670.1,670.15,670.2,670.29,670.3,670.35,670.43,670.49,670.5,670.57,670.6,670.66,670.7,670.76,670.8,670.89,670.9,670.99,671.0,671.09,671.1,671.19,671.2,671.29,671.3,671.39,671.4,671.49,671.5,671.59,671.64,671.69,671.7,671.79,671.8,671.89,671.9,671.99,672.0,672.09,672.12,672.19,672.21,672.29,672.3,672.39,672.4,672.49,672.54,672.59,672.6,672.69,672.7,672.79,672.8,672.87,672.9,672.99,673.0,673.09,673.1,673.19,673.23,673.29,673.3,673.39,673.4,673.49,673.5,673.59,673.6,673.69,673.72,673.79,673.8,673.89,673.9,673.99,674.0,674.09,674.1,674.19,674.2,674.29,674.3,674.39,674.44,674.49,674.5,674.59,674.6,674.69,674.7,674.77,674.81,674.89,674.9,674.99,675.0,675.09,675.1,675.18,675.22,675.29,675.3,675.39,675.4,675.49,675.5,675.59,675.6,675.69,675.7,675.79,675.8,675.89,675.9,675.99,676.02,676.09,676.1,676.19,676.2,676.29,676.3,676.35,676.4,676.49,676.5,676.59,676.6,676.69,676.7,676.75,676.82,676.89,676.9,676.99,677.0,677.09,677.1,677.19,677.2,677.29,677.3,677.39,677.4,677.49,677.5,677.59,677.6,677.69,677.7,677.79,677.8,677.89,677.93,677.98,678.0,678.09,678.1,678.19,678.2,678.29,678.34,678.39,678.43,678.49,678.5,678.59,678.6,678.69,678.7,678.79,678.8,678.89,678.9,678.99,679.0,679.09,679.1,679.19,679.2,679.29,679.3,679.39,679.4,679.49,679.52,679.57,679.6,679.69,679.7,679.79,679.8,679.89,679.9,680.0],"t1m":[0.9953,0.9941,0.994,0.9917,0.9912,0.9809,0.9759,0.9824,0.9836,0.9871,0.9862,0.9878,0.9881,0.9887,0.9882,0.9883,0.9885,0.9879,0.9877,0.9849,0.9844,0.9779,0.9769,0.9601,0.9571,0.9347,0.9325,0.8767,0.8642,0.6475,0.5708,0.7079,0.7379,0.8972,0.9056,0.9452,0.9468,0.9549,0.9572,0.9733,0.9742,0.9762,0.976,0.9802,0.9805,0.9823,0.9826,0.9843,0.9842,0.9829,0.9826,0.9782,0.9774,0.9648,0.9625,0.9455,0.9446,0.9148,0.9079,0.7765,0.7507,0.5948,0.6379,0.8559,0.8698,0.9361,0.9396,0.9524,0.9529,0.9687,0.9703,0.9774,0.9777,0.9761,0.9763,0.9809,0.9811,0.9833,0.9836,0.984,0.9834,0.9807,0.9802,0.9716,0.97,0.9553,0.9548,0.9411,0.9376,0.8703,0.8565,0.6564,0.6344,0.7907,0.8124,0.9212,0.9269,0.954,0.955,0.963,0.9649,0.977,0.9777,0.98,0.9797,0.9773,0.9783,0.9822,0.9824,0.9842,0.9842,0.9831,0.9828,0.9779,0.9769,0.9648,0.964,0.9587,0.9572,0.9261,0.9197,0.8027,0.7812,0.6874,0.7414,0.8969,0.9062,0.9515,0.9539,0.9634,0.9639,0.9747,0.9759,0.9815,0.9822,0.9811,0.9806,0.9779,0.9797,0.9825,0.9826,0.9835,0.9833,0.9802,0.9796,0.9699,0.9684,0.9579,0.9566,0.9408,0.9381,0.8917,0.8822,0.7549,0.7454,0.8511,0.8646,0.9335,0.9373,0.9567,0.9577,0.9644,0.9655,0.9736,0.9742,0.9775,0.9778,0.9761,0.9739,0.9763,0.9769,0.9796,0.9799,0.9812,0.9811,0.9785,0.978,0.9742,0.9741,0.9714,0.9706,0.9553,0.9522,0.8964,0.8862,0.8379,0.8606,0.9377,0.9425,0.9659,0.9672,0.9729,0.9732,0.9764,0.9767,0.9773,0.9773,0.9769,0.9768,0.9731,0.9707,0.9728,0.9732,0.9746,0.9748,0.9752,0.9747,0.9726,0.9723,0.9711,0.9709,0.9673,0.9666,0.9556,0.9535,0.924,0.9186,0.9362,0.9392,0.9531,0.9537,0.9551,0.9549,0.9527,0.9523,0.9476,0.947,0.9402,0.9393,0.9297,0.9284,0.9135,0.9115,0.8974,0.8958,0.8761,0.8734,0.8438,0.8397,0.7926,0.7861,0.7098,0.6988,0.5631,0.5429,0.3018,0.2696,0.0485,0.0387,0.0121,0.0113,0.0126,0.0131,0.0184,0.019,0.0239,0.0241,0.0349,0.0361,0.0555,0.0574,0.0845,0.0847,0.1235,0.123,0.1933,0.1897,0.2577,0.2667,0.2906,0.3073,0.3698,0.3513,0.4666,0.4388,0.4928,0.5132,0.561,0.5254,0.6431,0.6458,0.608,0.6448,0.7171,0.6799,0.7348,0.7464,0.7686,0.7394,0.7994,0.8066,0.7604,0.7529,0.7205,0.7024,0.734,0.7441,0.8545,0.8611,0.8732,0.8655,0.9027,0.9054,0.9115,0.9049,0.9346,0.9373,0.9426,0.9309,0.945,0.9474,0.9544,0.9524,0.9447,0.9507,0.9565,0.954,0.9349,0.9346,0.9441,0.9438,0.9232,0.9184,0.8502,0.8369,0.6971,0.697,0.8334,0.8473,0.9233,0.9276,0.9461,0.946,0.9505,0.9524,0.9683,0.9693,0.9736,0.9738,0.9765,0.9765,0.9776,0.9778,0.9771,0.9771,0.9753,0.9748,0.966,0.9644,0.9485,0.9488,0.9454,0.9437,0.9078,0.9005,0.7713,0.748,0.6286,0.6684,0.8538,0.8659,0.9288,0.9323,0.9471,0.9469,0.9549,0.9573,0.9722,0.9731,0.9774,0.9776,0.9793,0.9794,0.98,0.9801,0.9793,0.9791,0.9749,0.9742,0.9627,0.9606,0.9416,0.9413,0.9331,0.9302,0.8729,0.8614,0.6662,0.5676,0.6579,0.6873,0.8683,0.8785,0.9307,0.9336,0.9432,0.9421,0.957,0.9595,0.9724,0.9731,0.9782,0.9785,0.9796,0.9795,0.9799,0.9799,0.9784,0.9781,0.9733,0.9725,0.959,0.9565,0.9324,0.9318,0.9181,0.914,0.832,0.8149,0.5643,0.5204,0.6941,0.7239,0.8811,0.8895,0.9328,0.9352,0.9402,0.9382,0.9588,0.961,0.9737,0.9745,0.9789,0.9791,0.9796,0.9792,0.9796,0.9795,0.9779,0.9775,0.9723,0.9713,0.9569,0.9542,0.9236,0.9221,0.9038,0.8984,0.7868,0.7638,0.4953,0.4883,0.7332,0.7597,0.8926,0.8998,0.9351,0.9387,0.9356,0.9365,0.9624,0.9646,0.9756,0.9762,0.9799,0.9804,0.98,0.9796,0.98,0.98,0.9785,0.9781,0.9724,0.9715,0.9572,0.9548,0.9204,0.9169,0.89,0.8834,0.743,0.7143,0.4715,0.4833,0.7682,0.7912,0.9049,0.911,0.9392,0.9406,0.9377,0.9416,0.9693,0.9713,0.9817,0.9824,0.9869,0.9872,0.9901],"od1km":[4.677,5.925,6.039,8.3,8.817,19.301,24.353,17.797,16.538,12.956,13.927,12.259,11.941,11.393,11.897,11.725,11.605,12.208,12.385,15.232,15.709,22.299,23.399,40.719,43.825,67.536,69.884,131.62,145.953,434.608,560.705,345.517,303.879,108.51,99.173,56.4,54.698,46.101,43.753,27.047,26.178,24.051,24.262,19.99,19.674,17.898,17.543,15.874,15.904,17.257,17.532,22.015,22.819,35.843,38.238,55.993,57.037,89.074,96.624,253.022,286.768,519.606,449.535,155.564,139.543,66.001,62.352,48.758,48.204,31.834,30.198,22.822,22.579,24.225,23.946,19.257,19.048,16.802,16.579,16.146,16.69,19.473,19.992,28.78,30.454,45.723,46.231,60.667,64.423,138.882,154.957,420.994,455.103,234.818,207.789,82.116,75.857,47.126,46.048,37.685,35.755,23.24,22.54,20.238,20.537,22.944,21.904,17.932,17.765,15.975,15.877,17.082,17.391,22.359,23.337,35.833,36.667,42.157,43.754,76.786,83.66,219.793,246.897,374.791,299.172,108.801,98.483,49.666,47.152,37.275,36.753,25.577,24.434,18.687,17.983,19.107,19.604,22.341,20.476,17.641,17.517,16.607,16.811,19.986,20.608,30.536,32.082,43.047,44.351,61.052,63.86,114.643,125.304,281.161,293.815,161.236,145.489,68.866,64.769,44.225,43.181,36.239,35.114,26.785,26.182,22.76,22.466,24.155,26.458,24.035,23.366,20.593,20.324,19.017,19.107,21.751,22.272,26.117,26.195,29.009,29.836,45.781,49.021,109.369,120.867,176.893,150.083,64.361,59.271,34.649,33.325,27.432,27.15,23.843,23.57,22.917,22.983,23.372,23.512,27.314,29.716,27.537,27.12,25.701,25.531,25.12,25.63,27.828,28.063,29.374,29.553,33.281,33.985,45.413,47.589,79.046,84.907,65.897,62.78,48.018,47.422,45.96,46.128,48.487,48.909,53.805,54.465,61.654,62.607,72.922,74.271,90.459,92.717,108.228,110.085,132.329,135.312,169.791,174.68,232.446,240.691,342.718,358.421,574.262,610.781,1198.08,1310.799,3025.692,3251.565,4412.494,4486.954,4370.218,4336.278,3993.042,3960.889,3734.124,3725.603,3355.135,3321.163,2891.102,2858.012,2471.436,2469.012,2091.531,2095.347,1643.544,1662.163,1356.054,1321.533,1235.672,1179.787,994.852,1046.025,762.236,823.692,707.668,667.055,578.112,643.631,441.402,437.233,497.581,438.881,332.595,385.743,308.165,292.559,263.212,301.92,223.91,214.934,273.954,283.841,327.85,353.19,309.278,295.525,157.184,149.542,135.579,144.427,102.346,99.363,92.697,99.938,67.651,64.748,59.13,71.614,56.613,54.05,46.624,48.741,56.857,50.585,44.496,47.058,67.31,67.652,57.548,57.822,79.929,85.094,162.306,178.096,360.809,360.981,182.238,165.731,79.826,75.178,55.37,55.498,50.81,48.798,32.209,31.138,26.767,26.552,23.809,23.752,22.692,22.483,23.151,23.152,25.021,25.544,34.568,36.28,52.853,52.53,56.165,57.946,96.694,104.804,259.653,290.356,464.21,402.895,158.117,143.976,73.908,70.094,54.316,54.523,46.104,43.646,28.217,27.276,22.85,22.647,20.927,20.866,20.226,20.079,20.906,21.168,25.439,26.17,38.004,40.22,60.16,60.484,69.205,72.363,135.917,149.191,406.106,566.36,418.744,374.998,141.179,129.537,71.85,68.658,58.473,59.679,44.004,41.383,27.979,27.236,22.036,21.697,20.631,20.725,20.298,20.287,21.84,22.186,27.023,27.87,41.819,44.448,69.958,70.675,85.446,89.885,183.981,204.639,572.119,653.106,365.182,323.068,126.573,117.066,69.515,67.017,61.697,63.78,42.101,39.782,26.625,25.786,21.33,21.1,20.602,20.976,20.641,20.665,22.367,22.708,28.126,29.073,44.026,46.845,79.454,81.049,101.106,107.181,239.795,269.489,702.689,716.728,310.386,274.784,113.57,105.58,67.085,63.268,66.535,65.629,38.285,36.036,24.713,24.05,20.337,19.784,20.229,20.567,20.219,20.211,21.753,22.13,27.954,28.956,43.708,46.202,82.894,86.8,116.505,124.0,297.024,336.471,751.751,727.137,263.753,234.231,99.964,93.182,62.753,61.274,64.318,60.204,31.13,29.136,18.481,17.774,13.219,12.854,9.973]};
         var SERIES = {
           t1m:   {color:"#0d9488", label:"transmittance (1 m)",   log:false, min:0, max:1, unit:"", fmt:function(v){return v.toFixed(4);}},
           od1km: {color:"#d97706", label:"optical depth (1 km)",  log:true,  min:1, max:10000, unit:"", fmt:function(v){return v>=100?v.toFixed(0):v.toFixed(2);}}
@@ -725,22 +843,23 @@
       </script>
 
       <p>
-        At a CO₂ mole fraction of 420 ppm, the CO₂ alone attenuates about
-        98.9% of incident radiation at 667.53&nbsp;cm⁻¹ over a one-metre path
-        under these conditions. The spectrum includes only CO₂ as the
-        absorbing species — no H₂O or other constituents of air — while
-        pressure broadening is evaluated for CO₂ diluted in air at
-        1.01325&nbsp;bar, RADIS' default diluent for molecules. The rapidly
-        growing optical depth illustrates why the strongly absorbing central
-        region of the 15&nbsp;µm CO₂ band becomes opaque over
-        atmospheric-scale paths. In the real atmosphere, where pressure,
-        temperature and composition vary with altitude, spectral opacity
-        determines the characteristic altitude from which outgoing thermal
-        radiation emerges: strongly absorbing parts of the CO₂ band probe
-        higher atmospheric layers than the less opaque wings. The kilometre
-        calculation shown here deliberately keeps pressure and temperature
-        fixed: it is a homogeneous-gas illustration of that mechanism, not a
-        vertically resolved atmospheric model.
+        At 667.53&nbsp;cm⁻¹, near the centre of the ν₂ band, CO₂ at a mole
+        fraction of 420 ppm attenuates about 98.9% of incident monochromatic
+        radiation over a one-metre path under these conditions. That number
+        describes one narrow spectral location, not broadband thermal
+        radiation. The spectrum includes only CO₂ as the absorbing species
+        (no H₂O or other constituents of air); pressure broadening is
+        evaluated for CO₂ diluted in air at 1.01325&nbsp;bar, RADIS' default
+        for molecules. The rapidly growing optical depth illustrates why the
+        strongly absorbing central region of the 15&nbsp;µm CO₂ band becomes
+        opaque over atmospheric-scale paths. In the real atmosphere, where
+        pressure, temperature and composition vary with altitude, spectral
+        opacity determines the characteristic altitude from which outgoing
+        thermal radiation emerges: strongly absorbing parts of the CO₂ band
+        probe higher atmospheric layers than the less opaque wings. The
+        kilometre calculation shown here keeps pressure and temperature fixed
+        on purpose: it is a homogeneous-gas illustration of that mechanism,
+        not a vertically resolved atmospheric model.
       </p>
 
       <div class="callout">
@@ -748,15 +867,18 @@
         in a versioned envelope (<code>contract: "0.2"</code>) with
         <code>units: {"wavenumber": "cm-1 (vacuum)", "values": "dimensionless (0-1)"}</code>,
         the provenance record
-        <code>"HITRAN line-by-line calculation via RADIS 0.17.1"</code> with
-        <code>database_version: "HITRAN2020"</code> and a retrieval timestamp,
-        and the citations for both the data and the
-        code.<sup class="cite"><a href="#ref_hitran">[2]</a></sup><sup class="cite"><a href="#ref_radis">[1]</a></sup>
-        The 2501-point spectrum was decimated for transport and flagged
+        <code>"HITRAN line-by-line calculation via RADIS 0.17.1"</code>, a
+        retrieval timestamp, and the citations for both the data and the
+        code.<sup class="cite"><a href="#ref_hitran">[1]</a></sup><sup class="cite"><a href="#ref_radis">[4]</a></sup>
+        The envelope also refuses to overclaim the edition: RADIS requests
+        the latest HITRAN release without recording which one it cached, and
+        the notes say exactly that, pointing to
+        <code>source_download_date</code> instead. The 2501-point spectrum was
+        decimated for transport and flagged
         (<code>truncated: true, total_available: 2501</code>). The two path
         lengths are also mutually consistent via Beer–Lambert:
-        τ₁ₘ = −ln(0.0115) ≈ 4.47, and 1000 × 4.47 ≈ 4470 ≈ the computed 4466 —
-        the same homogeneous gas, scaled.
+        τ₁ₘ = −ln(0.01125) ≈ 4.487, and 1000 × 4.487 = 4487, which is the
+        computed kilometre value exactly. The same homogeneous gas, scaled.
       </div>
 
       <h2>Refusal is a feature</h2>
@@ -769,58 +891,41 @@
         1500&nbsp;K is the completeness of the line list. Transitions and hot
         bands that are negligible near room temperature become increasingly
         important at high temperature, while HITRAN applies intensity cut-offs
-        designed primarily for terrestrial atmospheric work — HITEMP is built
-        for that regime. A direct query happily returns a spectrum computed
-        from the incomplete list. open-faraday instead returns:
+        designed primarily for terrestrial atmospheric work.
+        HITEMP<sup class="cite"><a href="#ref_hitemp">[5]</a></sup> is built
+        for that regime. The underlying calculation can still return a
+        spectrum from that line list; a physics library computes what it is
+        asked to compute. open-faraday imposes an application-level policy on
+        top and returns:
       </p>
       <pre><code>{ "ok": false,
   "error": { "code": "out_of_validity_range",
-             "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500.0 K." },
+             "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500 K." },
   "notes": ["Consider databank='hitemp' (T &lt; ~2000 K) or 'exomol' for higher temperatures."] }</code></pre>
       <p>
         A structured refusal with a suggested alternative is more useful than a
         plausible but wrong spectrum. The same principle applies elsewhere in
         the tool surface: every atomic response carries three coverage caveats
-        (the NIST backend's <code>line_out=1</code> filter, the absence of
+        (the NIST ASD<sup class="cite"><a href="#ref_asd">[6]</a></sup>
+        backend's <code>line_out=1</code> filter, the absence of
         energy-level data, and the CPU-only atomic path, whose broadening
-        partners are limited to H, He, H₂ and free electrons — atomic
-        hydrogen by default, air broadening not available for atoms).
-        Limitations are reported rather than worked around.
+        partners are limited to H, He, H₂ and free electrons; atomic hydrogen
+        is the default, and air broadening is not available for atoms).
+        The ~700&nbsp;K and ~2000&nbsp;K ceilings are open-faraday's
+        conservative policy, not fundamental database boundaries; the
+        practical range of each databank is molecule- and
+        spectral-region-dependent. Limitations are reported rather than
+        worked around.
       </p>
-
-      <h2>What this doesn't do</h2>
-      <p>The scope is deliberately narrow, and several limits are worth stating plainly:</p>
-      <ul>
-        <li><strong>It finds nothing new.</strong> Acceleration, not discovery:
-        RADIS computes the physics, HITRAN/Kurucz/NIST/CODATA own the data,
-        scipy ships the constants. If you write Python yourself, use those
-        directly — or HAPI, HITRAN's own interface.</li>
-        <li><strong>Uncertainty is only as good as the source.</strong> Today
-        it is populated for CODATA constants; HITRAN's per-line error codes are
-        not yet passed through.</li>
-        <li><strong>Atomic coverage has real gaps.</strong> Lines without
-        transition probabilities and the full ASD level structure are out of
-        scope, and every atomic response says so.</li>
-        <li><strong>Databank validity limits are open-faraday's conservative
-        policy, not fundamental database boundaries.</strong> The server
-        refuses HITRAN above ~700 K and HITEMP above ~2000 K as engineering
-        guardrails; the practical range of each database is molecule- and
-        spectral-region-dependent.</li>
-        <li><strong>Incubating.</strong> Version 0.2; the response contract is
-        itself versioned — every envelope is stamped
-        <code>contract: "0.2"</code> so agents can detect shape changes while
-        the project is 0.x. No
-        hosted service exists — you run it locally, and no data is bundled or
-        redistributed.</li>
-      </ul>
 
       <h2>Outlook: the instrument side</h2>
       <p>
         The examples above start from a question typed into a chat. The setting
-        we are building toward starts from an instrument. In our laser
-        lab we are extending a microscope into a hyperspectral imaging setup —
-        multi-wavelength illumination, stitched fields of view, deconvolution —
-        where every pixel is not a colour but a spectrum.
+        we are building toward starts from an instrument, and this is not
+        speculative for us: the lab is open-faraday's first customer. In our
+        laser lab we are extending a microscope into a hyperspectral imaging
+        setup (multi-wavelength illumination, stitched fields of view,
+        deconvolution) where every pixel is not a colour but a spectrum.
       </p>
       <p>
         Many of the physically meaningful steps in interpreting that kind of
@@ -829,9 +934,9 @@
         emission lines. Identifying a spectral feature means querying line
         positions and strengths. Recovering optical properties from spectra
         means combining measured values with tabulated constants. When agents
-        take over parts of this loop — planning a scan, validating a
-        calibration before a run, flagging a feature worth a second look — each
-        of those steps needs the same discipline shown above: values with
+        take over parts of this loop (planning a scan, validating a
+        calibration before a run, flagging a feature worth a second look),
+        each of those steps needs the same discipline shown above: values with
         units, sources with editions, limits stated rather than hidden.
       </p>
       <p>
@@ -847,7 +952,7 @@
         that an agent can use it inside an experiment without silently
         changing units, assumptions, provenance or validity regimes. Today the
         question comes from a chat window. Eventually it will come from the
-        instrument itself — and at that point, units, provenance, completeness
+        instrument itself, and at that point units, provenance, completeness
         and validity regimes stop being interface niceties and become part of
         the experimental methodology.
       </p>
@@ -859,22 +964,9 @@
 
       <h2>Reproduce it</h2>
       <p>
-        The session behind this post was run from Claude Code with open-faraday
-        registered as a local MCP server. The following prompt reproduces it:
-      </p>
-      <blockquote>
-        Using only the open-faraday tools, no values from memory: fetch the CO₂
-        line list between 660 and 670 cm⁻¹ from HITRAN. Then compute the CO₂
-        contribution to transmittance in air at a CO₂ mole fraction of
-        420 ppm (296 K, 1.01325 bar) over a 1 m path between 655 and
-        680 cm⁻¹, and the optical depth (RADIS quantity "absorbance") of the
-        same homogeneous gas over 1 km. Try the same calculation at 1500 K.
-        Finally, give me the provenance report. Report every value with its
-        units and truncation flags.
-      </blockquote>
-      <p>
-        The numbers and the figure on this page are the unedited output of the
-        resulting tool calls, with these exact parameters (Python 3.13–3.14,
+        The prompt in the use-case section reproduces the whole session. The
+        numbers and the figure on this page are the unedited output of the
+        tool calls it triggers, with these exact parameters (Python 3.13–3.14,
         <code>pip install '.[spectroscopy]'</code>):
       </p>
       <pre><code><span class="c"># the lines, with honest truncation</span>
@@ -883,10 +975,10 @@ lines_fetch_molecular(molecule=<span class="s">"CO2"</span>, wavenum_min=<span c
 <span class="c"># the metre of air</span>
 spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">655</span>, wavenum_max=<span class="k">680</span>,
                    Tgas=<span class="k">296</span>, pressure_bar=<span class="k">1.01325</span>, mole_fraction=<span class="k">0.00042</span>,
-                   path_length_cm=<span class="k">100</span>, quantity=<span class="s">"transmittance"</span>)
+                   path_length_cm=<span class="k">100</span>, quantity=<span class="s">"transmittance"</span>, max_points=<span class="k">501</span>)
 
 <span class="c"># the kilometre</span>
-spectrum_calculate(..., path_length_cm=<span class="k">100000</span>, quantity=<span class="s">"absorbance"</span>)
+spectrum_calculate(..., path_length_cm=<span class="k">100000</span>, quantity=<span class="s">"absorbance"</span>, max_points=<span class="k">501</span>)
 
 <span class="c"># the refusal</span>
 spectrum_calculate(..., Tgas=<span class="k">1500</span>, databank=<span class="s">"hitran"</span>)
@@ -896,28 +988,38 @@ provenance_report()</code></pre>
 
       <h2>References</h2>
       <ol class="refs">
-        <li id="ref_radis">D.C.M. van den Bekerom, E. Pannier, "A discrete
-        integral transform for rapid spectral synthesis," <i>JQSRT</i>
-        <b>261</b>, 107476 (2021). <span class="mono">github.com/radis/radis</span>
-        — accessed via open-faraday <span class="mono">spectrum_calculate</span>.</li>
-        <li id="ref_hitran">I.E. Gordon et&nbsp;al., "The HITRAN2020 molecular
-        spectroscopic database," <i>JQSRT</i> <b>277</b>, 107949 (2022).
+        <li id="ref_hitran">I.E. Gordon et&nbsp;al., "The HITRAN2024 molecular
+        spectroscopic database," <i>JQSRT</i> <b>353</b>, 109807 (2026); an
+        older local cache may instead correspond to HITRAN2020: I.E. Gordon
+        et&nbsp;al., <i>JQSRT</i> <b>277</b>, 107949 (2022).
         <span class="mono">hitran.org</span> — fetched to the local machine by
-        RADIS under HITRAN's terms; no data redistributed here.</li>
-        <li id="ref_codata">CODATA 2022 recommended values, via
-        <span class="mono">scipy.constants</span> — accessed via open-faraday
-        <span class="mono">constants_get</span>.</li>
+        RADIS under HITRAN's terms; no data redistributed here. The exact
+        cached edition is not recorded by RADIS; open-faraday's provenance
+        notes flag this.</li>
+        <li id="ref_kurucz">R.L. Kurucz, "Including all the lines: data
+        releases for spectra and opacities," <i>Can. J. Phys.</i> <b>95</b>,
+        825 (2017); line lists at
+        <span class="mono">kurucz.harvard.edu</span> — accessed via
+        open-faraday <span class="mono">lines_fetch_atomic</span>.</li>
+        <li id="ref_codata">CODATA Task Group on Fundamental Constants,
+        "CODATA recommended values of the fundamental physical constants:
+        2022," NIST, <span class="mono">physics.nist.gov/constants</span> —
+        served by <span class="mono">scipy.constants</span>, accessed via
+        open-faraday <span class="mono">constants_get</span>.</li>
+        <li id="ref_radis">E. Pannier, C.O. Laux, "RADIS: A nonequilibrium
+        line-by-line radiative code for CO₂ and HITRAN-like database species,"
+        <i>JQSRT</i> <b>222–223</b>, 12–25 (2019); DIT optimization:
+        D.C.M. van den Bekerom, E. Pannier, <i>JQSRT</i> <b>261</b>, 107476
+        (2021). <span class="mono">github.com/radis/radis</span> — accessed
+        via open-faraday <span class="mono">spectrum_calculate</span>.</li>
+        <li id="ref_hitemp">L.S. Rothman et&nbsp;al., "HITEMP, the
+        high-temperature molecular spectroscopic database," <i>JQSRT</i>
+        <b>111</b>, 2139–2150 (2010).</li>
+        <li id="ref_asd">A. Kramida, Yu. Ralchenko, J. Reader, and NIST ASD
+        Team, NIST Atomic Spectra Database,
+        <span class="mono">physics.nist.gov/asd</span> — accessed via
+        open-faraday <span class="mono">lines_fetch_atomic</span>.</li>
       </ol>
-
-      <hr />
-
-      <div class="callout">
-        <strong>Provenance.</strong> Written with Claude in Claude Code against
-        a locally running open-faraday v0.1 server on 2026-08-21. Every
-        physical value in this post is the unedited output of a logged MCP tool
-        call (RADIS 0.17.1, HITRAN2020 line data fetched locally); no value was
-        taken from model memory.
-      </div>
     </main>
     <footer></footer>
   </body>
