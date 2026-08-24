@@ -89,7 +89,7 @@
   },
   {
     "path": "posts/open-faraday-agents-vs-api.html",
-    "title": "Any agent can call an API. open-faraday makes the answer citable.",
+    "title": "Scientific Context as an Executable Contract",
     "date": "2026-08-21",
     "tags": [
       "MCP",
@@ -102,6 +102,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "open-faraday is a small MCP server that serves spectroscopic reference data and fundamental constants to AI agents — with units, provenance and explicit limits on every response. What that adds over giving an agent generic data access, shown on the CO₂ contribution in one metre of air at fifteen microns."
+    "desc": "open-faraday is a small MCP server that serves spectroscopic reference data and fundamental constants to AI agents — turning units, provenance, completeness and validity limits into an executable contract on every response. What that adds over giving an agent generic data access, shown on the CO₂ contribution in one metre of air at fifteen microns."
   }
 ]
