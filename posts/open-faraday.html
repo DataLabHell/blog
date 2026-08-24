@@ -308,19 +308,18 @@
       </p>
       <div class="callout">
         <strong>TL;DR.</strong> open-faraday is a small open-source MCP server
-        that exposes spectroscopic reference data (HITRAN, HITEMP, ExoMol,
+        exposing spectroscopic reference data (HITRAN, HITEMP, ExoMol,
         Kurucz, NIST via RADIS) and CODATA constants to AI agents. Every
-        response is a versioned envelope carrying units, provenance,
-        truncation flags and coverage notes; requests outside a databank's
-        validity limits get a structured refusal instead of a plausible
-        number. The idea worth keeping is scientific context as an executable
-        contract, enforced at runtime rather than left to the agent; MCP is
-        just the transport. One worked example carries the argument: the CO₂
-        ν₂ band at 15&nbsp;µm, where one metre of air at 420&nbsp;ppm
-        transmits 1.13% at 667.53&nbsp;cm⁻¹ and the same gas reaches
-        τ&nbsp;≈&nbsp;4487 over a kilometre, every number an unedited,
-        reproducible tool output. The endgame is agents inside instrument
-        loops, with scientific assumptions machine-enforceable.
+        response is a versioned envelope with units, provenance, truncation
+        flags and coverage notes; requests outside validity limits get a
+        structured refusal instead of a plausible number. The idea worth
+        keeping: scientific context as an executable contract, enforced at
+        runtime; MCP is just the transport. One worked example carries the
+        argument, the CO₂ ν₂ band at 15&nbsp;µm: 1.13% transmittance at
+        667.53&nbsp;cm⁻¹ through one metre of air at 420&nbsp;ppm,
+        τ&nbsp;≈&nbsp;4487 over a kilometre, every number reproducible tool
+        output. The endgame: agents inside instrument loops, scientific
+        assumptions machine-enforceable.
       </div>
 
       <h2>Motivation</h2>
@@ -330,8 +329,8 @@
         trusted with one. Anyone who has tried knows the failure modes: a
         physical value supplied from model memory, a unit convention lost
         between response and answer, a partial result treated as a complete
-        one. None of these failures announces itself, and that silence is
-        what makes them dangerous in scientific use.
+        one. None announces itself; the silence is what makes them dangerous
+        in scientific use.
       </p>
       <p>
         The data itself is not the problem. Curated reference data for
@@ -339,48 +338,45 @@
         lists,<sup class="cite"><a href="#ref_hitran">[1]</a></sup> Kurucz's
         atomic tables,<sup class="cite"><a href="#ref_kurucz">[2]</a></sup>
         the CODATA constants,<sup class="cite"><a href="#ref_codata">[3]</a></sup>
-        among many others. What fails
-        in practice is the step between that data and an agent's answer.
-        Retrieving a value does not establish its units, physical convention,
-        completeness, validity regime, database edition or citation. Closing
-        that gap requires no new science, just interface constraints,
-        enforced at a protocol boundary rather than left to the agent's
-        discretion.
+        among many others. What fails is the step between that data and an
+        agent's answer: retrieving a value does not establish its units,
+        physical convention, completeness, validity regime, database edition
+        or citation. Closing that gap requires no new science, just interface
+        constraints enforced at a protocol boundary rather than left to the
+        agent's discretion.
         <a href="https://github.com/DataLabHell/open-faraday" target="_blank" rel="noopener">open-faraday</a>
-        addresses this step and only this step: it exposes
+        addresses exactly this step, exposing
         RADIS<sup class="cite"><a href="#ref_radis">[4]</a></sup> and
         scipy.constants<sup class="cite"><a href="#ref_codata">[3]</a></sup>
-        to agents through a fixed response contract. The
+        through a fixed response contract. The
         durable idea is not the protocol — it is scientific context as an
         executable contract: units, conventions, completeness, provenance,
         validity regimes and explicit failure, travelling with every value.
-        MCP delivers that contract to the agent, and the server is
-        deliberately small: a proof of the pattern, not a platform.
+        MCP delivers that contract, and the server is deliberately small: a
+        proof of the pattern, not a platform.
       </p>
 
       <div class="callout">
         <strong>Scope.</strong> One worked example, run end-to-end through
-        open-faraday 0.2.0 on 2026-08-24 (RADIS 0.17.1, HITRAN line data
-        fetched via HAPI; RADIS requests the latest release and does not
-        record the exact edition — the provenance notes say so explicitly).
-        All numbers below are unedited tool output; the calls needed to
-        reproduce them are listed at the end. The radiative-transfer
-        computation is done by
-        <a href="https://github.com/radis/radis" target="_blank" rel="noopener">RADIS</a>;
-        open-faraday contributes the interface contract, not the physics.
+        open-faraday 0.2.0 on 2026-08-24 (RADIS 0.17.1; RADIS fetches the
+        latest HITRAN release via HAPI without recording the exact edition,
+        and the provenance notes say so). All numbers are unedited tool
+        output, reproducible with the calls listed at the end.
+        <a href="https://github.com/radis/radis" target="_blank" rel="noopener">RADIS</a>
+        does the radiative transfer; open-faraday contributes the contract,
+        not the physics.
       </div>
 
       <h2>Scientific context has to cross the interface</h2>
       <p>
         Scientific databases already expose excellent programmatic interfaces,
-        and none of what follows requires MCP. Typed values and units,
-        truncation metadata, provenance and citations, structured errors,
-        validity checks: all of it can be implemented with REST, GraphQL,
-        gRPC or a plain Python library, and machine-readable tool discovery
-        has existed in OpenAPI for years. The problem we are interested in is
-        different: <em>what information has to cross the boundary together
-        with a scientific result, if an agent is expected to reason with
-        it?</em>
+        and none of what follows requires MCP: typed values and units,
+        truncation metadata, provenance, structured errors and validity
+        checks can all be served by REST, GraphQL, gRPC or a plain Python
+        library, and OpenAPI has offered machine-readable tool discovery for
+        years. The problem we are interested in is different: <em>what
+        information has to cross the boundary together with a scientific
+        result, if an agent is expected to reason with it?</em>
       </p>
       <p>
         A spectral line is not just a number. Its meaning depends on units,
@@ -442,13 +438,6 @@
         (there is no HTTP API), but because the contract lives in the response envelope rather than
         in the transport, importing the module in Python hands back exactly the same envelope.</figcaption>
       </figure>
-
-      <p>
-        What does a scientific software interface have to guarantee before an
-        autonomous agent can be trusted to use it? Our working answer: units,
-        conventions, provenance, completeness, assumptions, validity regimes
-        and explicit failure.
-      </p>
 
       <p>
         In the setup used here, Claude Code launches open-faraday locally and
@@ -645,10 +634,9 @@
         <code>truncated: true, total_available: 1361</code> — 1361 lines of the
         main isotopologue (the tool's <code>isotope="1"</code> default) in a
         10&nbsp;cm⁻¹ window.<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
-        The flag is the point: returning only the first 40 records without
-        machine-readable completeness metadata would leave the agent free to
-        mistake a partial result for the full line list. The envelope makes
-        that state explicit.
+        The flag is the point: without machine-readable completeness
+        metadata, an agent is free to mistake 40 records for the full line
+        list. The envelope makes that state explicit.
       </p>
 
       <p>
@@ -693,10 +681,10 @@
         where <var>σ</var>(<var>ν</var>) is the monochromatic absorption
         cross-section per molecule (cm²), <var>n</var> the CO₂ number density
         (cm⁻³) from the ideal-gas law, and <var>L</var> the path length (cm).
-        The units cancel, so <var>τ</var> is dimensionless, which is also why
-        the two path lengths in the example are mutually checkable: within
-        this homogeneous-gas model, increasing the path from 1&nbsp;m to
-        1&nbsp;km gives exactly 1000&nbsp;× the optical depth.
+        The units cancel, so <var>τ</var> is dimensionless, and within this
+        homogeneous-gas model the 1&nbsp;km path carries exactly
+        1000&nbsp;× the optical depth of the 1&nbsp;m path, which is what
+        makes the two runs mutually checkable.
         The cross-section itself is what RADIS assembles line by line from
         the HITRAN records,
       </p>
@@ -843,23 +831,21 @@
       </script>
 
       <p>
-        At 667.53&nbsp;cm⁻¹, near the centre of the ν₂ band, CO₂ at a mole
-        fraction of 420 ppm attenuates about 98.9% of incident monochromatic
-        radiation over a one-metre path under these conditions. That number
-        describes one narrow spectral location, not broadband thermal
-        radiation. The spectrum includes only CO₂ as the absorbing species
-        (no H₂O or other constituents of air); pressure broadening is
-        evaluated for CO₂ diluted in air at 1.01325&nbsp;bar, RADIS' default
-        for molecules. The rapidly growing optical depth illustrates why the
-        strongly absorbing central region of the 15&nbsp;µm CO₂ band becomes
-        opaque over atmospheric-scale paths. In the real atmosphere, where
-        pressure, temperature and composition vary with altitude, spectral
-        opacity determines the characteristic altitude from which outgoing
-        thermal radiation emerges: strongly absorbing parts of the CO₂ band
-        probe higher atmospheric layers than the less opaque wings. The
-        kilometre calculation shown here keeps pressure and temperature fixed
-        on purpose: it is a homogeneous-gas illustration of that mechanism,
-        not a vertically resolved atmospheric model.
+        At 667.53&nbsp;cm⁻¹, near the centre of the ν₂ band, CO₂ at 420 ppm
+        attenuates about 98.9% of incident monochromatic radiation over one
+        metre under these conditions. That number describes one narrow
+        spectral location, not broadband thermal radiation, and CO₂ alone (no
+        H₂O or other constituents of air), with pressure broadening evaluated
+        for CO₂ diluted in air at 1.01325&nbsp;bar, RADIS' default for
+        molecules. The growing optical depth shows why the strongly absorbing
+        centre of the 15&nbsp;µm band becomes opaque over atmospheric-scale
+        paths. In the real atmosphere, where pressure, temperature and
+        composition vary with altitude, spectral opacity sets the
+        characteristic altitude from which outgoing thermal radiation
+        emerges: strongly absorbing parts of the band probe higher layers
+        than the less opaque wings. The kilometre run keeps pressure and
+        temperature fixed on purpose: a homogeneous-gas illustration of the
+        mechanism, not a vertically resolved atmospheric model.
       </p>
 
       <div class="callout">
@@ -872,48 +858,43 @@
         code.<sup class="cite"><a href="#ref_hitran">[1]</a></sup><sup class="cite"><a href="#ref_radis">[4]</a></sup>
         The envelope also refuses to overclaim the edition: RADIS requests
         the latest HITRAN release without recording which one it cached, and
-        the notes say exactly that, pointing to
-        <code>source_download_date</code> instead. The 2501-point spectrum was
-        decimated for transport and flagged
-        (<code>truncated: true, total_available: 2501</code>). The two path
-        lengths are also mutually consistent via Beer–Lambert:
-        τ₁ₘ = −ln(0.01125) ≈ 4.487, and 1000 × 4.487 = 4487, which is the
-        computed kilometre value exactly. The same homogeneous gas, scaled.
+        the notes say so, pointing to <code>source_download_date</code>
+        instead. The 2501-point spectrum was decimated for transport and
+        flagged (<code>truncated: true, total_available: 2501</code>), and
+        the two path lengths cross-check via Beer–Lambert:
+        τ₁ₘ = −ln(0.01125) ≈ 4.487, and 1000 × 4.487 = 4487, the computed
+        kilometre value exactly.
       </div>
 
       <h2>Refusal is a feature</h2>
       <p>
         The contract also encodes when a result should <em>not</em> be
-        produced. The same session then requested the same band at 1500&nbsp;K, a flame
-        temperature far above HITRAN's intended regime. HITRAN line
-        intensities are referenced to 296&nbsp;K and can in principle be
-        rescaled to other temperatures; the practical limitation at
-        1500&nbsp;K is the completeness of the line list. Transitions and hot
-        bands that are negligible near room temperature become increasingly
-        important at high temperature, while HITRAN applies intensity cut-offs
-        designed primarily for terrestrial atmospheric work.
+        produced. The same session requested the same band at 1500&nbsp;K,
+        far above HITRAN's intended regime. Line intensities referenced to
+        296&nbsp;K can in principle be rescaled; the real limitation at
+        1500&nbsp;K is line-list completeness, because hot bands and
+        transitions negligible at room temperature grow important while
+        HITRAN's intensity cut-offs target terrestrial atmospheric work.
         HITEMP<sup class="cite"><a href="#ref_hitemp">[5]</a></sup> is built
-        for that regime. The underlying calculation can still return a
-        spectrum from that line list; a physics library computes what it is
-        asked to compute. open-faraday imposes an application-level policy on
-        top and returns:
+        for that regime. A physics library still computes what it is asked to
+        compute; open-faraday imposes an application-level policy on top and
+        returns:
       </p>
       <pre><code>{ "ok": false,
   "error": { "code": "out_of_validity_range",
              "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500 K." },
   "notes": ["Consider databank='hitemp' (T &lt; ~2000 K) or 'exomol' for higher temperatures."] }</code></pre>
       <p>
-        A structured refusal with a suggested alternative is more useful than a
-        plausible but wrong spectrum. The same principle applies elsewhere in
-        the tool surface: every atomic response carries three coverage caveats
+        A structured refusal with a suggested alternative beats a plausible
+        but wrong spectrum. The same principle runs through the tool surface:
+        every atomic response carries three coverage caveats
         (the NIST ASD<sup class="cite"><a href="#ref_asd">[6]</a></sup>
-        backend's <code>line_out=1</code> filter, the absence of
-        energy-level data, and the CPU-only atomic path, whose broadening
-        partners are limited to H, He, H₂ and free electrons; atomic hydrogen
-        is the default, and air broadening is not available for atoms).
-        The ~700&nbsp;K and ~2000&nbsp;K ceilings are open-faraday's
-        conservative policy, not fundamental database boundaries; the
-        practical range of each databank is molecule- and
+        backend's <code>line_out=1</code> filter, no energy-level data, and a
+        CPU-only atomic path whose broadening partners are limited to H, He,
+        H₂ and free electrons; atomic hydrogen is the default, and air
+        broadening is unavailable for atoms). The ~700&nbsp;K and
+        ~2000&nbsp;K ceilings are conservative policy, not fundamental
+        database boundaries; each databank's practical range is molecule- and
         spectral-region-dependent. Limitations are reported rather than
         worked around.
       </p>
@@ -928,16 +909,14 @@
         deconvolution) where every pixel is not a colour but a spectrum.
       </p>
       <p>
-        Many of the physically meaningful steps in interpreting that kind of
-        data lean on reference data.
-        Checking a wavelength calibration means comparing against known
-        emission lines. Identifying a spectral feature means querying line
-        positions and strengths. Recovering optical properties from spectra
-        means combining measured values with tabulated constants. When agents
-        take over parts of this loop (planning a scan, validating a
-        calibration before a run, flagging a feature worth a second look),
-        each of those steps needs the same discipline shown above: values with
-        units, sources with editions, limits stated rather than hidden.
+        Many of the physically meaningful steps in interpreting that data
+        lean on reference data: wavelength calibration checks against known
+        emission lines, feature identification queries line positions and
+        strengths, optical-property retrieval combines measurements with
+        tabulated constants. When agents take over parts of this loop
+        (planning a scan, validating a calibration, flagging a feature worth
+        a second look), each step needs the discipline shown above: values
+        with units, sources with editions, limits stated rather than hidden.
       </p>
       <p>
         That is where open-faraday sits: the
