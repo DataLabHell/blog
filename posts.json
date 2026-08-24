@@ -102,6 +102,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "open-faraday is a small MCP server that serves spectroscopic reference data and fundamental constants to AI agents — turning units, provenance, completeness and validity limits into an executable contract on every response. What that adds over giving an agent generic data access, shown on the CO₂ contribution in one metre of air at fifteen microns."
+    "desc": "open-faraday builds a trustworthy boundary between scientific reference data and AI agents — units, provenance, completeness and validity limits enforced as an executable contract on every response. Demonstrated end-to-end on one worked example: the CO₂ contribution to the transmission of air at 15 µm."
   }
 ]
