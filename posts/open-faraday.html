@@ -123,6 +123,14 @@
         margin-top: 0.35rem;
       }
 
+      /* ── wide figure breakout (diagram needs the room) ── */
+      .article-content .fig-breakout {
+        width: min(94vw, 1080px);
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
       /* ── interactive figure panels (light) ── */
       .article-content .fig {
         background: var(--off-white);
@@ -443,7 +451,7 @@
         each stage.
       </p>
 
-      <figure class="fig" id="dataflow">
+      <figure class="fig fig-breakout" id="dataflow">
         <div class="ttl">Figure 2 · Data flow — one tool call, from question to citable envelope</div>
         <div class="flowsteps" role="group" aria-label="Highlight a step of the data flow">
           <button type="button" data-target="1" aria-pressed="false">1 · Tool call</button>
@@ -456,7 +464,7 @@
         moving right, amber is the enveloped answer moving back, blue is RADIS talking to the archives and
         its local cache. open-faraday has no database HTTP integration of its own — remote retrieval is
         delegated to RADIS' documented fetchers.</div>
-        <svg id="flowsvg" viewBox="0 0 1100 430" role="img"
+        <svg id="flowsvg" viewBox="0 0 1100 442" role="img"
              aria-label="Data flow: an agent sends a JSON-RPC tool call over stdio to open-faraday, which validates it against the contract, calls RADIS as a Python library; RADIS fetches from HITRAN, Kurucz or NIST archives on first use and caches locally; the answer returns as an envelope with data, units, provenance and truncation flags; a session ledger feeds provenance_report.">
           <defs>
             <marker id="ar-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -518,19 +526,20 @@
           <!-- arrows: request (teal) -->
           <g data-step="1">
             <line x1="220" y1="170" x2="291" y2="170" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
-            <text x="255" y="155" text-anchor="middle" fill="#0d9488" font-size="13.5" font-family="JetBrains Mono,monospace">tool call</text>
+            <text x="255" y="155" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">tool call</text>
             <text x="255" y="192" text-anchor="middle" fill="#8a8f98" font-size="12" font-family="JetBrains Mono,monospace">stdio</text>
           </g>
           <g data-step="2">
             <line x1="567" y1="170" x2="631" y2="170" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
-            <text x="599" y="155" text-anchor="middle" fill="#0d9488" font-size="13.5" font-family="JetBrains Mono,monospace">Python call</text>
+            <text x="599" y="147" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">Python</text>
+            <text x="599" y="162" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">call</text>
             <text x="599" y="192" text-anchor="middle" fill="#8a8f98" font-size="12" font-family="JetBrains Mono,monospace">gated</text>
           </g>
           <g data-step="3">
             <line x1="845" y1="135" x2="901" y2="112" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
             <line x1="845" y1="166" x2="901" y2="166" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
             <line x1="845" y1="200" x2="901" y2="222" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <text x="866" y="98" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS · first use</text>
+            <text x="873" y="158" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS</text>
             <line x1="740" y1="270" x2="740" y2="313" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)" marker-start="url(#ar-b)"/>
             <text x="758" y="296" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">cache hit / fill</text>
           </g>
@@ -538,7 +547,7 @@
           <!-- arrows: response (amber) -->
           <g data-step="4">
             <path d="M632 252 C 550 322, 340 322, 224 252" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#ar-a)"/>
-            <text x="418" y="320" text-anchor="middle" fill="#d97706" font-size="13" font-family="JetBrains Mono,monospace">envelope: contract · data · units · provenance · truncated</text>
+            <text x="430" y="424" text-anchor="middle" fill="#d97706" font-size="13" font-family="JetBrains Mono,monospace">envelope: contract · data · units · provenance · truncated</text>
           </g>
           <g data-step="5">
             <rect x="306" y="330" width="250" height="64" rx="9" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
