@@ -295,8 +295,8 @@
         molecular line lists, Kurucz's atomic tables, the CODATA constants —
         among many others. What fails in practice is the step between that
         data and an agent's answer. Retrieving a value does not establish its
-        units, physical convention, completeness, database edition or
-        citation. Closing that gap requires no new science — it requires
+        units, physical convention, completeness, validity regime, database
+        edition or citation. Closing that gap requires no new science — it requires
         interface constraints, enforced at a protocol boundary rather than
         left to the agent's discretion.
         <a href="https://github.com/DataLabHell/open-faraday" target="_blank" rel="noopener">open-faraday</a>
@@ -307,6 +307,8 @@
       <div class="callout">
         <strong>Scope.</strong> One worked example, run end-to-end through the
         open-faraday MCP server on 2026-08-21 (RADIS 0.17.1, HITRAN line data).
+        The example deliberately preserves the HITRAN2020 data returned by the
+        recorded session; newer HITRAN and HITEMP releases exist.
         All numbers below are unedited tool output; the calls needed to
         reproduce them are listed at the end. The radiative-transfer
         computation is done by
@@ -331,13 +333,13 @@
       <div class="tbl"><table>
         <thead><tr><th>Failure mode</th><th>Generic data access through an agent</th><th>open-faraday contract</th></tr></thead>
         <tbody>
-          <tr><td>Naked numbers</td><td>A float arrives. cm⁻¹ or nm? Vacuum or air? The vacuum/air offset is ~0.1–0.2&nbsp;nm in the visible — enough to shift a line identification.<sup class="cite"><a href="#ref_radis">[1]</a></sup></td>
+          <tr><td>Naked numbers</td><td>A bare float may arrive. cm⁻¹ or nm? Vacuum or air? The vacuum/air offset is ~0.1–0.2&nbsp;nm in the visible — enough to shift a line identification.<sup class="cite"><a href="#ref_radis">[1]</a></sup></td>
           <td class="good">Every field has a units entry; wavenumbers are labelled <code>cm-1 (vacuum)</code> explicitly.</td></tr>
-          <tr><td>Silent truncation</td><td>Endpoints page and cap. An agent that gets 40 lines treats them as all lines — and produces confidently wrong band physics.</td>
+          <tr><td>Silent truncation</td><td>Endpoints page and cap. A capped response may be mistaken for the complete result — and produce confidently wrong band physics.</td>
           <td class="good"><code>truncated: true</code> plus <code>total_available</code> on every cut result.</td></tr>
-          <tr><td>No provenance</td><td>Which database edition? Retrieved when? Cited how? The response doesn't say, so the paper can't either.</td>
+          <tr><td>No provenance</td><td>Which database edition? Retrieved when? Cited how? If source metadata is absent, the agent cannot establish any of it — and neither can the paper.</td>
           <td class="good">Source, version, retrieval timestamp, citation and license ride on every response; <code>provenance_report</code> assembles the session bibliography.</td></tr>
-          <tr><td>Fabrication pressure</td><td>An empty or failed response creates an opportunity for the model to fill the gap with a plausible value from prior knowledge.</td>
+          <tr><td>Fabrication pressure</td><td>An empty or failed response can create an opportunity for the model to fill the gap with a plausible value from prior knowledge.</td>
           <td class="good">Structured errors only: <code>not_in_database</code>, <code>out_of_validity_range</code>, <code>upstream_unavailable</code>. An error is never shaped like a result.</td></tr>
         </tbody>
       </table></div>
@@ -356,7 +358,7 @@
         with it over stdio. (MCP also supports remote deployments; this post
         describes the setup actually used.) The client obtains the server's
         tools — each with a name, a description and a typed parameter schema —
-        and every subsequent call is a structured JSON-RPC message.
+        and tool calls are exchanged as structured JSON-RPC messages.
       </p>
       <p>
         Within this data layer the agent therefore sees a deliberately narrow
@@ -682,16 +684,19 @@
       </script>
 
       <p>
-        At a CO₂ mole fraction of 420 ppm, the CO₂ alone removes about 98.9%
-        of the radiation at the optical-depth maximum over a one-metre path
-        under these conditions — again, the spectrum contains CO₂ only, not
-        the other constituents of air such as H₂O. The rapidly growing optical
-        depth illustrates why the strongly absorbing central region of the
-        15&nbsp;µm CO₂ band becomes opaque over atmospheric-scale paths. In
-        the real atmosphere, where pressure, temperature and composition vary
-        with altitude, that spectral opacity shifts the level from which
-        outgoing thermal radiation can escape — upward near strongly absorbing
-        parts of the band, downward toward the wings. The kilometre
+        At a CO₂ mole fraction of 420 ppm, the CO₂ alone attenuates about
+        98.9% of incident radiation at 667.53&nbsp;cm⁻¹ over a one-metre path
+        under these conditions. The spectrum includes only CO₂ as the
+        absorbing species — no H₂O or other constituents of air — while
+        pressure broadening is evaluated for CO₂ diluted in air at
+        1.01325&nbsp;bar, RADIS' default diluent for molecules. The rapidly
+        growing optical depth illustrates why the strongly absorbing central
+        region of the 15&nbsp;µm CO₂ band becomes opaque over
+        atmospheric-scale paths. In the real atmosphere, where pressure,
+        temperature and composition vary with altitude, spectral opacity
+        determines the characteristic altitude from which outgoing thermal
+        radiation emerges: strongly absorbing parts of the CO₂ band probe
+        higher atmospheric layers than the less opaque wings. The kilometre
         calculation shown here deliberately keeps pressure and temperature
         fixed: it is a homogeneous-gas illustration of that mechanism, not a
         vertically resolved atmospheric model.
@@ -771,7 +776,8 @@
         where every pixel is not a colour but a spectrum.
       </p>
       <p>
-        Nearly every step in interpreting that kind of data leans on reference data.
+        Many of the physically meaningful steps in interpreting that kind of
+        data lean on reference data.
         Checking a wavelength calibration means comparing against known
         emission lines. Identifying a spectral feature means querying line
         positions and strengths. Recovering optical properties from spectra
@@ -804,12 +810,13 @@
       </p>
       <blockquote>
         Using only the open-faraday tools, no values from memory: fetch the CO₂
-        line list between 660 and 670 cm⁻¹ from HITRAN. Then compute the
-        transmittance of ordinary air (420 ppm CO₂, 296 K, 1.01325 bar) over a
-        1 m path between 655 and 680 cm⁻¹, and the absorbance of the same air
-        over 1 km. Try the same calculation at 1500 K. Finally, give me the
-        provenance report. Report every value with its units and truncation
-        flags.
+        line list between 660 and 670 cm⁻¹ from HITRAN. Then compute the CO₂
+        contribution to transmittance in air at a CO₂ mole fraction of
+        420 ppm (296 K, 1.01325 bar) over a 1 m path between 655 and
+        680 cm⁻¹, and the optical depth (RADIS quantity "absorbance") of the
+        same homogeneous gas over 1 km. Try the same calculation at 1500 K.
+        Finally, give me the provenance report. Report every value with its
+        units and truncation flags.
       </blockquote>
       <p>
         The numbers and the figure on this page are the unedited output of the
