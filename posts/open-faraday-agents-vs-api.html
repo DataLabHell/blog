@@ -334,7 +334,7 @@
       <p>
         None of these safeguards involves new science. They are interface
         constraints, enforced at the protocol boundary rather than left to the
-        agent's discretion. The next section describes that boundary.
+        agent's discretion.
       </p>
 
       <h2>How MCP works — and where the discipline lives</h2>
@@ -383,83 +383,83 @@
 
           <!-- nodes -->
           <g data-step="1" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="30" y="120" width="180" height="104" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.4"/>
-            <text x="120" y="152" text-anchor="middle" fill="#1f2124" font-size="15" font-weight="700">Agent</text>
-            <text x="120" y="172" text-anchor="middle" fill="#666666" font-size="11.5">LLM in an MCP host</text>
-            <text x="120" y="188" text-anchor="middle" fill="#666666" font-size="11.5">(Claude Desktop / Code)</text>
-            <text x="120" y="208" text-anchor="middle" fill="#8a8f98" font-size="10.5" font-family="JetBrains Mono,monospace">sees only typed tools</text>
+            <rect x="20" y="105" width="200" height="135" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.4"/>
+            <text x="120" y="135" text-anchor="middle" fill="#1f2124" font-size="20" font-weight="700">Agent</text>
+            <text x="120" y="158" text-anchor="middle" fill="#666666" font-size="14.5">LLM in an MCP host</text>
+            <text x="120" y="176" text-anchor="middle" fill="#666666" font-size="14.5">(Claude Desktop / Code)</text>
+            <text x="120" y="218" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">sees only typed tools</text>
           </g>
 
           <g data-step="2" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="330" y="100" width="230" height="144" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.4"/>
-            <text x="445" y="130" text-anchor="middle" fill="#1f2124" font-size="15" font-weight="700">open-faraday</text>
-            <text x="445" y="149" text-anchor="middle" fill="#666666" font-size="11.5">MCP server · the contract</text>
-            <line x1="350" y1="162" x2="540" y2="162" stroke="rgba(0,0,0,.12)"/>
-            <text x="445" y="182" text-anchor="middle" fill="#0f766e" font-size="10.5" font-family="JetBrains Mono,monospace">validate args · validity gate</text>
-            <text x="445" y="199" text-anchor="middle" fill="#0f766e" font-size="10.5" font-family="JetBrains Mono,monospace">units · truncation · errors</text>
-            <text x="445" y="216" text-anchor="middle" fill="#0f766e" font-size="10.5" font-family="JetBrains Mono,monospace">ledger entry per call</text>
-            <text x="445" y="236" text-anchor="middle" fill="#8a8f98" font-size="10.5" font-family="JetBrains Mono,monospace">no HTTP client of its own</text>
+            <rect x="295" y="85" width="272" height="185" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.4"/>
+            <text x="431" y="115" text-anchor="middle" fill="#1f2124" font-size="20" font-weight="700">open-faraday</text>
+            <text x="431" y="137" text-anchor="middle" fill="#666666" font-size="14.5">MCP server · the contract</text>
+            <line x1="315" y1="151" x2="547" y2="151" stroke="rgba(0,0,0,.12)"/>
+            <text x="431" y="173" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">validate args · validity gate</text>
+            <text x="431" y="192" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">units · truncation · errors</text>
+            <text x="431" y="211" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">ledger entry per call</text>
+            <text x="431" y="245" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">no HTTP client of its own</text>
           </g>
 
           <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="650" y="100" width="180" height="144" rx="10" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.4"/>
-            <text x="740" y="130" text-anchor="middle" fill="#1f2124" font-size="15" font-weight="700">RADIS</text>
-            <text x="740" y="149" text-anchor="middle" fill="#666666" font-size="11.5">LGPL library, imported</text>
-            <line x1="668" y1="162" x2="812" y2="162" stroke="rgba(0,0,0,.12)"/>
-            <text x="740" y="182" text-anchor="middle" fill="#2d6ff5" font-size="10.5" font-family="JetBrains Mono,monospace">line-by-line physics</text>
-            <text x="740" y="199" text-anchor="middle" fill="#2d6ff5" font-size="10.5" font-family="JetBrains Mono,monospace">documented fetchers</text>
-            <text x="740" y="216" text-anchor="middle" fill="#2d6ff5" font-size="10.5" font-family="JetBrains Mono,monospace">CPU, on your machine</text>
+            <rect x="635" y="85" width="210" height="185" rx="10" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.4"/>
+            <text x="740" y="115" text-anchor="middle" fill="#1f2124" font-size="20" font-weight="700">RADIS</text>
+            <text x="740" y="137" text-anchor="middle" fill="#666666" font-size="14.5">LGPL library, imported</text>
+            <line x1="653" y1="151" x2="827" y2="151" stroke="rgba(0,0,0,.12)"/>
+            <text x="740" y="173" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">line-by-line physics</text>
+            <text x="740" y="192" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">documented fetchers</text>
+            <text x="740" y="211" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">CPU, on your machine</text>
           </g>
 
           <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="920" y="84" width="160" height="42" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
-            <text x="1000" y="110" text-anchor="middle" fill="#666666" font-size="11.5" font-family="JetBrains Mono,monospace">hitran.org</text>
-            <rect x="920" y="136" width="160" height="42" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
-            <text x="1000" y="162" text-anchor="middle" fill="#666666" font-size="11.5" font-family="JetBrains Mono,monospace">kurucz.harvard.edu</text>
-            <rect x="920" y="188" width="160" height="42" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
-            <text x="1000" y="214" text-anchor="middle" fill="#666666" font-size="11.5" font-family="JetBrains Mono,monospace">physics.nist.gov</text>
-            <text x="1000" y="74" text-anchor="middle" fill="#8a8f98" font-size="10.5">curated archives · their terms</text>
+            <rect x="905" y="84" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
+            <text x="997" y="114" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">hitran.org</text>
+            <rect x="905" y="142" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
+            <text x="997" y="172" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">kurucz.harvard.edu</text>
+            <rect x="905" y="200" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
+            <text x="997" y="230" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">physics.nist.gov</text>
+            <text x="997" y="72" text-anchor="middle" fill="#8a8f98" font-size="13">curated archives · their terms</text>
           </g>
 
           <!-- cache -->
           <g data-step="3">
-            <path d="M660 320 h160 a0,0 0 0 1 0,0 v52 a80,14 0 0 1 -160,0 v-52" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.2"/>
-            <ellipse cx="740" cy="320" rx="80" ry="14" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.2"/>
-            <text x="740" y="352" text-anchor="middle" fill="#2d6ff5" font-size="11" font-family="JetBrains Mono,monospace">~/.radisdb</text>
-            <text x="740" y="368" text-anchor="middle" fill="#8a8f98" font-size="10" font-family="JetBrains Mono,monospace">HDF5, CO2 ≈ 38 MB</text>
+            <path d="M645 330 h190 v55 a95,15 0 0 1 -190,0 v-55" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.2"/>
+            <ellipse cx="740" cy="330" rx="95" ry="15" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.2"/>
+            <text x="740" y="368" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">~/.radisdb</text>
+            <text x="740" y="386" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">HDF5, CO2 ≈ 38 MB</text>
           </g>
 
           <!-- arrows: request (teal) -->
           <g data-step="1">
-            <line x1="210" y1="150" x2="326" y2="150" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
-            <text x="268" y="138" text-anchor="middle" fill="#0d9488" font-size="10.5" font-family="JetBrains Mono,monospace">tool call</text>
-            <text x="268" y="170" text-anchor="middle" fill="#8a8f98" font-size="10" font-family="JetBrains Mono,monospace">JSON-RPC · stdio</text>
+            <line x1="220" y1="170" x2="291" y2="170" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
+            <text x="255" y="155" text-anchor="middle" fill="#0d9488" font-size="13.5" font-family="JetBrains Mono,monospace">tool call</text>
+            <text x="255" y="192" text-anchor="middle" fill="#8a8f98" font-size="12" font-family="JetBrains Mono,monospace">stdio</text>
           </g>
           <g data-step="2">
-            <line x1="560" y1="150" x2="646" y2="150" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
-            <text x="603" y="138" text-anchor="middle" fill="#0d9488" font-size="10.5" font-family="JetBrains Mono,monospace">Python call</text>
-            <text x="603" y="170" text-anchor="middle" fill="#8a8f98" font-size="10" font-family="JetBrains Mono,monospace">only if gate passes</text>
+            <line x1="567" y1="170" x2="631" y2="170" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
+            <text x="599" y="155" text-anchor="middle" fill="#0d9488" font-size="13.5" font-family="JetBrains Mono,monospace">Python call</text>
+            <text x="599" y="192" text-anchor="middle" fill="#8a8f98" font-size="12" font-family="JetBrains Mono,monospace">gated</text>
           </g>
           <g data-step="3">
-            <line x1="830" y1="131" x2="916" y2="105" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <line x1="830" y1="157" x2="916" y2="157" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <line x1="830" y1="183" x2="916" y2="209" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <text x="873" y="93" text-anchor="middle" fill="#2d6ff5" font-size="10" font-family="JetBrains Mono,monospace">HTTPS · first use</text>
-            <line x1="740" y1="244" x2="740" y2="302" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)" marker-start="url(#ar-b)"/>
-            <text x="758" y="278" fill="#2d6ff5" font-size="10" font-family="JetBrains Mono,monospace">cache hit / fill</text>
+            <line x1="845" y1="135" x2="901" y2="112" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
+            <line x1="845" y1="166" x2="901" y2="166" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
+            <line x1="845" y1="200" x2="901" y2="222" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
+            <text x="866" y="98" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS · first use</text>
+            <line x1="740" y1="270" x2="740" y2="313" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)" marker-start="url(#ar-b)"/>
+            <text x="758" y="296" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">cache hit / fill</text>
           </g>
 
           <!-- arrows: response (amber) -->
           <g data-step="4">
-            <path d="M650 226 C 560 300, 330 300, 216 236" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#ar-a)"/>
-            <text x="435" y="296" text-anchor="middle" fill="#d97706" font-size="10.5" font-family="JetBrains Mono,monospace">envelope: data · units · provenance · truncated · notes</text>
+            <path d="M632 252 C 550 322, 340 322, 224 252" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#ar-a)"/>
+            <text x="430" y="320" text-anchor="middle" fill="#d97706" font-size="13" font-family="JetBrains Mono,monospace">envelope: data · units · provenance · truncated · notes</text>
           </g>
           <g data-step="5">
-            <rect x="330" y="330" width="230" height="58" rx="9" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
-            <text x="445" y="354" text-anchor="middle" fill="#b45309" font-size="11.5" font-family="JetBrains Mono,monospace">provenance_report()</text>
-            <text x="445" y="372" text-anchor="middle" fill="#666666" font-size="10.5">session bibliography, paste-ready</text>
-            <line x1="445" y1="244" x2="445" y2="326" stroke="#d97706" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
-            <text x="463" y="290" fill="#d97706" font-size="10" font-family="JetBrains Mono,monospace">ledger</text>
+            <rect x="306" y="330" width="250" height="64" rx="9" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
+            <text x="431" y="357" text-anchor="middle" fill="#b45309" font-size="14.5" font-family="JetBrains Mono,monospace">provenance_report()</text>
+            <text x="431" y="379" text-anchor="middle" fill="#666666" font-size="13">session bibliography, paste-ready</text>
+            <line x1="431" y1="270" x2="431" y2="326" stroke="#d97706" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
+            <text x="447" y="302" fill="#d97706" font-size="12" font-family="JetBrains Mono,monospace">ledger</text>
           </g>
         </svg>
         <figcaption>One tool call end to end. Teal: the request — a typed JSON-RPC call over stdio, then a
@@ -514,8 +514,7 @@
       <p>
         The example question: <em>how strongly does the CO₂ in ordinary air absorb
         thermal infrared near 15&nbsp;µm?</em> This spectral region is dominated by the
-        ν₂ bending mode of CO₂, the absorption feature at the core of the
-        greenhouse effect. The session ran as follows.
+        ν₂ bending mode of CO₂, a central absorption feature of the greenhouse effect. The session ran as follows.
       </p>
 
       <p>
@@ -741,13 +740,13 @@
       <h2>Outlook: the instrument side</h2>
       <p>
         The examples above start from a question typed into a chat. The setting
-        we are actually building toward starts from an instrument. In our laser
+        we are building toward starts from an instrument. In our laser
         lab we are extending a microscope into a hyperspectral imaging setup —
         multi-wavelength illumination, stitched fields of view, deconvolution —
         where every pixel is not a colour but a spectrum.
       </p>
       <p>
-        Interpreting that kind of data is reference-data work all the way down.
+        Nearly every step in interpreting that kind of data leans on reference data.
         Checking a wavelength calibration means comparing against known
         emission lines. Identifying a spectral feature means querying line
         positions and strengths. Recovering optical properties from spectra
@@ -758,7 +757,7 @@
         units, sources with editions, limits stated rather than hidden.
       </p>
       <p>
-        That is where open-faraday sits in the larger picture: the
+        That is where open-faraday sits: the
         reference-data layer between the instrument and the agents that work
         with it, with <code>provenance_report</code> becoming part of each
         experiment's record. More on the microscope itself once it reaches
