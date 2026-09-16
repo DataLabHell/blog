@@ -399,6 +399,18 @@
         it cannot defend, and where it cannot defend one, it says so instead
         of producing it.
       </p>
+      <p>
+        There is a difference between a contract a client can read and one it
+        can check, and for a while this was only the first. The envelope was a
+        convention inside a block of text: correct, documented, and impossible
+        to validate without parsing the text and trusting that its shape had
+        not changed. Each tool now declares the envelope as its return type, so
+        the protocol publishes a schema for it and hands back a structured
+        object beside the text. A client validates the contract instead of
+        believing it. Writing the declaration immediately caught a response
+        shape that did not match what we thought we were sending, which is the
+        usual reward for making a claim checkable.
+      </p>
 
       <figure class="fig" id="layers">
         <div class="ttl">Figure 1 · Three layers — the contract is not the transport</div>
@@ -910,22 +922,27 @@
       <p>
         A contract is only worth something if it is also enforced against the
         party that wrote it. Holding open-faraday to its own promise turned up
-        four places where it cannot be kept, and it is worth being specific
-        about them, because three of the four are not ours to fix.
+        four places where it could not be kept. One of them was ours and is
+        closed. The other three sit in the layer below, which is the more
+        interesting half of the story.
       </p>
       <p>
-        <strong>Uncertainty is available for constants, not for line data.</strong>
-        CODATA values arrive with their standard uncertainty and an exactness
-        flag, because <code>scipy.constants</code> carries both. Line data
-        arrives without any, and not because the databases lack it. HITRAN
-        publishes a per-line uncertainty index and a per-parameter reference
-        identifier for every transition;<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
-        NIST ASD publishes a letter accuracy grade for every transition
-        probability.<sup class="cite"><a href="#ref_asd">[6]</a></sup> Both are
-        dropped inside the fetchers before open-faraday ever sees the table.
-        Until that changes, the honest statement is: units always,
-        uncertainty where the source provides it <em>and</em> the retrieval
-        path preserves it.
+        <strong>Uncertainty is available for constants, mostly not for line
+        data.</strong> CODATA values arrive with their standard uncertainty and
+        an exactness flag, because <code>scipy.constants</code> carries both.
+        Molecular line data arrives without any, and not because the databases
+        lack it: HITRAN publishes a per-line uncertainty index and a
+        per-parameter reference identifier for every
+        transition,<sup class="cite"><a href="#ref_hitran">[1]</a></sup> and
+        both are discarded inside the fetcher before open-faraday ever sees the
+        table. Atomic lines are the exception, and only since the rework
+        described below: NIST ASD publishes a letter accuracy grade for every
+        transition probability,<sup class="cite"><a href="#ref_asd">[6]</a></sup>
+        and that grade now rides in the response, labelled as what it is. It is
+        a graded bound, not a standard deviation, and the units block says so
+        rather than letting it be read as one. The honest statement of the
+        promise: units always, uncertainty where the source provides it
+        <em>and</em> the retrieval path preserves it.
       </p>
       <p>
         <strong>The HITRAN edition cannot be pinned.</strong> RADIS asks
@@ -957,20 +974,31 @@
         checksum, and a certificate.
       </p>
       <p>
-        <strong>The optional NIST backend downloads more than it says.</strong>
-        Asking for atomic lines in a 2&nbsp;nm window with the NIST backend
-        does not send a query for that window. It downloads the complete line
-        table for the species and filters locally afterwards. That is a
-        reasonable caching strategy and a poor fit for a government reference
-        database served under standard-reference-data terms, and it was not
-        documented anywhere. It is documented now, Kurucz remains the default,
-        and the fix in progress is to route that backend through a
-        window-bounded query instead.
+        <strong>The optional NIST backend downloaded far more than it
+        said.</strong> Asking for atomic lines in a 2&nbsp;nm window did not
+        send a query for that window. It downloaded the complete line table for
+        the species, stored it, registered it as a local database, and applied
+        the window to the file afterwards. A reasonable caching strategy in
+        general, and a poor fit for a government reference compilation served
+        under standard-reference-data terms. It was documented nowhere.
+      </p>
+      <p>
+        This is the one we could fix ourselves, and the fix was smaller than
+        the problem: the same query, sent with its bounds, through a
+        general-purpose astronomy client that was already installed as a
+        dependency. One request per call, nothing stored, and the client
+        identifies itself honestly on the way out. The interesting part is what
+        came back with it. The bounded path returns the accuracy grade, the
+        observed and the calculated wavelength, the oscillator strength, the
+        relative intensity and the configuration and term label of both levels
+        of every line. It also stops filtering out lines that have no measured
+        transition probability, which ASD lists precisely because they are
+        useful for identification. Doing less work returned more data.
       </p>
 
       <h2>What we sent upstream</h2>
       <p>
-        Three of those four live in RADIS, the library that does the physics
+        The remaining three live in RADIS, the library that does the physics
         and the retrieval. That is not a complaint. RADIS is an excellent
         piece of scientific software, it is what makes this project possible,
         and none of these are bugs in its physics. They are places where a
