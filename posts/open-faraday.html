@@ -485,7 +485,7 @@
         moving right, amber is the enveloped answer moving back, blue is RADIS talking to the archives and
         its local cache. Teal also runs along the bottom: the one retrieval open-faraday performs itself, a
         single window-bounded ASD query through astroquery that stores nothing.</div>
-        <svg id="flowsvg" viewBox="0 0 1100 490" role="img"
+        <svg id="flowsvg" viewBox="0 0 1100 500" role="img"
              aria-label="Data flow: an agent sends a JSON-RPC tool call over stdio to open-faraday, which validates it against the contract and then takes one of two retrieval paths. For line lists and spectra it calls RADIS as a Python library; RADIS downloads a whole species from hitran.org or kurucz.harvard.edu on first use and caches it locally. For atomic lines from NIST it sends one window-bounded query to physics.nist.gov through astroquery and caches nothing. The answer returns as an envelope with data, units, provenance and truncation flags; a session ledger feeds provenance_report.">
           <defs>
             <marker id="ar-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -539,8 +539,8 @@
             <rect x="905" y="421" width="185" height="48" rx="8" fill="#ffffff" stroke="#0d9488"/>
             <text x="997" y="451" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">physics.nist.gov</text>
             <path d="M567 235 H600 V445 H901" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#ar-t)"/>
-            <text x="752" y="431" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">astroquery.nist · one bounded ASD query</text>
-            <text x="752" y="466" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">window only · nothing cached</text>
+            <text x="726" y="464" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">astroquery.nist · bounded ASD query</text>
+            <text x="726" y="482" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">window only · nothing cached</text>
           </g>
 
           <!-- cache -->
@@ -1087,10 +1087,13 @@
         exchange for tool calls that could have been Python.
       </p>
       <p>
-        So a second shape is taking form alongside it: the same policy tables,
-        the same refusals, the same provenance ledger, packaged as a skill
-        that an agent reads and executes directly against RADIS and
-        <code>scipy.constants</code>. Same rules, no process.
+        A second shape is therefore in review, and it is worth being exact
+        about its status: it is a proposal on an open pull request, not
+        something you can install today. The figures above show what ships. The
+        proposal packages the same policy tables, the same refusals and the
+        same provenance ledger as a skill an agent reads and executes directly
+        against RADIS and <code>scipy.constants</code>. Same rules, no process
+        to manage.
       </p>
       <p>
         The difference between the two is worth stating plainly rather than
@@ -1098,9 +1101,20 @@
         <em>enforced</em>: a 1500&nbsp;K HITRAN request cannot get through. In
         a skill, the refusal is <em>instructed</em>: the agent is told to check
         the validity gate first, and a sufficiently careless one can skip it.
-        That is a real weakening, and it buys reach. Both are worth having for
-        different clients, which is why the contract lives in tables that both
-        can share rather than in either one's code.
+        That is a real weakening, and it buys reach.
+      </p>
+      <p>
+        There is a second cost, and it is the more instructive one. A skill
+        that has to run without the package installed cannot import the
+        server's policy tables; it has to carry a copy. Two copies of a refusal
+        table drift, silently and inevitably, and the drift always favours the
+        copy nobody tests. So the first thing the proposal needed was not more
+        features but a test that compares the two tables and fails when they
+        diverge. Run against the proposed branch it immediately found two:
+        one table had fallen behind, and the one holding each database's usage
+        terms was missing entirely. That test is the price of the second shape,
+        and it is worth paying, because the alternative is a skill that quietly
+        refuses less than the server it claims to mirror.
       </p>
 
       <h2>Not the only one any more</h2>
