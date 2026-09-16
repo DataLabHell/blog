@@ -90,7 +90,7 @@
   {
     "path": "posts/open-faraday.html",
     "title": "Scientific Context as an Executable Contract",
-    "date": "2026-08-21",
+    "date": "2026-09-16",
     "tags": [
       "MCP",
       "LLM",
@@ -98,10 +98,11 @@
       "Open Source",
       "Physics",
       "Spectroscopy",
-      "Research"
+      "Research",
+      "Provenance"
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "open-faraday builds a trustworthy boundary between scientific reference data and AI agents — units, provenance, completeness and validity limits enforced as an executable contract on every response. Demonstrated end-to-end on one worked example: the CO₂ contribution to the transmission of air at 15 µm."
+    "desc": "open-faraday builds a trustworthy boundary between scientific reference data and AI agents: units, provenance, completeness and validity limits enforced as an executable contract on every response. Demonstrated end-to-end on the CO₂ contribution to the transmission of air at 15 µm — and on the four places where the contract could not be kept, three of which turned into patches sent upstream."
   }
 ]

@@ -302,8 +302,8 @@
     <header></header>
     <main>
       <p class="post-subtitle">
-        Building a trustworthy boundary between scientific reference data and
-        AI agents.
+        What it takes to hand an AI agent a number it can defend &mdash; and
+        what breaks when you actually try.
       </p>
 
       <p class="repo-link">
@@ -320,14 +320,17 @@
         Kurucz, NIST via RADIS) and CODATA constants to AI agents. Every
         response is a versioned envelope with units, provenance, truncation
         flags and coverage notes; requests outside validity limits get a
-        structured refusal instead of a plausible number. The idea worth
-        keeping: scientific context as an executable contract, enforced at
-        runtime; MCP is just the transport. One worked example carries the
-        argument, the CO₂ ν₂ band at 15&nbsp;µm: 1.13% transmittance at
-        667.53&nbsp;cm⁻¹ through one metre of air at 420&nbsp;ppm,
-        τ&nbsp;≈&nbsp;4487 over a kilometre, every number reproducible tool
-        output. The endgame: agents inside instrument loops, scientific
-        assumptions machine-enforceable.
+        structured refusal instead of a plausible number. The one-line
+        position: <em>it refuses to hand an agent a number it cannot
+        defend.</em> The idea worth keeping is scientific context as an
+        executable contract, enforced at runtime; MCP is just the transport.
+        One worked example carries the argument, the CO₂ ν₂ band at
+        15&nbsp;µm: 1.13% transmittance at 667.53&nbsp;cm⁻¹ through one metre
+        of air at 420&nbsp;ppm, τ&nbsp;≈&nbsp;4487 over a kilometre, every
+        number reproducible tool output. The uncomfortable half of the story
+        is in the second part: holding yourself to that contract surfaces the
+        places where the data supply chain cannot meet it, and most of those
+        turned out to sit upstream, not in our code.
       </div>
 
       <h2>Motivation</h2>
@@ -361,7 +364,9 @@
         executable contract: units, conventions, completeness, provenance,
         validity regimes and explicit failure, travelling with every value.
         MCP delivers that contract, and the server is deliberately small: a
-        proof of the pattern, not a platform.
+        proof of the pattern, not a platform. The second half of this article
+        is about what happened when we took that contract seriously enough to
+        audit ourselves against it.
       </p>
 
 
@@ -390,6 +395,9 @@
         chosen validity policies. MCP's role is narrower: it gives agents a
         standardized way to consume that contract. The scientific contract is
         open-faraday; MCP is the interface it ships today for reaching it.
+        As a single commitment: the interface will not hand an agent a number
+        it cannot defend, and where it cannot defend one, it says so instead
+        of producing it.
       </p>
 
       <figure class="fig" id="layers">
@@ -898,9 +906,179 @@
         worked around.
       </p>
 
+      <h2>Where the contract does not reach</h2>
+      <p>
+        A contract is only worth something if it is also enforced against the
+        party that wrote it. Holding open-faraday to its own promise turned up
+        four places where it cannot be kept, and it is worth being specific
+        about them, because three of the four are not ours to fix.
+      </p>
+      <p>
+        <strong>Uncertainty is available for constants, not for line data.</strong>
+        CODATA values arrive with their standard uncertainty and an exactness
+        flag, because <code>scipy.constants</code> carries both. Line data
+        arrives without any, and not because the databases lack it. HITRAN
+        publishes a per-line uncertainty index and a per-parameter reference
+        identifier for every transition;<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
+        NIST ASD publishes a letter accuracy grade for every transition
+        probability.<sup class="cite"><a href="#ref_asd">[6]</a></sup> Both are
+        dropped inside the fetchers before open-faraday ever sees the table.
+        Until that changes, the honest statement is: units always,
+        uncertainty where the source provides it <em>and</em> the retrieval
+        path preserves it.
+      </p>
+      <p>
+        <strong>The HITRAN edition cannot be pinned.</strong> RADIS asks
+        HITRAN's server for the current release and records the download date,
+        not which edition came back. For a project whose whole pitch is that a
+        figure can be rebuilt from cited data, an unpinnable edition is a
+        direct hit. The envelope handles it the only honest way, by citing the
+        edition through its retrieval date rather than naming one. Our own
+        documentation did worse for a while: an architecture diagram labelled
+        the source <code>HITRAN2020</code> while the code deliberately refused
+        to name any edition, and the current release is
+        HITRAN2024.<sup class="cite"><a href="#ref_hitran">[1]</a></sup> The
+        docs asserted what the code declared unknowable. That is exactly the
+        failure mode the envelope exists to prevent, sitting on our own front
+        page, and it is fixed.
+      </p>
+      <p>
+        <strong>The default atomic source is unversioned and travels over
+        plain HTTP.</strong> The Kurucz line lists<sup class="cite"><a href="#ref_kurucz">[2]</a></sup>
+        carry no version, so the provenance record can only say "state at
+        fetch time". They are also fetched over <code>http://</code>, with no
+        transport authentication. That one cannot be fixed by switching the
+        scheme: the host answers on port 443, but its certificate is issued
+        for a different hostname entirely, so a verified TLS connection to the
+        name RADIS uses is not available today (checked 2026-09-16). Nothing
+        distinguishes the real file from an injected one, which is an awkward
+        property for a provenance-first tool. The mitigation available now is
+        to record the exact URL that answered; the real fix is a pinned
+        checksum, and a certificate.
+      </p>
+      <p>
+        <strong>The optional NIST backend downloads more than it says.</strong>
+        Asking for atomic lines in a 2&nbsp;nm window with the NIST backend
+        does not send a query for that window. It downloads the complete line
+        table for the species and filters locally afterwards. That is a
+        reasonable caching strategy and a poor fit for a government reference
+        database served under standard-reference-data terms, and it was not
+        documented anywhere. It is documented now, Kurucz remains the default,
+        and the fix in progress is to route that backend through a
+        window-bounded query instead.
+      </p>
+
+      <h2>What we sent upstream</h2>
+      <p>
+        Three of those four live in RADIS, the library that does the physics
+        and the retrieval. That is not a complaint. RADIS is an excellent
+        piece of scientific software, it is what makes this project possible,
+        and none of these are bugs in its physics. They are places where a
+        library optimised for computing spectra quietly discards metadata that
+        a provenance-first consumer needs. Building the contract is what made
+        them visible, which is the argument for building contracts.
+      </p>
+      <p>
+        So the work went where the problem is. Three patches are prepared
+        against RADIS, each with tests, each verified against the installed
+        library rather than against its documentation:
+      </p>
+      <ul>
+        <li>
+          <strong>Per-line uncertainty and references.</strong> The machinery
+          already exists: RADIS' HITRAN database manager can request the
+          uncertainty indices and the reference identifiers, slice them out of
+          the raw record as a fallback, and fail loudly if they go missing. The
+          public fetch function simply never passes the flag, so none of it is
+          reachable. The patch threads the keyword through and warns when a
+          cached database predates it. Worth noting for anyone hitting the same
+          wall: the HITEMP path already returns both columns, because it parses
+          the fixed-width record directly.
+        </li>
+        <li>
+          <strong>The ASD accuracy grade.</strong> The NIST parser reads the
+          accuracy column, uses it to drop repeated header rows, and then
+          discards it in the final column selection. It is the only per-line
+          uncertainty estimate ASD publishes for a transition probability. The
+          patch keeps it next to the coefficient it qualifies, with an offline
+          test built from a recorded ASD response, since that parser had no
+          test coverage at all.
+        </li>
+        <li>
+          <strong>An honest User-Agent.</strong> Every database download
+          identified itself as Chrome 91 on Windows, to every host, including
+          the government server hosting the atomic database. It arrived as
+          collateral in an unrelated download fix rather than as a decision.
+          Research data centres size their capacity from their traffic; a
+          browser string makes library traffic indistinguishable from a person
+          clicking a link, so a heavy automated pattern cannot be attributed
+          and the host has no way to reach the project before resorting to a
+          block. The patch sends the library name and version instead. Both
+          strings were checked against all four hosts first and return
+          identical status codes.
+        </li>
+      </ul>
+      <p>
+        This is the part of the story we did not anticipate. The point of a
+        provenance contract is to make an agent's answer defensible. The
+        side effect, once you write the contract down and enforce it, is that
+        it audits the supply chain underneath you, and it turns out the most
+        useful thing a small wrapper can do is send the findings upstream where
+        everyone gets them.
+      </p>
+
+      <h2>Two shapes for the same contract</h2>
+      <p>
+        The server is one way to deliver a contract, and it is the right one
+        when the agent cannot execute code: a chat client speaks the protocol,
+        the server holds the policy, and an invalid request is refused before
+        anything runs. But a growing share of agents <em>can</em> execute code,
+        and for those, a local server is a process to install and manage in
+        exchange for tool calls that could have been Python.
+      </p>
+      <p>
+        So a second shape is taking form alongside it: the same policy tables,
+        the same refusals, the same provenance ledger, packaged as a skill
+        that an agent reads and executes directly against RADIS and
+        <code>scipy.constants</code>. Same rules, no process.
+      </p>
+      <p>
+        The difference between the two is worth stating plainly rather than
+        selling them as equivalent. In the server, the refusal is
+        <em>enforced</em>: a 1500&nbsp;K HITRAN request cannot get through. In
+        a skill, the refusal is <em>instructed</em>: the agent is told to check
+        the validity gate first, and a sufficiently careless one can skip it.
+        That is a real weakening, and it buys reach. Both are worth having for
+        different clients, which is why the contract lives in tables that both
+        can share rather than in either one's code.
+      </p>
+
+      <h2>Not the only one any more</h2>
+      <p>
+        When this work started, nothing else exposed spectroscopic line data to
+        agents through a protocol. That changed in September 2026, when an
+        independent HITRAN MCP server appeared and went from nothing to a
+        substantial tool surface in a week. Elsewhere, the largest open
+        scientific agent toolkits now instruct their agents to read CODATA
+        constants straight from <code>scipy.constants</code> &mdash; the same
+        mechanism used here.
+      </p>
+      <p>
+        The honest reading: the barrier to entry is a weekend, and coverage is
+        not a moat. What survives is narrower. It is the envelope, the refusals,
+        the coverage notes and the session bibliography, and whether they are
+        enforced or merely documented. One detail makes the case better than
+        any argument: a widely used physics skill instructs its agent never to
+        hardcode physical constants, then prints its CODATA values labelled
+        with an edition four years older than the one its own dependency ships,
+        and hardcodes a table of particle masses immediately below that
+        instruction. Nobody was careless. Editions drift, and instructions do
+        not notice. A stamped, version-carrying envelope does.
+      </p>
+
       <h2>Outlook: the instrument side</h2>
       <p>
-        The examples above start from a question typed into a chat. The setting
+        All of the above starts from a question typed into a chat. The setting
         we are building toward starts from an instrument, and this is not
         speculative for us: the lab is open-faraday's first customer. In our
         laser lab we are extending a microscope into a hyperspectral imaging
