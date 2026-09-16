@@ -415,7 +415,7 @@
       <figure class="fig" id="layers">
         <div class="ttl">Figure 1 · Three layers — the contract is not the transport</div>
         <svg viewBox="0 0 1100 540" role="img"
-             aria-label="Three-layer diagram. Top: scientific databases and physics engines — HITRAN, Kurucz, NIST, CODATA, RADIS, scipy. Middle: open-faraday, scientific context as an executable contract. Bottom: two consumers of that contract — a Python import returning the same envelope in-process, and MCP, the only interface the server ships, which an agent connects to.">
+             aria-label="Three-layer diagram. Top: scientific databases and physics engines — HITRAN, Kurucz, NIST, CODATA, reached through RADIS, astroquery and scipy. Middle: open-faraday, scientific context as an executable contract. Bottom: two consumers of that contract — a Python import returning the same envelope in-process, and MCP, the only interface the server ships, which an agent connects to.">
           <defs>
             <marker id="lyr-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0 0L10 5L0 10z" fill="#8a8f98"/></marker>
@@ -423,7 +423,7 @@
           <g font-family="Space Grotesk,system-ui,sans-serif">
             <rect x="280" y="25" width="540" height="95" rx="10" fill="#ffffff" stroke="#d0d0d0" stroke-width="1.4"/>
             <text x="550" y="62" text-anchor="middle" fill="#1f2124" font-size="18" font-weight="700">Scientific databases &amp; physics engines</text>
-            <text x="550" y="90" text-anchor="middle" fill="#666666" font-size="13.5" font-family="JetBrains Mono,monospace">HITRAN · Kurucz · NIST · CODATA — RADIS · scipy</text>
+            <text x="550" y="90" text-anchor="middle" fill="#666666" font-size="13.5" font-family="JetBrains Mono,monospace">HITRAN · Kurucz · NIST · CODATA — RADIS · astroquery · scipy</text>
 
             <line x1="550" y1="120" x2="550" y2="156" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
 
@@ -451,7 +451,8 @@
           </g>
         </svg>
         <figcaption>The layering behind the article. Databases and physics engines own the data and
-        the physics. open-faraday wraps access to them in one executable contract: required fields,
+        the physics; open-faraday reaches them through RADIS, astroquery and scipy rather than through
+        clients of its own. open-faraday wraps access to them in one executable contract: required fields,
         validation, structured refusal. MCP over stdio is the only interface the server ships today
         (there is no HTTP API), but because the contract lives in the response envelope rather than
         in the transport, importing the module in Python hands back exactly the same envelope.</figcaption>
@@ -482,10 +483,10 @@
         </div>
         <div class="stepdetail" id="stepdetail">Select a step — or read the whole path: teal is the request
         moving right, amber is the enveloped answer moving back, blue is RADIS talking to the archives and
-        its local cache. open-faraday has no database HTTP integration of its own — remote retrieval is
-        delegated to RADIS' documented fetchers.</div>
-        <svg id="flowsvg" viewBox="0 0 1100 442" role="img"
-             aria-label="Data flow: an agent sends a JSON-RPC tool call over stdio to open-faraday, which validates it against the contract, calls RADIS as a Python library; RADIS fetches from HITRAN, Kurucz or NIST archives on first use and caches locally; the answer returns as an envelope with data, units, provenance and truncation flags; a session ledger feeds provenance_report.">
+        its local cache. Teal also runs along the bottom: the one retrieval open-faraday performs itself, a
+        single window-bounded ASD query through astroquery that stores nothing.</div>
+        <svg id="flowsvg" viewBox="0 0 1100 490" role="img"
+             aria-label="Data flow: an agent sends a JSON-RPC tool call over stdio to open-faraday, which validates it against the contract and then takes one of two retrieval paths. For line lists and spectra it calls RADIS as a Python library; RADIS downloads a whole species from hitran.org or kurucz.harvard.edu on first use and caches it locally. For atomic lines from NIST it sends one window-bounded query to physics.nist.gov through astroquery and caches nothing. The answer returns as an envelope with data, units, provenance and truncation flags; a session ledger feeds provenance_report.">
           <defs>
             <marker id="ar-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0 0L10 5L0 10z" fill="#0d9488"/></marker>
@@ -512,7 +513,7 @@
             <text x="431" y="173" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">validate args · validity gate</text>
             <text x="431" y="192" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">units · truncation · errors</text>
             <text x="431" y="211" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">session source ledger</text>
-            <text x="431" y="245" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">no HTTP client of its own</text>
+            <text x="431" y="245" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">no bulk fetchers of its own</text>
           </g>
 
           <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
@@ -530,9 +531,16 @@
             <text x="997" y="114" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">hitran.org</text>
             <rect x="905" y="142" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
             <text x="997" y="172" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">kurucz.harvard.edu</text>
-            <rect x="905" y="200" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
-            <text x="997" y="230" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">physics.nist.gov</text>
             <text x="997" y="72" text-anchor="middle" fill="#8a8f98" font-size="13">curated archives · their terms</text>
+          </g>
+
+          <!-- second retrieval path: one bounded query, no cache -->
+          <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
+            <rect x="905" y="421" width="185" height="48" rx="8" fill="#ffffff" stroke="#0d9488"/>
+            <text x="997" y="451" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">physics.nist.gov</text>
+            <path d="M567 235 H600 V445 H901" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#ar-t)"/>
+            <text x="752" y="431" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">astroquery.nist · one bounded ASD query</text>
+            <text x="752" y="466" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">window only · nothing cached</text>
           </g>
 
           <!-- cache -->
@@ -558,7 +566,6 @@
           <g data-step="3">
             <line x1="845" y1="135" x2="901" y2="112" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
             <line x1="845" y1="166" x2="901" y2="166" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <line x1="845" y1="200" x2="901" y2="222" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
             <text x="873" y="158" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS</text>
             <line x1="740" y1="270" x2="740" y2="313" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)" marker-start="url(#ar-b)"/>
             <text x="758" y="296" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">cache hit / fill</text>
@@ -581,9 +588,11 @@
         plain Python call into RADIS, and only if the contract gate passes (a 1500&nbsp;K HITRAN request dies
         here, before any network). Blue: RADIS talking to the archives — HTTPS on first use under each
         database's own terms, then the local HDF5 cache. Amber: the answer coming back as the envelope, and
-        the dashed ledger feed that makes <span class="mono">provenance_report()</span> possible. open-faraday
-        contains no database HTTP integration of its own; retrieval is delegated to RADIS'
-        documented fetchers.</figcaption>
+        the dashed ledger feed that makes <span class="mono">provenance_report()</span> possible. The teal
+        path along the bottom is the exception to "everything goes through RADIS": atomic lines from NIST
+        are fetched by one window-bounded query through <span class="mono">astroquery.nist</span>, which
+        downloads only the requested window and keeps nothing. RADIS' own NIST fetcher would download and
+        store the species' entire line table instead.</figcaption>
       </figure>
 
       <script>
@@ -884,6 +893,14 @@
         τ₁ₘ = −ln(0.01125) ≈ 4.487, and 1000 × 4.487 = 4487, the computed
         kilometre value exactly.
       </div>
+      <p class="small">
+        The envelopes on this page say <code>contract: "0.2"</code> because
+        that is what this session returned, and relabelling them would be the
+        exact thing this article argues against. The contract has since moved
+        to 0.3. Nothing in the molecular or spectrum path changed with it, so
+        these numbers reproduce unaltered; what changed is on the atomic side,
+        and is described below.
+      </p>
 
       <h2>Refusal is a feature</h2>
       <p>
@@ -906,12 +923,17 @@
       <p>
         A structured refusal with a suggested alternative beats a plausible
         but wrong spectrum. The same principle runs through the tool surface:
-        every atomic response carries three coverage caveats
-        (the NIST ASD<sup class="cite"><a href="#ref_asd">[6]</a></sup>
-        backend's <code>line_out=1</code> filter, no energy-level data, and a
-        CPU-only atomic path whose broadening partners are limited to H, He,
-        H₂ and free electrons; atomic hydrogen is the default, and air
-        broadening is unavailable for atoms). The ~700&nbsp;K and
+        every atomic response carries the coverage caveats of the backend
+        that served it, and only those. A Kurucz response says the
+        A-coefficients are derived from published log gf values and that the
+        list carries no version. A NIST ASD<sup class="cite"><a href="#ref_asd">[6]</a></sup>
+        response says the accuracy grade is a graded bound and not a standard
+        uncertainty. Both say that energy levels are not covered as a table,
+        and that the atomic path is CPU-only with broadening partners limited
+        to H, He, H₂ and free electrons; atomic hydrogen is the default and
+        air broadening is unavailable. Shipping the union of both lists would
+        have been less work and would have described neither backend
+        accurately. The ~700&nbsp;K and
         ~2000&nbsp;K ceilings are conservative policy, not fundamental
         database boundaries; each databank's practical range is molecule- and
         spectral-region-dependent. Limitations are reported rather than
