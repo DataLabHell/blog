@@ -412,12 +412,10 @@
         the protocol publishes a schema for it and hands back a structured
         object beside the text. A client validates the contract instead of
         believing it. Writing the declaration immediately caught a response
-        shape that did not match what we thought we were sending &mdash; and,
-        as the second half of this article describes, the declaration itself
-        was then wrong for three weeks in a way that made the published schema
-        unsatisfiable by the very responses it described. Publishing a schema
-        and validating against it from the outside are two different
-        commitments, and only the second one is worth anything.
+        shape that did not match what we thought we were sending. Publishing a
+        schema and validating against it from the outside are two different
+        commitments, though, and only the second one is worth anything &mdash;
+        which the second half of this article had to learn the hard way.
       </p>
 
       <figure class="fig" id="layers">
@@ -1006,11 +1004,10 @@
         Only the Kurucz response says the atomic path is CPU-only with
         broadening partners limited to H, He, H₂ and free electrons, atomic
         hydrogen the default and air broadening unavailable &mdash; because only
-        Kurucz reaches RADIS at all. On an ASD response that sentence described
-        a code path the call never entered, which is how it read until 0.3.1,
-        and it is exactly the failure separating the lists was meant to
-        prevent. Shipping the union of both would have been less work and
-        would have described neither backend accurately. The ~700&nbsp;K and
+        Kurucz reaches RADIS at all: on an ASD response that sentence would
+        describe a code path the call never entered. Shipping the union of both
+        lists would have been less work and would have described neither
+        backend accurately. The ~700&nbsp;K and
         ~2000&nbsp;K ceilings are conservative policy, not fundamental
         database boundaries; each databank's practical range is molecule- and
         spectral-region-dependent. Limitations are reported rather than
