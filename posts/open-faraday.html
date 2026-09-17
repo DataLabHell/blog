@@ -328,8 +328,8 @@
         One worked example carries the argument, the CO₂ ν₂ band at
         15&nbsp;µm: 1.13% transmittance at 667.53&nbsp;cm⁻¹ through one metre
         of air at 420&nbsp;ppm, τ&nbsp;≈&nbsp;4487 over a kilometre, every
-        number unedited tool output, re-run against open-faraday 0.3.1 on
-        2026-09-18.
+        number tool output, rounded for display, re-run against open-faraday
+        v0.3.1 on 2026-09-18.
       </div>
 
       <h2>Motivation</h2>
@@ -392,9 +392,12 @@
         chosen validity policies. MCP's role is narrower: it gives agents a
         standardized way to consume that contract. The scientific contract is
         open-faraday; MCP is the interface it ships today for reaching it.
-        As a single commitment: a value leaves this interface with everything
-        a reader needs to check it, and where that is missing, the request is
-        refused rather than answered.
+        As a single commitment: a value ships with the scientific context that
+        is available and with its unknowns named, and requests that violate a
+        defined validity policy are refused rather than answered. The
+        distinction that buys is between an undisclosed assumption and a
+        disclosed limitation — the worked example below is served even though
+        the exact HITRAN edition cannot be determined, and says so.
       </p>
       <p>
         There is a difference between a contract a client can read and one it
@@ -733,15 +736,26 @@
         <var>σ</var>(<var>ν</var>) = Σ<sub><var>i</var></sub>&nbsp;<var>S</var><sub><var>i</var></sub>(<var>T</var><sub>gas</sub>)&thinsp;<var>φ</var><sub><var>i</var></sub>(<var>ν</var> − <var>ν</var><sub><var>i</var></sub>)
       </div>
       <p>
-        a sum over every transition <var>i</var> in the window: the line
+        a sum over the transitions <var>i</var> in the window: the line
         intensity <var>S</var><sub><var>i</var></sub> from the database
         (rescaled to <var>T</var><sub>gas</sub> via the lower-state energy
         and partition function), and a normalized line-shape function
         <var>φ</var><sub><var>i</var></sub>, in practice a Voigt profile
-        combining pressure broadening by air with Doppler broadening. This is
-        why the 1361-line count from the truncation flag matters physically:
-        drop lines from the sum and <var>σ</var>(<var>ν</var>) is simply
-        wrong.
+        combining pressure broadening by air with Doppler broadening. Not
+        every transition survives into the sum: RADIS applies an intensity
+        cutoff, here 10⁻²⁷, and the response reports what that did. For this
+        spectrum it found 17&nbsp;028 lines across isotopologues 1–9, summed
+        5315 of them and discarded 11&nbsp;713 below the cutoff. Which lines
+        enter the sum is a physical choice, not a formatting one, and it is
+        reported rather than assumed.
+      </p>
+      <p>
+        The 1361 from the line query above is a different number and answers a
+        different question: it is the completeness total for
+        <code>lines_fetch_molecular</code> over 660–670&nbsp;cm⁻¹ with the
+        principal isotopologue alone. The spectrum spans 655–680&nbsp;cm⁻¹ and
+        uses every isotopologue. Two windows, two isotope selections, two
+        counts — which is why each response carries its own.
       </p>
 
       <div class="stats">
@@ -759,8 +773,8 @@
         </div>
         <div class="chart-wrap"><canvas id="speccanvas" role="img"
           aria-label="Line chart of the CO2 nu2 band between 655 and 680 inverse centimetres. CO2 transmittance through one metre drops from near 1 in the wings to 0.0113 at the optical-depth maximum at 667.53; CO2 optical depth over one kilometre of the same homogeneous gas, on a log scale, rises from about 5 to 4487 at the same wavenumber."></canvas></div>
-        <div class="chart-readout" id="specreadout">hover the curve for exact values</div>
-        <figcaption>Verbatim output of two <span class="mono">spectrum_calculate</span> calls, identical
+        <div class="chart-readout" id="specreadout">hover the curve for the plotted values</div>
+        <figcaption>Output of two <span class="mono">spectrum_calculate</span> calls, identical
         conditions, path lengths 1&nbsp;m and 1&nbsp;km. Both responses were decimated for transport and
         flagged (<span class="mono">truncated: true, total_available: 2501</span>;
         <span class="mono">max_points=501</span> requested, 498 returned). The decimation splits
@@ -771,7 +785,10 @@
         marked point is the optical-depth maximum near the ν₂ Q branch, at 667.53&nbsp;cm⁻¹ on
         this sampled spectrum (the conventional band centre lies near 667.4&nbsp;cm⁻¹; the exact
         Q-branch shape is sensitive to pressure broadening and line mixing): CO₂ transmittance
-        0.0113 over one metre, optical depth 4487 over one kilometre of the same homogeneous gas. Hover (or tap) for values; the buttons switch quantity.</figcaption>
+        0.0113 over one metre, optical depth 4487 over one kilometre of the same homogeneous gas. The
+        plotted arrays are the returned values rounded for display — wavenumbers to 2 decimals,
+        transmittance to 4, optical depth to 3 — and all 1494 of them match the responses at that
+        precision. Hover (or tap) for the plotted values; the buttons switch quantity.</figcaption>
         <details class="dtable"><summary>Data as table (every 25th point)</summary>
           <div class="tbl"><table id="spectable"><thead><tr><th>wavenumber (cm⁻¹, vac)</th><th>transmittance, 1 m</th><th>optical depth, 1 km</th></tr></thead><tbody></tbody></table></div>
         </details>
@@ -844,10 +861,22 @@
           }
         }
         function pick(clientX){
+          // The decimated grid is not uniform — buckets contribute their
+          // extremes, so neighbouring samples can sit 0.01 or 0.09 cm-1 apart.
+          // Mapping the pointer straight onto an array index therefore reads
+          // out a neighbouring record: 175 of the 498 samples, up to 0.07 cm-1
+          // away. Convert to a wavenumber and binary-search the nearest.
           var r = canvas.getBoundingClientRect();
           var frac = (clientX - r.left - PAD.l) / (r.width - PAD.l - PAD.r);
-          var i = Math.round(frac*(DATA.w.length-1));
-          return Math.max(0, Math.min(DATA.w.length-1, i));
+          var w = DATA.w, n = w.length;
+          var target = w[0] + frac * (w[n-1] - w[0]);
+          var lo = 0, hi = n - 1;
+          while (lo < hi) {
+            var mid = (lo + hi) >> 1;
+            if (w[mid] < target) { lo = mid + 1; } else { hi = mid; }
+          }
+          if (lo > 0 && Math.abs(w[lo-1] - target) <= Math.abs(w[lo] - target)) { lo -= 1; }
+          return Math.max(0, Math.min(n - 1, lo));
         }
         canvas.addEventListener("pointermove", function(e){
           hoverI = pick(e.clientX);
@@ -855,7 +884,7 @@
           readout.textContent = DATA.w[hoverI].toFixed(2)+" cm⁻¹ · "+s.label+" = "+s.fmt(DATA[cur][hoverI]);
           draw();
         });
-        canvas.addEventListener("pointerleave", function(){ hoverI=-1; readout.textContent="hover the curve for exact values"; draw(); });
+        canvas.addEventListener("pointerleave", function(){ hoverI=-1; readout.textContent="hover the curve for the plotted values"; draw(); });
         document.querySelectorAll(".chartbtns button").forEach(function(b){
           b.addEventListener("click", function(){
             cur = b.getAttribute("data-series");
@@ -895,9 +924,13 @@
 
       <div class="callout">
         <strong>What travelled with the numbers.</strong> Each value arrived
-        in a versioned envelope (<code>contract: "0.3"</code>) with
-        <code>units: {"wavenumber": "cm-1 (vacuum)", "values": "dimensionless (0-1)"}</code>,
-        the provenance record
+        in a versioned envelope (<code>contract: "0.3"</code>) with a unit per
+        field, and the two calls do not share one: the metre response labels its
+        values <code>"dimensionless (0-1)"</code>, the kilometre response
+        <code>"dimensionless (base-e optical depth)"</code>, both over
+        <code>"cm-1 (vacuum)"</code>. Same tool, same window, two quantities,
+        and the envelope says which is which rather than leaving it to the axis
+        label. Each carries the provenance record
         <code>"HITRAN line-by-line calculation via RADIS 0.17.1"</code>, a
         retrieval timestamp, and the citations for both the data and the
         code.<sup class="cite"><a href="#ref_hitran">[1]</a></sup><sup class="cite"><a href="#ref_radis">[4]</a></sup>
@@ -906,14 +939,18 @@
         the notes say so, pointing to <code>source_download_date</code>
         instead. The 2501-point spectrum was decimated for transport and
         flagged (<code>truncated: true, total_available: 2501</code>), and
-        the two path lengths cross-check via Beer–Lambert:
-        τ₁ₘ = −ln(0.01125) ≈ 4.487, and 1000 × 4.487 = 4487, the computed
-        kilometre value exactly.
+        the two path lengths cross-check via Beer–Lambert on the returned
+        values, not the displayed ones: −ln(0.011254874675236337) =
+        4.486953939715527, and 1000 × that is 4486.953939715527 against a
+        computed kilometre value of 4486.953939715522 — agreement to 5×10⁻¹².
+        Rounded to the figures plotted here the same check reads
+        −1000 ln(0.01125) ≈ 4487.4 against 4487, which is the rounding, not a
+        discrepancy.
       </div>
       <p class="small">
-        Every number on this page is unedited tool output, re-run against
-        open-faraday 0.3.1 on 2026-09-18 over stdio with an unmodified MCP
-        client: 1361 lines in the window, 2501 spectral points before
+        Every number on this page comes from tool output, rounded for display
+        and not otherwise edited, re-run against open-faraday v0.3.1 on
+        2026-09-18 over stdio with an unmodified MCP client: 1361 lines in the window, 2501 spectral points before
         decimation, the optical-depth maximum at 667.53&nbsp;cm&#8315;&#185;,
         &tau;&nbsp;=&nbsp;4487 over the kilometre and 1.13% transmittance over
         the metre. The calls that produce them are listed at the end of this
@@ -1008,12 +1045,18 @@
 
       <h2>Reproduce it</h2>
       <p>
-        The prompt in the use-case section reproduces the whole session. The
-        numbers and the figure on this page are the unedited output of the
-        tool calls it triggers, with these exact parameters (Python 3.13 or
-        3.14, <code>pip install '.[spectroscopy]'</code>). The calls below
-        were run on 2026-09-18 against open-faraday 0.3.1, over stdio with an
-        unmodified <code>mcp.ClientSession</code>:
+        The prompt in the use-case section drives the whole session. The
+        numbers and the figure on this page are the output of the five tool
+        calls it triggers, rounded for display, with these exact parameters
+        (Python 3.13 or 3.14, <code>pip install '.[spectroscopy]'</code>).
+        They were run on 2026-09-18 over stdio against an unmodified
+        <code>mcp.ClientSession</code>, at tag <code>v0.3.1</code>, commit
+        <code>ede0720f3ee32863ea461bb411e7c36ac35a7908</code>, with
+        <code>uv.lock</code> at SHA-256 <code>bb025957…5451be0</code>. The
+        version string in the MCP handshake is only <code>0.3.1</code>, which
+        does not pin a revision, so the commit is given here. Below are the
+        calls themselves, not a client program — every argument is shown, so
+        an agent or a Python caller can issue them as they stand:
       </p>
       <pre><code><span class="c"># the lines, with honest truncation</span>
 lines_fetch_molecular(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">660</span>, wavenum_max=<span class="k">670</span>, database=<span class="s">"hitran"</span>)
@@ -1024,10 +1067,15 @@ spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span clas
                    path_length_cm=<span class="k">100</span>, quantity=<span class="s">"transmittance"</span>, max_points=<span class="k">501</span>)
 
 <span class="c"># the kilometre</span>
-spectrum_calculate(..., path_length_cm=<span class="k">100000</span>, quantity=<span class="s">"absorbance"</span>, max_points=<span class="k">501</span>)
+spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">655</span>, wavenum_max=<span class="k">680</span>,
+                   Tgas=<span class="k">296</span>, pressure_bar=<span class="k">1.01325</span>, mole_fraction=<span class="k">0.00042</span>,
+                   path_length_cm=<span class="k">100000</span>, quantity=<span class="s">"absorbance"</span>, max_points=<span class="k">501</span>)
 
 <span class="c"># the refusal</span>
-spectrum_calculate(..., Tgas=<span class="k">1500</span>, databank=<span class="s">"hitran"</span>)
+spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">655</span>, wavenum_max=<span class="k">680</span>,
+                   Tgas=<span class="k">1500</span>, pressure_bar=<span class="k">1.01325</span>, mole_fraction=<span class="k">0.00042</span>,
+                   path_length_cm=<span class="k">100</span>, quantity=<span class="s">"transmittance"</span>,
+                   max_points=<span class="k">501</span>, databank=<span class="s">"hitran"</span>)
 
 <span class="c"># the bibliography</span>
 provenance_report()</code></pre>
