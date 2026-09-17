@@ -328,13 +328,8 @@
         One worked example carries the argument, the CO₂ ν₂ band at
         15&nbsp;µm: 1.13% transmittance at 667.53&nbsp;cm⁻¹ through one metre
         of air at 420&nbsp;ppm, τ&nbsp;≈&nbsp;4487 over a kilometre, every
-        number unedited tool output. Re-run four weeks later, and again a month
-        after that, every physical value came back identical. The uncomfortable
-        half of the story is in the second part: holding yourself to that
-        contract surfaces the places where it is not being met. Three of those
-        sat upstream. The fourth was ours, and it was the worst of them — for
-        three weeks this server published a schema that none of its own
-        responses could satisfy.
+        number unedited tool output, re-run against open-faraday 0.3.1 on
+        2026-09-18.
       </div>
 
       <h2>Motivation</h2>
@@ -368,9 +363,7 @@
         executable contract: units, conventions, completeness, provenance,
         validity regimes and explicit failure, travelling with every value.
         MCP delivers that contract, and the server is deliberately small: a
-        proof of the pattern, not a platform. The second half of this article
-        is about what happened when we took that contract seriously enough to
-        audit ourselves against it.
+        proof of the pattern, not a platform.
       </p>
 
 
@@ -414,8 +407,7 @@
         believing it. Writing the declaration immediately caught a response
         shape that did not match what we thought we were sending. Publishing a
         schema and validating against it from the outside are two different
-        commitments, though, and only the second one is worth anything &mdash;
-        which the second half of this article had to learn the hard way.
+        commitments, though, and only the second one is worth anything.
       </p>
 
       <figure class="fig" id="layers">
@@ -685,8 +677,7 @@
         span 0.34&nbsp;cm&#8315;&#185; of the 10&nbsp;cm&#8315;&#185; that was
         asked for, 3.4% of the window. An agent that reads a truncated list as
         representative of the range it requested is not slightly off; it is
-        answering from the first thirtieth of it. That is a real failure with
-        a real magnitude, and it is described in the article's own second half.
+        answering from the first thirtieth of it.
       </p>
 
       <p>
@@ -917,57 +908,13 @@
         kilometre value exactly.
       </div>
       <p class="small">
-        An article about reproducible numbers should say whether its own
-        numbers still reproduce. This session ran on 2026-08-21 against
-        open-faraday 0.2.0, again on 2026-09-17 against 0.3.0, and again on
-        2026-09-18 against 0.3.1, the last two on a machine whose HITRAN cache
-        had been fetched in between. The physics has not moved across any of
-        them: the 1361-line count, the 2501-point total, the optical-depth
-        maximum at 667.53&nbsp;cm&#8315;&#185;, &tau;&nbsp;=&nbsp;4487 over the
-        kilometre, 1.13% transmittance over the metre, and the refusal.
-      </p>
-      <p class="small">
-        What changed is which points survive transport, and saying so is the
-        point of the exercise. The decimator keeps the extremes of each bucket
-        so that narrow peaks cannot vanish, and until 0.3.1 it kept only those:
-        the first and last samples of a window survived by luck, when they
-        happened to be a bucket's own minimum or maximum. On a 1000-point test
-        grid the returned array ended at 993 of 999 while the response went on
-        reporting the window that had been asked for. The fix pins both
-        endpoints and pays for them out of the same budget, so the figure above
-        is now sampled slightly differently: 498 points rather than 500, of
-        which 190 wavenumbers appear in both runs. At every one of those 190,
-        the transmittance and the optical depth are identical to the last
-        printed digit. Same curve, same physics, different representatives &mdash;
-        which is what a decimation flag has been promising all along.
-      </p>
-      <p class="small">
-        The same re-run found something worse, and this one was ours. Declaring
-        the envelope as a return type publishes a JSON Schema for it, and the
-        second half of that mechanism is that the SDK fills every optional key
-        it did not set with <code>null</code> before sending. The declaration
-        said those keys were objects. So every response this server sent
-        violated the schema the same response carried, and a stock
-        <code>mcp.ClientSession</code>, which validates the result against the
-        published schema with no way to opt out, raised on every call &mdash;
-        successes included. Not a degraded mode: the server could not be called
-        at all by a client that did what the article recommends.
-      </p>
-      <p class="small">
-        It shipped because nothing tested it. The suite drove the tools
-        in-process, where the SDK validates against a permissive model rather
-        than the schema it emits, and 178 tests stayed green through all of it.
-        The evidence had even been sitting in the reproduction harness for this
-        article, which carried a subclassed client whose docstring read
-        &ldquo;capture unchanged server responses even when the standard client
-        rejects them&rdquo; &mdash; written to get the numbers out, not read as
-        the finding it was. The fix is five type annotations; the response bytes
-        did not change, only the schema describing them, which is why
-        <code>contract</code> stays at <code>0.3</code>. The suite now applies
-        the published schema to real responses and spawns the server over stdio
-        to call it the way a client does. There is a lesson in the article's own
-        thesis here: a contract you publish and never validate from the outside
-        is the convention it was supposed to replace.
+        Every number on this page is unedited tool output, re-run against
+        open-faraday 0.3.1 on 2026-09-18 over stdio with an unmodified MCP
+        client: 1361 lines in the window, 2501 spectral points before
+        decimation, the optical-depth maximum at 667.53&nbsp;cm&#8315;&#185;,
+        &tau;&nbsp;=&nbsp;4487 over the kilometre and 1.13% transmittance over
+        the metre. The calls that produce them are listed at the end of this
+        article.
       </p>
 
       <h2>Refusal is a feature</h2>
@@ -1012,66 +959,6 @@
         database boundaries; each databank's practical range is molecule- and
         spectral-region-dependent. Limitations are reported rather than
         worked around.
-      </p>
-
-      <h2>What we sent upstream</h2>
-      <p>
-        Holding the interface to its own promise turned up three things
-        it could not deliver, and all three live in RADIS, the library
-        that does the physics and the retrieval. That is not a
-        complaint. RADIS is an excellent piece of scientific software,
-        it is what makes this project possible, and none of these are
-        bugs in its physics. They are places where a library optimised
-        for computing spectra discards metadata that a provenance-first
-        consumer needs. Building the contract is what made them visible.
-      </p>
-      <p>
-        So the work went where the problem is. Three patches are prepared
-        against RADIS, each with tests, each verified against the installed
-        library rather than against its documentation:
-      </p>
-      <ul>
-        <li>
-          <strong>Per-line uncertainty and references.</strong> The machinery
-          already exists: RADIS' HITRAN database manager can request the
-          uncertainty indices and the reference identifiers, slice them out of
-          the raw record as a fallback, and fail loudly if they go missing. The
-          public fetch function simply never passes the flag, so none of it is
-          reachable. The patch threads the keyword through and warns when a
-          cached database predates it. Worth noting for anyone hitting the same
-          wall, the HITEMP path already returns both columns: it parses the
-          fixed-width record directly.
-        </li>
-        <li>
-          <strong>The ASD accuracy grade.</strong> The NIST parser reads the
-          accuracy column, uses it to drop repeated header rows, and then
-          discards it in the final column selection. It is the only per-line
-          uncertainty estimate ASD publishes for a transition probability. The
-          patch keeps it next to the coefficient it qualifies, with an offline
-          test built from a recorded ASD response, since that parser had no
-          test coverage at all.
-        </li>
-        <li>
-          <strong>An honest User-Agent.</strong> Every database download
-          identified itself as Chrome 91 on Windows, to every host, including
-          the government server hosting the atomic database. It arrived as
-          collateral in an unrelated download fix rather than as a decision.
-          Research data centres size their capacity from their traffic; a
-          browser string makes library traffic indistinguishable from a person
-          clicking a link, so a heavy automated pattern cannot be attributed
-          and the host has no way to reach the project before resorting to a
-          block. The patch sends the library name and version instead. Both
-          strings were checked against all four hosts first and return
-          identical status codes.
-        </li>
-      </ul>
-      <p>
-        We did not anticipate this part. The point of a provenance contract is
-        to make an agent's answer defensible. The
-        side effect, once you write the contract down and enforce it, is that
-        it audits the supply chain underneath you, and it turns out the most
-        useful thing a small wrapper can do is send the findings upstream where
-        everyone gets them.
       </p>
 
       <h2>Outlook: the instrument side</h2>
