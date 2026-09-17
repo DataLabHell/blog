@@ -327,7 +327,9 @@
         One worked example carries the argument, the CO₂ ν₂ band at
         15&nbsp;µm: 1.13% transmittance at 667.53&nbsp;cm⁻¹ through one metre
         of air at 420&nbsp;ppm, τ&nbsp;≈&nbsp;4487 over a kilometre, every
-        number reproducible tool output. The uncomfortable half of the story
+        number unedited tool output. Re-run four weeks later against a release
+        that deliberately broke the response contract, all 1500 plotted values
+        came back identical. The uncomfortable half of the story
         is in the second part: holding yourself to that contract surfaces the
         places where the data supply chain cannot meet it, and most of those
         turned out to sit upstream, not in our code.
@@ -408,8 +410,7 @@
         the protocol publishes a schema for it and hands back a structured
         object beside the text. A client validates the contract instead of
         believing it. Writing the declaration immediately caught a response
-        shape that did not match what we thought we were sending, which is the
-        usual reward for making a claim checkable.
+        shape that did not match what we thought we were sending.
       </p>
 
       <figure class="fig" id="layers">
@@ -608,7 +609,7 @@
           "3": ["RADIS — an imported LGPL library, never copied — does the physics on your CPU. On first use its documented fetchers download the line list under the database's own terms (CO2/HITRAN ≈ 38 MB) into ~/.radisdb; after that the call is offline.",
                 'fetch_hitran("CO2") → 1361 lines in 660–670 cm⁻¹ → line-by-line τ(ν)'],
           "4": ["The answer returns wrapped: values with units, decimation flagged with the true total, coverage notes, and the source with edition, citation, license and retrieval time.",
-                '{"ok": true, "contract": "0.2", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"source": "HITRAN ... via RADIS 0.17.1", ...}}'],
+                '{"ok": true, "contract": "0.3", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"source": "HITRAN ... via RADIS 0.17.1", ...}}'],
           "5": ["Every data-serving call feeds the session ledger (repeated identical queries are recorded once — a bibliography needs each source once). provenance_report() returns the session's complete bibliography, ready to paste into a methods section.",
                 '{"entries": [{"tool": "spectrum_calculate", "citation": "Pannier & Laux (2019) ...;\n   line data: Gordon et al. (2022) ..."}], "entry_count": 3}']
         };
@@ -739,7 +740,7 @@
       </div>
 
       <figure class="fig" id="spectrumfig">
-        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.2.0)</div>
+        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.2.0, re-run unchanged on 0.3.0)</div>
         <div class="chartbtns" role="group" aria-label="Select displayed quantity">
           <button type="button" data-series="t1m" aria-pressed="true" style="--sc:#0d9488"><i style="background:#0d9488"></i>Transmittance, 1 m path</button>
           <button type="button" data-series="od1km" aria-pressed="false" style="--sc:#d97706"><i style="background:#d97706"></i>Optical depth, 1 km path (log)</button>
@@ -878,7 +879,7 @@
 
       <div class="callout">
         <strong>What travelled with the numbers.</strong> Each value arrived
-        in a versioned envelope (<code>contract: "0.2"</code>) with
+        in a versioned envelope (<code>contract: "0.3"</code>) with
         <code>units: {"wavenumber": "cm-1 (vacuum)", "values": "dimensionless (0-1)"}</code>,
         the provenance record
         <code>"HITRAN line-by-line calculation via RADIS 0.17.1"</code>, a
@@ -894,12 +895,18 @@
         kilometre value exactly.
       </div>
       <p class="small">
-        The envelopes on this page say <code>contract: "0.2"</code> because
-        that is what this session returned, and relabelling them would be the
-        exact thing this article argues against. The contract has since moved
-        to 0.3. Nothing in the molecular or spectrum path changed with it, so
-        these numbers reproduce unaltered; what changed is on the atomic side,
-        and is described below.
+        An article about reproducible numbers should say whether its own
+        numbers still reproduce. This session ran on 2026-08-21 against
+        open-faraday 0.2.0. On 2026-09-17 the same five calls ran again
+        against 0.3.0, a release that deliberately broke the response
+        contract, on a machine whose HITRAN cache had been fetched in
+        between. Every one of the 500 plotted wavenumbers, all 500
+        transmittance values and all 500 optical depths came back identical,
+        as did the 1361-line count, the 2501-point total and the refusal. The
+        only thing that changed in the envelope is the contract version, from
+        <code>0.2</code> to <code>0.3</code>, which is what a contract version
+        is for. What 0.3 did change is on the atomic side, and is described
+        below.
       </p>
 
       <h2>Refusal is a feature</h2>
@@ -917,8 +924,9 @@
         returns:
       </p>
       <pre><code>{ "ok": false,
+  "contract": "0.3",
   "error": { "code": "out_of_validity_range",
-             "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500 K." },
+             "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500.0 K." },
   "notes": ["Consider databank='hitemp' (T &lt; ~2000 K) or 'exomol' for higher temperatures."] }</code></pre>
       <p>
         A structured refusal with a suggested alternative beats a plausible
@@ -1009,8 +1017,8 @@
         the problem: the same query, sent with its bounds, through a
         general-purpose astronomy client that was already installed as a
         dependency. One request per call, nothing stored, and the client
-        identifies itself honestly on the way out. The interesting part is what
-        came back with it. The bounded path returns the accuracy grade, the
+        identifies itself honestly on the way out. The bounded path also returns
+        more than the old one did: the accuracy grade, the
         observed and the calculated wavelength, the oscillator strength, the
         relative intensity and the configuration and term label of both levels
         of every line. It also stops filtering out lines that have no measured
@@ -1024,9 +1032,9 @@
         and the retrieval. That is not a complaint. RADIS is an excellent
         piece of scientific software, it is what makes this project possible,
         and none of these are bugs in its physics. They are places where a
-        library optimised for computing spectra quietly discards metadata that
+        library optimised for computing spectra discards metadata that
         a provenance-first consumer needs. Building the contract is what made
-        them visible, which is the argument for building contracts.
+        them visible.
       </p>
       <p>
         So the work went where the problem is. Three patches are prepared
@@ -1042,8 +1050,8 @@
           public fetch function simply never passes the flag, so none of it is
           reachable. The patch threads the keyword through and warns when a
           cached database predates it. Worth noting for anyone hitting the same
-          wall: the HITEMP path already returns both columns, because it parses
-          the fixed-width record directly.
+          wall, the HITEMP path already returns both columns: it parses the
+          fixed-width record directly.
         </li>
         <li>
           <strong>The ASD accuracy grade.</strong> The NIST parser reads the
@@ -1069,8 +1077,8 @@
         </li>
       </ul>
       <p>
-        This is the part of the story we did not anticipate. The point of a
-        provenance contract is to make an agent's answer defensible. The
+        We did not anticipate this part. The point of a provenance contract is
+        to make an agent's answer defensible. The
         side effect, once you write the contract down and enforce it, is that
         it audits the supply chain underneath you, and it turns out the most
         useful thing a small wrapper can do is send the findings upstream where
@@ -1087,8 +1095,7 @@
         exchange for tool calls that could have been Python.
       </p>
       <p>
-        A second shape is therefore in review, and it is worth being exact
-        about its status: it is a proposal on an open pull request, not
+        A second shape is in review: a proposal on an open pull request, not
         something you can install today. The figures above show what ships. The
         proposal packages the same policy tables, the same refusals and the
         same provenance ledger as a skill an agent reads and executes directly
@@ -1096,15 +1103,14 @@
         to manage.
       </p>
       <p>
-        The difference between the two is worth stating plainly rather than
-        selling them as equivalent. In the server, the refusal is
+        The two are not equivalent. In the server, the refusal is
         <em>enforced</em>: a 1500&nbsp;K HITRAN request cannot get through. In
         a skill, the refusal is <em>instructed</em>: the agent is told to check
         the validity gate first, and a sufficiently careless one can skip it.
         That is a real weakening, and it buys reach.
       </p>
       <p>
-        There is a second cost, and it is the more instructive one. A skill
+        The second cost is the more instructive one. A skill
         that has to run without the package installed cannot import the
         server's policy tables; it has to carry a copy. Two copies of a refusal
         table drift, silently and inevitably, and the drift always favours the
@@ -1113,7 +1119,7 @@
         diverge. Run against the proposed branch it immediately found two:
         one table had fallen behind, and the one holding each database's usage
         terms was missing entirely. That test is the price of the second shape,
-        and it is worth paying, because the alternative is a skill that quietly
+        and it is worth paying, because the alternative is a skill that
         refuses less than the server it claims to mirror.
       </p>
 
@@ -1128,12 +1134,12 @@
         mechanism used here.
       </p>
       <p>
-        The honest reading: the barrier to entry is a weekend, and coverage is
-        not a moat. What survives is narrower. It is the envelope, the refusals,
-        the coverage notes and the session bibliography, and whether they are
-        enforced or merely documented. One detail makes the case better than
-        any argument: a widely used physics skill instructs its agent never to
-        hardcode physical constants, then prints its CODATA values labelled
+        The barrier to entry is a weekend, and coverage is not a moat. What
+        survives is narrower. It is the envelope, the refusals, the coverage
+        notes and the session bibliography, and whether they are enforced or
+        merely documented. A widely used physics skill instructs its agent
+        never to hardcode physical constants, then prints its CODATA values
+        labelled
         with an edition four years older than the one its own dependency ships,
         and hardcodes a table of particle masses immediately below that
         instruction. Nobody was careless. Editions drift, and instructions do
@@ -1186,8 +1192,10 @@
       <p>
         The prompt in the use-case section reproduces the whole session. The
         numbers and the figure on this page are the unedited output of the
-        tool calls it triggers, with these exact parameters (Python 3.13–3.14,
-        <code>pip install '.[spectroscopy]'</code>):
+        tool calls it triggers, with these exact parameters (Python 3.13 or
+        3.14, <code>pip install '.[spectroscopy]'</code>). The calls below
+        were run again on 2026-09-17 against open-faraday 0.3.0 and returned
+        the same values to every printed digit:
       </p>
       <pre><code><span class="c"># the lines, with honest truncation</span>
 lines_fetch_molecular(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">660</span>, wavenum_max=<span class="k">670</span>, database=<span class="s">"hitran"</span>)
