@@ -316,8 +316,9 @@
       </p>
       <div class="callout">
         <strong>TL;DR.</strong> open-faraday is a small open-source MCP server
-        exposing spectroscopic reference data (HITRAN, HITEMP, ExoMol,
-        Kurucz, NIST via RADIS) and CODATA constants to AI agents. Every
+        exposing spectroscopic reference data (HITRAN, HITEMP, ExoMol and
+        Kurucz via RADIS, NIST ASD via astroquery) and CODATA constants to AI
+        agents. Every
         response is a versioned envelope with units, provenance, truncation
         flags and coverage notes; requests outside validity limits get a
         structured refusal instead of a plausible number. The one-line
@@ -567,7 +568,8 @@
           <g data-step="3">
             <line x1="845" y1="135" x2="901" y2="112" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
             <line x1="845" y1="166" x2="901" y2="166" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <text x="873" y="158" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS</text>
+            <text x="873" y="106" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS</text>
+            <text x="873" y="186" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTP</text>
             <line x1="740" y1="270" x2="740" y2="313" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)" marker-start="url(#ar-b)"/>
             <text x="758" y="296" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">cache hit / fill</text>
           </g>
@@ -588,7 +590,9 @@
         <figcaption>One tool call end to end. Teal: the request — a typed JSON-RPC call over stdio, then a
         plain Python call into RADIS, and only if the contract gate passes (a 1500&nbsp;K HITRAN request dies
         here, before any network). Blue: RADIS talking to the archives — HTTPS on first use under each
-        database's own terms, then the local HDF5 cache. Amber: the answer coming back as the envelope, and
+        database's own terms, over HTTPS to hitran.org but plain HTTP to
+        kurucz.harvard.edu, whose certificate is issued for a different hostname; then the local
+        HDF5 cache. Amber: the answer coming back as the envelope, and
         the dashed ledger feed that makes <span class="mono">provenance_report()</span> possible. The teal
         path along the bottom is the exception to "everything goes through RADIS": atomic lines from NIST
         are fetched by one window-bounded query through <span class="mono">astroquery.nist</span>, which
@@ -607,11 +611,11 @@
           "2": ["Arguments are validated and the validity gate runs before anything touches the network: HITRAN above ~700 K is refused as a structured error, with the better databank suggested.",
                 '{"ok": false, "error": {"code": "out_of_validity_range", ...},\n "notes": ["Consider databank=\'hitemp\' (T < ~2000 K) ..."]}'],
           "3": ["RADIS — an imported LGPL library, never copied — does the physics on your CPU. On first use its documented fetchers download the line list under the database's own terms (CO2/HITRAN ≈ 38 MB) into ~/.radisdb; after that the call is offline.",
-                'fetch_hitran("CO2") → 1361 lines in 660–670 cm⁻¹ → line-by-line τ(ν)'],
+                'calc_spectrum("CO2", 655–680 cm⁻¹, 296 K, 420 ppm) → line-by-line τ(ν)'],
           "4": ["The answer returns wrapped: values with units, decimation flagged with the true total, coverage notes, and the source with edition, citation, license and retrieval time.",
                 '{"ok": true, "contract": "0.3", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"source": "HITRAN ... via RADIS 0.17.1", ...}}'],
           "5": ["Every data-serving call feeds the session ledger (repeated identical queries are recorded once — a bibliography needs each source once). provenance_report() returns the session's complete bibliography, ready to paste into a methods section.",
-                '{"entries": [{"tool": "spectrum_calculate", "citation": "Pannier & Laux (2019) ...;\n   line data: Gordon et al. (2022) ..."}], "entry_count": 3}']
+                '{"ok": true, "contract": "0.3", "data": {"entries": [{"tool": "spectrum_calculate",\n   "citation": "Pannier & Laux (2019) ...; line data: Cite the edition actually\n   fetched ... HITRAN2024: Gordon et al. (2026) ..."}], "entry_count": 3}}']
         };
         var current = null;
         buttons.forEach(function(b){
@@ -620,7 +624,7 @@
             if (current === step) { // toggle off
               current = null; svg.classList.remove('focused');
               buttons.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
-              detail.innerHTML = 'Select a step — teal is the request, amber the enveloped answer, blue the RADIS fetch and cache.';
+              detail.innerHTML = 'Select a step — teal is the request, amber the enveloped answer, blue the RADIS fetch and cache. Teal also runs along the bottom: the one bounded ASD query open-faraday makes itself.';
               svg.querySelectorAll('[data-step]').forEach(function(g){ g.classList.remove('on'); });
               return;
             }
@@ -1099,15 +1103,20 @@ provenance_report()</code></pre>
         line-by-line radiative code for CO₂ and HITRAN-like database species,"
         <i>JQSRT</i> <b>222–223</b>, 12–25 (2019); DIT optimization:
         D.C.M. van den Bekerom, E. Pannier, <i>JQSRT</i> <b>261</b>, 107476
-        (2021). <span class="mono">github.com/radis/radis</span> — accessed
-        via open-faraday <span class="mono">spectrum_calculate</span>.</li>
+        (2021). <span class="mono">github.com/radis/radis</span> — the retrieval
+        and physics behind <span class="mono">spectrum_calculate</span>,
+        <span class="mono">lines_fetch_molecular</span> and
+        <span class="mono">lines_fetch_atomic</span> on its Kurucz backend.</li>
         <li id="ref_hitemp">L.S. Rothman et&nbsp;al., "HITEMP, the
         high-temperature molecular spectroscopic database," <i>JQSRT</i>
         <b>111</b>, 2139–2150 (2010).</li>
         <li id="ref_asd">A. Kramida, Yu. Ralchenko, J. Reader, and NIST ASD
         Team, NIST Atomic Spectra Database,
-        <span class="mono">physics.nist.gov/asd</span> — accessed via
-        open-faraday <span class="mono">lines_fetch_atomic</span>.</li>
+        <span class="mono">physics.nist.gov/asd</span> — reached by
+        <span class="mono">lines_fetch_atomic</span> through one
+        window-bounded <span class="mono">astroquery.nist</span> query per
+        call; nothing is downloaded beyond the window and nothing is
+        cached.</li>
       </ol>
     </main>
     <footer></footer>
