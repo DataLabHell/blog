@@ -321,8 +321,8 @@
         response is a versioned envelope with units, provenance, truncation
         flags and coverage notes; requests outside validity limits get a
         structured refusal instead of a plausible number. The one-line
-        position: <em>it refuses to hand an agent a number it cannot
-        defend.</em> The idea worth keeping is scientific context as an
+        rule: <em>a value ships with what you need to check it, or it does
+        not ship.</em> The idea worth keeping is scientific context as an
         executable contract, enforced at runtime; MCP is just the transport.
         One worked example carries the argument, the CO₂ ν₂ band at
         15&nbsp;µm: 1.13% transmittance at 667.53&nbsp;cm⁻¹ through one metre
@@ -331,8 +331,8 @@
         that deliberately broke the response contract, all 1500 plotted values
         came back identical. The uncomfortable half of the story
         is in the second part: holding yourself to that contract surfaces the
-        places where the data supply chain cannot meet it, and most of those
-        turned out to sit upstream, not in our code.
+        places where the data supply chain cannot meet it, and all three of
+        those turned out to sit upstream, not in our code.
       </div>
 
       <h2>Motivation</h2>
@@ -397,9 +397,9 @@
         chosen validity policies. MCP's role is narrower: it gives agents a
         standardized way to consume that contract. The scientific contract is
         open-faraday; MCP is the interface it ships today for reaching it.
-        As a single commitment: the interface will not hand an agent a number
-        it cannot defend, and where it cannot defend one, it says so instead
-        of producing it.
+        As a single commitment: a value leaves this interface with everything
+        a reader needs to check it, and where that is missing, the request is
+        refused rather than answered.
       </p>
       <p>
         There is a difference between a contract a client can read and one it
@@ -905,8 +905,7 @@
         as did the 1361-line count, the 2501-point total and the refusal. The
         only thing that changed in the envelope is the contract version, from
         <code>0.2</code> to <code>0.3</code>, which is what a contract version
-        is for. What 0.3 did change is on the atomic side, and is described
-        below.
+        is for.
       </p>
 
       <h2>Refusal is a feature</h2>
@@ -948,93 +947,16 @@
         worked around.
       </p>
 
-      <h2>Where the contract does not reach</h2>
-      <p>
-        A contract is only worth something if it is also enforced against the
-        party that wrote it. Holding open-faraday to its own promise turned up
-        four places where it could not be kept. One of them was ours and is
-        closed. The other three sit in the layer below, which is the more
-        interesting half of the story.
-      </p>
-      <p>
-        <strong>Uncertainty is available for constants, mostly not for line
-        data.</strong> CODATA values arrive with their standard uncertainty and
-        an exactness flag, because <code>scipy.constants</code> carries both.
-        Molecular line data arrives without any, and not because the databases
-        lack it: HITRAN publishes a per-line uncertainty index and a
-        per-parameter reference identifier for every
-        transition,<sup class="cite"><a href="#ref_hitran">[1]</a></sup> and
-        both are discarded inside the fetcher before open-faraday ever sees the
-        table. Atomic lines are the exception, and only since the rework
-        described below: NIST ASD publishes a letter accuracy grade for every
-        transition probability,<sup class="cite"><a href="#ref_asd">[6]</a></sup>
-        and that grade now rides in the response, labelled as what it is. It is
-        a graded bound, not a standard deviation, and the units block says so
-        rather than letting it be read as one. The honest statement of the
-        promise: units always, uncertainty where the source provides it
-        <em>and</em> the retrieval path preserves it.
-      </p>
-      <p>
-        <strong>The HITRAN edition cannot be pinned.</strong> RADIS asks
-        HITRAN's server for the current release and records the download date,
-        not which edition came back. For a project whose whole pitch is that a
-        figure can be rebuilt from cited data, an unpinnable edition is a
-        direct hit. The envelope handles it the only honest way, by citing the
-        edition through its retrieval date rather than naming one. Our own
-        documentation did worse for a while: an architecture diagram labelled
-        the source <code>HITRAN2020</code> while the code deliberately refused
-        to name any edition, and the current release is
-        HITRAN2024.<sup class="cite"><a href="#ref_hitran">[1]</a></sup> The
-        docs asserted what the code declared unknowable. That is exactly the
-        failure mode the envelope exists to prevent, sitting on our own front
-        page, and it is fixed.
-      </p>
-      <p>
-        <strong>The default atomic source is unversioned and travels over
-        plain HTTP.</strong> The Kurucz line lists<sup class="cite"><a href="#ref_kurucz">[2]</a></sup>
-        carry no version, so the provenance record can only say "state at
-        fetch time". They are also fetched over <code>http://</code>, with no
-        transport authentication. That one cannot be fixed by switching the
-        scheme: the host answers on port 443, but its certificate is issued
-        for a different hostname entirely, so a verified TLS connection to the
-        name RADIS uses is not available today (checked 2026-09-16). Nothing
-        distinguishes the real file from an injected one, which is an awkward
-        property for a provenance-first tool. The mitigation available now is
-        to record the exact URL that answered; the real fix is a pinned
-        checksum, and a certificate.
-      </p>
-      <p>
-        <strong>The optional NIST backend downloaded far more than it
-        said.</strong> Asking for atomic lines in a 2&nbsp;nm window did not
-        send a query for that window. It downloaded the complete line table for
-        the species, stored it, registered it as a local database, and applied
-        the window to the file afterwards. A reasonable caching strategy in
-        general, and a poor fit for a government reference compilation served
-        under standard-reference-data terms. It was documented nowhere.
-      </p>
-      <p>
-        This is the one we could fix ourselves, and the fix was smaller than
-        the problem: the same query, sent with its bounds, through a
-        general-purpose astronomy client that was already installed as a
-        dependency. One request per call, nothing stored, and the client
-        identifies itself honestly on the way out. The bounded path also returns
-        more than the old one did: the accuracy grade, the
-        observed and the calculated wavelength, the oscillator strength, the
-        relative intensity and the configuration and term label of both levels
-        of every line. It also stops filtering out lines that have no measured
-        transition probability, which ASD lists precisely because they are
-        useful for identification. Doing less work returned more data.
-      </p>
-
       <h2>What we sent upstream</h2>
       <p>
-        The remaining three live in RADIS, the library that does the physics
-        and the retrieval. That is not a complaint. RADIS is an excellent
-        piece of scientific software, it is what makes this project possible,
-        and none of these are bugs in its physics. They are places where a
-        library optimised for computing spectra discards metadata that
-        a provenance-first consumer needs. Building the contract is what made
-        them visible.
+        Holding the interface to its own promise turned up three things
+        it could not deliver, and all three live in RADIS, the library
+        that does the physics and the retrieval. That is not a
+        complaint. RADIS is an excellent piece of scientific software,
+        it is what makes this project possible, and none of these are
+        bugs in its physics. They are places where a library optimised
+        for computing spectra discards metadata that a provenance-first
+        consumer needs. Building the contract is what made them visible.
       </p>
       <p>
         So the work went where the problem is. Three patches are prepared
@@ -1083,67 +1005,6 @@
         it audits the supply chain underneath you, and it turns out the most
         useful thing a small wrapper can do is send the findings upstream where
         everyone gets them.
-      </p>
-
-      <h2>Two shapes for the same contract</h2>
-      <p>
-        The server is one way to deliver a contract, and it is the right one
-        when the agent cannot execute code: a chat client speaks the protocol,
-        the server holds the policy, and an invalid request is refused before
-        anything runs. But a growing share of agents <em>can</em> execute code,
-        and for those, a local server is a process to install and manage in
-        exchange for tool calls that could have been Python.
-      </p>
-      <p>
-        A second shape is in review: a proposal on an open pull request, not
-        something you can install today. The figures above show what ships. The
-        proposal packages the same policy tables, the same refusals and the
-        same provenance ledger as a skill an agent reads and executes directly
-        against RADIS and <code>scipy.constants</code>. Same rules, no process
-        to manage.
-      </p>
-      <p>
-        The two are not equivalent. In the server, the refusal is
-        <em>enforced</em>: a 1500&nbsp;K HITRAN request cannot get through. In
-        a skill, the refusal is <em>instructed</em>: the agent is told to check
-        the validity gate first, and a sufficiently careless one can skip it.
-        That is a real weakening, and it buys reach.
-      </p>
-      <p>
-        The second cost is the more instructive one. A skill
-        that has to run without the package installed cannot import the
-        server's policy tables; it has to carry a copy. Two copies of a refusal
-        table drift, silently and inevitably, and the drift always favours the
-        copy nobody tests. So the first thing the proposal needed was not more
-        features but a test that compares the two tables and fails when they
-        diverge. Run against the proposed branch it immediately found two:
-        one table had fallen behind, and the one holding each database's usage
-        terms was missing entirely. That test is the price of the second shape,
-        and it is worth paying, because the alternative is a skill that
-        refuses less than the server it claims to mirror.
-      </p>
-
-      <h2>Not the only one any more</h2>
-      <p>
-        When this work started, nothing else exposed spectroscopic line data to
-        agents through a protocol. That changed in September 2026, when an
-        independent HITRAN MCP server appeared and went from nothing to a
-        substantial tool surface in a week. Elsewhere, the largest open
-        scientific agent toolkits now instruct their agents to read CODATA
-        constants straight from <code>scipy.constants</code> &mdash; the same
-        mechanism used here.
-      </p>
-      <p>
-        The barrier to entry is a weekend, and coverage is not a moat. What
-        survives is narrower. It is the envelope, the refusals, the coverage
-        notes and the session bibliography, and whether they are enforced or
-        merely documented. A widely used physics skill instructs its agent
-        never to hardcode physical constants, then prints its CODATA values
-        labelled
-        with an edition four years older than the one its own dependency ships,
-        and hardcodes a table of particle masses immediately below that
-        instruction. Nobody was careless. Editions drift, and instructions do
-        not notice. A stamped, version-carrying envelope does.
       </p>
 
       <h2>Outlook: the instrument side</h2>
