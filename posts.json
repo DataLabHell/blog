@@ -90,7 +90,7 @@
   {
     "path": "posts/open-faraday.html",
     "title": "Scientific Context as an Executable Contract",
-    "date": "2026-09-17",
+    "date": "2026-09-18",
     "tags": [
       "MCP",
       "LLM",
@@ -103,6 +103,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "Spectroscopic reference data for AI agents under one rule: a value ships with what you need to check it, or it does not ship. The worked example reproduced to every digit a month later. What the rule could not deliver became patches against RADIS."
+    "desc": "Spectroscopic reference data for AI agents under one rule: a value ships with what you need to check it, or it does not ship. The worked example still reproduces to every digit. What the rule could not deliver became patches against RADIS — and then it caught us publishing a schema none of our own responses could satisfy."
   }
 ]
