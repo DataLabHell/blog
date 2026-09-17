@@ -752,7 +752,7 @@
       </div>
 
       <figure class="fig" id="spectrumfig">
-        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.2.0, re-run on 0.3.0 and 0.3.1)</div>
+        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.3.1)</div>
         <div class="chartbtns" role="group" aria-label="Select displayed quantity">
           <button type="button" data-series="t1m" aria-pressed="true" style="--sc:#0d9488"><i style="background:#0d9488"></i>Transmittance, 1 m path</button>
           <button type="button" data-series="od1km" aria-pressed="false" style="--sc:#d97706"><i style="background:#d97706"></i>Optical depth, 1 km path (log)</button>
@@ -762,9 +762,12 @@
         <div class="chart-readout" id="specreadout">hover the curve for exact values</div>
         <figcaption>Verbatim output of two <span class="mono">spectrum_calculate</span> calls, identical
         conditions, path lengths 1&nbsp;m and 1&nbsp;km. Both responses were decimated for transport and
-        flagged (<span class="mono">truncated: true, total_available: 2501</span>; 498 points shown,
-        <span class="mono">max_points=501</span>, extrema preserved per bucket and both window
-        endpoints retained). The
+        flagged (<span class="mono">truncated: true, total_available: 2501</span>;
+        <span class="mono">max_points=501</span> requested, 498 returned). The decimation splits
+        the computed grid into buckets and keeps each bucket's minimum and maximum, so a narrow
+        line cannot be sampled away, and it always keeps both ends of the requested window; where
+        an endpoint is also a bucket extreme the point is kept once, which is why the count lands
+        just under the cap. The
         marked point is the optical-depth maximum near the ν₂ Q branch, at 667.53&nbsp;cm⁻¹ on
         this sampled spectrum (the conventional band centre lies near 667.4&nbsp;cm⁻¹; the exact
         Q-branch shape is sensitive to pressure broadening and line mixing): CO₂ transmittance
@@ -1009,9 +1012,8 @@
         numbers and the figure on this page are the unedited output of the
         tool calls it triggers, with these exact parameters (Python 3.13 or
         3.14, <code>pip install '.[spectroscopy]'</code>). The calls below
-        were run again on 2026-09-18 against open-faraday 0.3.1, over stdio
-        with an unmodified <code>mcp.ClientSession</code>, and returned the
-        same physical values to every printed digit:
+        were run on 2026-09-18 against open-faraday 0.3.1, over stdio with an
+        unmodified <code>mcp.ClientSession</code>:
       </p>
       <pre><code><span class="c"># the lines, with honest truncation</span>
 lines_fetch_molecular(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">660</span>, wavenum_max=<span class="k">670</span>, database=<span class="s">"hitran"</span>)
