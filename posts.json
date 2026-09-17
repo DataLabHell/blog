@@ -103,6 +103,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "open-faraday builds a trustworthy boundary between scientific reference data and AI agents: units, provenance, completeness and validity limits enforced as an executable contract on every response. Demonstrated end to end on the CO₂ contribution to the transmission of air at 15 µm, re-run four weeks later against a release that broke the contract and reproduced to every digit, and on the three things the contract could not deliver, all of which became patches against RADIS."
+    "desc": "Spectroscopic reference data for AI agents under one rule: a value ships with what you need to check it, or it does not ship. The worked example reproduced to every digit a month later. What the rule could not deliver became patches against RADIS."
   }
 ]
