@@ -103,6 +103,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "Spectroscopic reference data for AI agents under one rule: a value ships with what you need to check it, or it does not ship. Units, provenance, completeness and validity limits travel with every number, and a request outside them gets a structured refusal instead of a plausible one. One worked example carries it: the CO₂ ν₂ band at 15 µm, every figure unedited tool output."
+    "desc": "Spectroscopic reference data for AI agents under one rule: a value ships with what you need to check it, or it does not ship. Units, provenance and completeness on every number, and a refusal past the validity limits."
   }
 ]
