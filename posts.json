@@ -89,7 +89,7 @@
   },
   {
     "path": "posts/open-faraday.html",
-    "title": "Scientific Context as an Executable Contract",
+    "title": "One Metre of Air, 1.13% of the Light",
     "date": "2026-09-18",
     "tags": [
       "MCP",
@@ -103,6 +103,6 @@
     ],
     "author": "Daniel Hauser",
     "image": "static/posts/open-faraday.png",
-    "desc": "Spectroscopic reference data for AI agents under one rule: a value ships with what you need to check it, or it does not ship. Units, provenance and completeness on every number, and a refusal past the validity limits."
+    "desc": "A line-by-line journey through CO₂'s 15 µm band—and how open-faraday gives scientific agents verifiable spectra, units, provenance and the ability to refuse the wrong calculation."
   }
 ]

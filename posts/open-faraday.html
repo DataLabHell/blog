@@ -123,14 +123,6 @@
         margin-top: 0.35rem;
       }
 
-      /* ── wide figure breakout (diagram needs the room) ── */
-      .article-content .fig-breakout {
-        width: min(94vw, 1080px);
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
       /* ── interactive figure panels (light) ── */
       .article-content .fig {
         background: var(--off-white);
@@ -147,12 +139,6 @@
         color: var(--mid-gray);
         margin-bottom: 0.75rem;
       }
-      .article-content .fig svg {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-      }
       .article-content .fig figcaption {
         color: var(--mid-gray);
         text-align: left;
@@ -166,14 +152,12 @@
       }
 
       /* ── figure controls ── */
-      .flowsteps,
       .chartbtns {
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
         margin: 0 0 0.6rem;
       }
-      .flowsteps button,
       .chartbtns button {
         font-family: inherit;
         font-size: 0.75rem;
@@ -188,16 +172,9 @@
         gap: 7px;
         transition: color 0.15s, border-color 0.15s, background 0.15s;
       }
-      .flowsteps button:hover,
       .chartbtns button:hover {
         color: var(--dark);
         border-color: var(--mid-gray);
-      }
-      .flowsteps button[aria-pressed="true"] {
-        color: #fff;
-        background: var(--accent);
-        border-color: var(--accent);
-        font-weight: 600;
       }
       .chartbtns button[aria-pressed="true"] {
         color: var(--dark);
@@ -205,7 +182,6 @@
         border-color: var(--mid-gray);
         font-weight: 600;
       }
-      .flowsteps button:focus-visible,
       .chartbtns button:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 2px;
@@ -216,29 +192,6 @@
         border-radius: 2px;
         display: inline-block;
       }
-      .stepdetail {
-        font-size: 0.82rem;
-        line-height: 1.6;
-        color: var(--mid-gray);
-        background: var(--white);
-        border: 1px solid var(--light-gray);
-        border-radius: 4px;
-        padding: 0.7rem 0.9rem;
-        margin: 0 0 0.6rem;
-        min-height: 74px;
-      }
-      .stepdetail .mono {
-        color: #0f766e;
-        font-size: 0.74rem;
-        display: block;
-        margin-top: 6px;
-        overflow-x: auto;
-        white-space: pre;
-      }
-      #flowsvg [data-step] { transition: opacity 0.18s; }
-      #flowsvg.focused [data-step] { opacity: 0.25; }
-      #flowsvg.focused [data-step].on { opacity: 1; }
-
       /* ── spectrum chart ── */
       .chart-wrap { position: relative; height: 340px; }
       .chart-wrap canvas {
@@ -302,8 +255,8 @@
     <header></header>
     <main>
       <p class="post-subtitle">
-        What it takes for an AI agent to return a number you can check
-        &mdash; and what breaks when you actually try.
+        A line-by-line journey through the CO₂ 15&nbsp;µm band &mdash; and the
+        scientific contract an AI agent needs to reason about it safely.
       </p>
 
       <p class="repo-link">
@@ -314,459 +267,143 @@
           github.com/DataLabHell/open-faraday
         </a>
       </p>
+
       <div class="callout">
-        <strong>TL;DR.</strong> open-faraday is a small open-source MCP server
-        exposing spectroscopic reference data (HITRAN, HITEMP, ExoMol and
-        Kurucz via RADIS, NIST ASD via astroquery) and CODATA constants to AI
-        agents. Every
-        response is a versioned envelope with units, provenance, truncation
-        flags and coverage notes; requests outside validity limits get a
-        structured refusal instead of a plausible number. The one-line
-        rule: <em>a value ships with what you need to check it, or it does
-        not ship.</em> The idea worth keeping is scientific context as an
-        executable contract, enforced at runtime; MCP is just the transport.
-        One worked example carries the argument, the CO₂ ν₂ band at
-        15&nbsp;µm: 1.13% transmittance at 667.53&nbsp;cm⁻¹ through one metre
-        of air at 420&nbsp;ppm, τ&nbsp;≈&nbsp;4487 over a kilometre, every
-        number tool output, rounded for display, re-run against open-faraday
-        v0.3.1 on 2026-09-18.
+        <strong>The result.</strong> At 667.53&nbsp;cm⁻¹, close to the centre
+        of CO₂'s 15&nbsp;µm bending band, the CO₂ in a one-metre path of
+        otherwise ordinary air at 420&nbsp;ppm transmits only
+        <strong>1.13%</strong> of an incident monochromatic beam &mdash; CO₂
+        alone, with water vapour and every other absorber excluded. Stretch the
+        same idealized gas to one kilometre and its optical depth is about
+        <strong>4487</strong>. open-faraday calculated both through a real MCP
+        session &mdash; and returned the assumptions, units, provenance,
+        truncation and validity limits with the numbers.
       </div>
 
-      <h2>Motivation</h2>
+      <h2>A metre of air can go dark</h2>
       <p>
-        AI agents are moving into scientific work, and the question has
-        shifted from whether an agent can call a tool to whether it can be
-        trusted with one. Anyone who has tried knows the failure modes: a
-        physical value supplied from model memory, a unit convention lost
-        between response and answer, a partial result treated as a complete
-        one. None announces itself; the silence is what makes them dangerous
-        in scientific use.
+        Air looks transparent because our eyes sample a friendly part of the
+        spectrum. Move to a wavelength of 14.98&nbsp;µm and the situation
+        changes. A CO₂ molecule can bend: its two oxygen atoms move while the
+        carbon sits between them, creating a time-varying electric dipole that
+        couples strongly to infrared radiation. Rotation splits that vibration
+        into a dense forest of lines. Near the Q branch, many of those lines
+        crowd together.
       </p>
       <p>
-        The data itself is not the problem. Curated reference data for
-        spectroscopy already exists: HITRAN's molecular line
-        lists,<sup class="cite"><a href="#ref_hitran">[1]</a></sup> Kurucz's
-        atomic tables,<sup class="cite"><a href="#ref_kurucz">[2]</a></sup>
-        the CODATA constants,<sup class="cite"><a href="#ref_codata">[3]</a></sup>
-        among many others. What fails is the step between that data and an
-        agent's answer: retrieving a value does not establish its units,
-        physical convention, completeness, validity regime, database edition
-        or citation. Closing that gap requires no new science, just interface
-        constraints enforced at a protocol boundary rather than left to the
-        agent's discretion.
-        <a href="https://github.com/DataLabHell/open-faraday" target="_blank" rel="noopener">open-faraday</a>
-        addresses exactly this step, exposing
-        RADIS<sup class="cite"><a href="#ref_radis">[4]</a></sup> and
-        scipy.constants<sup class="cite"><a href="#ref_codata">[3]</a></sup>
-        through a fixed response contract. The
-        durable idea is not the protocol — it is scientific context as an
-        executable contract: units, conventions, completeness, provenance,
-        validity regimes and explicit failure, travelling with every value.
-        MCP delivers that contract, and the server is deliberately small: a
-        proof of the pattern, not a platform.
-      </p>
-
-
-      <h2>Scientific context has to cross the interface</h2>
-      <p>
-        Scientific databases already expose excellent programmatic interfaces,
-        and none of what follows requires MCP: typed values and units,
-        truncation metadata, provenance, structured errors and validity
-        checks can all be served by REST, GraphQL, gRPC or a plain Python
-        library, and OpenAPI has offered machine-readable tool discovery for
-        years. The problem we are interested in is different: <em>what
-        information has to cross the boundary together with a scientific
-        result, if an agent is expected to reason with it?</em>
+        Spectroscopists usually label this axis by wavenumber
+        <var>ν̃</var>&nbsp;=&nbsp;1/<var>λ</var>, so 667.53&nbsp;cm⁻¹ is
+        14.98&nbsp;µm. CO₂ is a linear molecule: its symmetric stretch does
+        not create a changing dipole in the isolated molecule, while its
+        doubly degenerate bend, ν₂, does. The accompanying rotational
+        transitions form P, Q and R structure. The Q branch is the central
+        pile-up of Δ<var>J</var>&nbsp;=&nbsp;0 transitions &mdash; not one
+        impossibly strong line, but many quantum transitions overlapping
+        after thermal populations and collisional broadening are accounted
+        for.
       </p>
       <p>
-        A spectral line is not just a number. Its meaning depends on units,
-        conventions, database edition, isotopologue, the completeness of the
-        query, and the physical regime in which the underlying data is
-        appropriate. The same holds for a calculated spectrum: parameters,
-        assumptions, provenance and validity limits are part of the result.
+        We asked <a href="https://github.com/DataLabHell/open-faraday" target="_blank" rel="noopener">open-faraday</a>
+        to isolate the CO₂ contribution between 655 and 680&nbsp;cm⁻¹ at
+        296&nbsp;K and 1.01325&nbsp;bar, with a mole fraction of
+        420&nbsp;×&nbsp;10⁻⁶. Water vapour and every other absorber were
+        excluded. The 420&nbsp;ppm value is a round reference and, by 2026, a
+        low one: NOAA reports a 427.55&nbsp;ppm monthly mean at Mauna Loa for
+        August 2026.<sup class="cite"><a href="#ref_noaa">[3]</a></sup> This
+        run was not repeated at that value. RADIS performed the line-by-line physics locally using
+        HITRAN data;<sup class="cite"><a href="#ref_hitran">[1]</a></sup><sup class="cite"><a href="#ref_radis">[2]</a></sup>
+        open-faraday supplied the guarded interface around that calculation.
       </p>
       <p>
-        open-faraday makes these properties an executable scientific
-        contract: the interface requires them, validates them, returns them
-        in a predictable structure, and refuses requests that violate its
-        chosen validity policies. MCP's role is narrower: it gives agents a
-        standardized way to consume that contract. The scientific contract is
-        open-faraday; MCP is the interface it ships today for reaching it.
-        As a single commitment: a value ships with the scientific context that
-        is available and with its unknowns named, and requests that violate a
-        defined validity policy are refused rather than answered. The
-        distinction that buys is between an undisclosed assumption and a
-        disclosed limitation — the worked example below is served even though
-        the exact HITRAN edition cannot be determined, and says so.
-      </p>
-      <p>
-        There is a difference between a contract a client can read and one it
-        can check, and for a while this was only the first. The envelope was a
-        convention inside a block of text: correct, documented, and impossible
-        to validate without parsing the text and trusting that its shape had
-        not changed. Each tool now declares the envelope as its return type, so
-        the protocol publishes a schema for it and hands back a structured
-        object beside the text. A client validates the contract instead of
-        believing it. Writing the declaration immediately caught a response
-        shape that did not match what we thought we were sending. Publishing a
-        schema and validating against it from the outside are two different
-        commitments, though, and only the second one is worth anything.
+        The distinction matters. open-faraday is not a new spectroscopy code
+        or database. Its innovation is the scientific contract: an agent gets
+        a value only together with the context needed to interpret it, and a
+        request outside a defined validity policy is refused instead of being
+        answered with a plausible-looking spectrum.
       </p>
 
-      <figure class="fig" id="layers">
-        <div class="ttl">Figure 1 · Three layers — the contract is not the transport</div>
-        <svg viewBox="0 0 1100 540" role="img"
-             aria-label="Three-layer diagram. Top: scientific databases and physics engines — HITRAN, Kurucz, NIST, CODATA, reached through RADIS, astroquery and scipy. Middle: open-faraday, scientific context as an executable contract. Bottom: two consumers of that contract — a Python import returning the same envelope in-process, and MCP, the only interface the server ships, which an agent connects to.">
-          <defs>
-            <marker id="lyr-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0L10 5L0 10z" fill="#8a8f98"/></marker>
-          </defs>
-          <g font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="280" y="25" width="540" height="95" rx="10" fill="#ffffff" stroke="#d0d0d0" stroke-width="1.4"/>
-            <text x="550" y="62" text-anchor="middle" fill="#1f2124" font-size="18" font-weight="700">Scientific databases &amp; physics engines</text>
-            <text x="550" y="90" text-anchor="middle" fill="#666666" font-size="13.5" font-family="JetBrains Mono,monospace">HITRAN · Kurucz · NIST · CODATA — RADIS · astroquery · scipy</text>
-
-            <line x1="550" y1="120" x2="550" y2="156" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
-
-            <rect x="310" y="160" width="480" height="105" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.6"/>
-            <text x="550" y="200" text-anchor="middle" fill="#1f2124" font-size="19" font-weight="700">open-faraday</text>
-            <text x="550" y="226" text-anchor="middle" fill="#0f766e" font-size="14.5">scientific context as an executable contract</text>
-            <text x="550" y="250" text-anchor="middle" fill="#0f766e" font-size="13" font-family="JetBrains Mono,monospace">requires · validates · structures · refuses</text>
-
-            <line x1="550" y1="265" x2="402" y2="316" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
-            <line x1="550" y1="265" x2="698" y2="316" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
-
-            <rect x="250" y="320" width="290" height="80" rx="10" fill="#ffffff" stroke="#d0d0d0" stroke-width="1.4"/>
-            <text x="395" y="355" text-anchor="middle" fill="#1f2124" font-size="15.5" font-weight="700">Python import</text>
-            <text x="395" y="378" text-anchor="middle" fill="#8a8f98" font-size="13">same envelope, in-process</text>
-
-            <rect x="560" y="320" width="290" height="80" rx="10" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.6"/>
-            <text x="705" y="355" text-anchor="middle" fill="#1f2124" font-size="15.5" font-weight="700">MCP</text>
-            <text x="705" y="378" text-anchor="middle" fill="#2d6ff5" font-size="13">agent interface · the shipped surface</text>
-
-            <line x1="705" y1="400" x2="705" y2="436" stroke="#8a8f98" stroke-width="1.8" marker-end="url(#lyr-ar)"/>
-
-            <rect x="560" y="440" width="290" height="75" rx="10" fill="#ffffff" stroke="#d0d0d0" stroke-width="1.4"/>
-            <text x="705" y="472" text-anchor="middle" fill="#1f2124" font-size="15.5" font-weight="700">Agent</text>
-            <text x="705" y="495" text-anchor="middle" fill="#8a8f98" font-size="13">LLM in an MCP host</text>
-          </g>
-        </svg>
-        <figcaption>The layering behind the article. Databases and physics engines own the data and
-        the physics; open-faraday reaches them through RADIS, astroquery and scipy rather than through
-        clients of its own. open-faraday wraps access to them in one executable contract: required fields,
-        validation, structured refusal. MCP over stdio is the only interface the server ships today
-        (there is no HTTP API), but because the contract lives in the response envelope rather than
-        in the transport, importing the module in Python hands back exactly the same envelope.</figcaption>
-      </figure>
-
+      <h2>From molecular lines to missing photons</h2>
       <p>
-        In the setup used here, Claude Code launches open-faraday locally and
-        talks to it over the
-        <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">Model Context Protocol</a>
-        (stdio); the agent discovers five typed tools. The schemas alone are
-        not the contract. What makes it <em>executable</em> is runtime
-        enforcement: validated arguments, mandatory response metadata, checked
-        validity policies, and structured refusals instead of plausible
-        results. Context stops being documentation the agent is expected to
-        remember and becomes part of the behavior of the interface. The
-        figure below shows the path of one tool call; the buttons highlight
-        each stage.
-      </p>
-
-      <figure class="fig fig-breakout" id="dataflow">
-        <div class="ttl">Figure 2 · Data flow — one tool call, from question to citable envelope</div>
-        <div class="flowsteps" role="group" aria-label="Highlight a step of the data flow">
-          <button type="button" data-target="1" aria-pressed="false">1 · Tool call</button>
-          <button type="button" data-target="2" aria-pressed="false">2 · Contract gate</button>
-          <button type="button" data-target="3" aria-pressed="false">3 · RADIS fetch &amp; physics</button>
-          <button type="button" data-target="4" aria-pressed="false">4 · Envelope back</button>
-          <button type="button" data-target="5" aria-pressed="false">5 · The receipt</button>
-        </div>
-        <div class="stepdetail" id="stepdetail">Select a step — or read the whole path: teal is the request
-        moving right, amber is the enveloped answer moving back, blue is RADIS talking to the archives and
-        its local cache. Teal also runs along the bottom: the one retrieval open-faraday performs itself, a
-        single window-bounded ASD query through astroquery that stores nothing.</div>
-        <svg id="flowsvg" viewBox="0 0 1100 500" role="img"
-             aria-label="Data flow: an agent sends a JSON-RPC tool call over stdio to open-faraday, which validates it against the contract and then takes one of two retrieval paths. For line lists and spectra it calls RADIS as a Python library; RADIS downloads a whole species from hitran.org or kurucz.harvard.edu on first use and caches it locally. For atomic lines from NIST it sends one window-bounded query to physics.nist.gov through astroquery and caches nothing. The answer returns as an envelope with data, units, provenance and truncation flags; a session ledger feeds provenance_report.">
-          <defs>
-            <marker id="ar-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0L10 5L0 10z" fill="#0d9488"/></marker>
-            <marker id="ar-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0L10 5L0 10z" fill="#d97706"/></marker>
-            <marker id="ar-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-              <path d="M0 0L10 5L0 10z" fill="#2d6ff5"/></marker>
-          </defs>
-
-          <!-- nodes -->
-          <g data-step="1" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="20" y="105" width="200" height="135" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.4"/>
-            <text x="120" y="135" text-anchor="middle" fill="#1f2124" font-size="20" font-weight="700">Agent</text>
-            <text x="120" y="158" text-anchor="middle" fill="#666666" font-size="14.5">LLM in an MCP host</text>
-            <text x="120" y="176" text-anchor="middle" fill="#666666" font-size="14.5">(Claude Desktop / Code)</text>
-            <text x="120" y="218" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">sees only typed tools</text>
-          </g>
-
-          <g data-step="2" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="295" y="85" width="272" height="185" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="1.4"/>
-            <text x="431" y="115" text-anchor="middle" fill="#1f2124" font-size="20" font-weight="700">open-faraday</text>
-            <text x="431" y="137" text-anchor="middle" fill="#666666" font-size="14.5">MCP server · the contract</text>
-            <line x1="315" y1="151" x2="547" y2="151" stroke="rgba(0,0,0,.12)"/>
-            <text x="431" y="173" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">validate args · validity gate</text>
-            <text x="431" y="192" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">units · truncation · errors</text>
-            <text x="431" y="211" text-anchor="middle" fill="#0f766e" font-size="14" font-family="JetBrains Mono,monospace">session source ledger</text>
-            <text x="431" y="245" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">no bulk fetchers of its own</text>
-          </g>
-
-          <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="635" y="85" width="210" height="185" rx="10" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.4"/>
-            <text x="740" y="115" text-anchor="middle" fill="#1f2124" font-size="20" font-weight="700">RADIS</text>
-            <text x="740" y="137" text-anchor="middle" fill="#666666" font-size="14.5">LGPL library, imported</text>
-            <line x1="653" y1="151" x2="827" y2="151" stroke="rgba(0,0,0,.12)"/>
-            <text x="740" y="173" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">line-by-line physics</text>
-            <text x="740" y="192" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">documented fetchers</text>
-            <text x="740" y="211" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">CPU, on your machine</text>
-          </g>
-
-          <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="905" y="84" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
-            <text x="997" y="114" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">hitran.org</text>
-            <rect x="905" y="142" width="185" height="48" rx="8" fill="#ffffff" stroke="#d0d0d0"/>
-            <text x="997" y="172" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">kurucz.harvard.edu</text>
-            <text x="997" y="72" text-anchor="middle" fill="#8a8f98" font-size="13">curated archives · their terms</text>
-          </g>
-
-          <!-- second retrieval path: one bounded query, no cache -->
-          <g data-step="3" font-family="Space Grotesk,system-ui,sans-serif">
-            <rect x="905" y="421" width="185" height="48" rx="8" fill="#ffffff" stroke="#0d9488"/>
-            <text x="997" y="451" text-anchor="middle" fill="#666666" font-size="14" font-family="JetBrains Mono,monospace">physics.nist.gov</text>
-            <path d="M567 235 H600 V445 H901" fill="none" stroke="#0d9488" stroke-width="1.8" marker-end="url(#ar-t)"/>
-            <text x="726" y="464" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">astroquery.nist · bounded ASD query</text>
-            <text x="726" y="482" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">window only · nothing cached</text>
-          </g>
-
-          <!-- cache -->
-          <g data-step="3">
-            <path d="M645 330 h190 v55 a95,15 0 0 1 -190,0 v-55" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.2"/>
-            <ellipse cx="740" cy="330" rx="95" ry="15" fill="#ffffff" stroke="#2d6ff5" stroke-width="1.2"/>
-            <text x="740" y="368" text-anchor="middle" fill="#2d6ff5" font-size="14" font-family="JetBrains Mono,monospace">~/.radisdb</text>
-            <text x="740" y="386" text-anchor="middle" fill="#8a8f98" font-size="13" font-family="JetBrains Mono,monospace">HDF5, CO2 ≈ 38 MB</text>
-          </g>
-
-          <!-- arrows: request (teal) -->
-          <g data-step="1">
-            <line x1="220" y1="170" x2="291" y2="170" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
-            <text x="255" y="155" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">tool call</text>
-            <text x="255" y="192" text-anchor="middle" fill="#8a8f98" font-size="12" font-family="JetBrains Mono,monospace">stdio</text>
-          </g>
-          <g data-step="2">
-            <line x1="567" y1="170" x2="631" y2="170" stroke="#0d9488" stroke-width="2" marker-end="url(#ar-t)"/>
-            <text x="599" y="147" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">Python</text>
-            <text x="599" y="162" text-anchor="middle" fill="#0d9488" font-size="13" font-family="JetBrains Mono,monospace">call</text>
-            <text x="599" y="192" text-anchor="middle" fill="#8a8f98" font-size="12" font-family="JetBrains Mono,monospace">gated</text>
-          </g>
-          <g data-step="3">
-            <line x1="845" y1="135" x2="901" y2="112" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <line x1="845" y1="166" x2="901" y2="166" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)"/>
-            <text x="873" y="106" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTPS</text>
-            <text x="873" y="186" text-anchor="middle" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">HTTP</text>
-            <line x1="740" y1="270" x2="740" y2="313" stroke="#2d6ff5" stroke-width="1.6" marker-end="url(#ar-b)" marker-start="url(#ar-b)"/>
-            <text x="758" y="296" fill="#2d6ff5" font-size="12" font-family="JetBrains Mono,monospace">cache hit / fill</text>
-          </g>
-
-          <!-- arrows: response (amber) -->
-          <g data-step="4">
-            <path d="M632 252 C 550 322, 340 322, 224 252" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#ar-a)"/>
-            <text x="430" y="424" text-anchor="middle" fill="#d97706" font-size="13" font-family="JetBrains Mono,monospace">envelope: contract · data · units · provenance · truncated</text>
-          </g>
-          <g data-step="5">
-            <rect x="306" y="330" width="250" height="64" rx="9" fill="#ffffff" stroke="#d97706" stroke-width="1.2"/>
-            <text x="431" y="357" text-anchor="middle" fill="#b45309" font-size="14.5" font-family="JetBrains Mono,monospace">provenance_report()</text>
-            <text x="431" y="379" text-anchor="middle" fill="#666666" font-size="13">session bibliography, paste-ready</text>
-            <line x1="431" y1="270" x2="431" y2="326" stroke="#d97706" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ar-a)"/>
-            <text x="447" y="302" fill="#d97706" font-size="12" font-family="JetBrains Mono,monospace">ledger</text>
-          </g>
-        </svg>
-        <figcaption>One tool call end to end. Teal: the request — a typed JSON-RPC call over stdio, then a
-        plain Python call into RADIS, and only if the contract gate passes (a 1500&nbsp;K HITRAN request dies
-        here, before any network). Blue: RADIS talking to the archives — HTTPS on first use under each
-        database's own terms, over HTTPS to hitran.org but plain HTTP to
-        kurucz.harvard.edu, whose certificate is issued for a different hostname; then the local
-        HDF5 cache. Amber: the answer coming back as the envelope, and
-        the dashed ledger feed that makes <span class="mono">provenance_report()</span> possible. The teal
-        path along the bottom is the exception to "everything goes through RADIS": atomic lines from NIST
-        are fetched by one window-bounded query through <span class="mono">astroquery.nist</span>, which
-        downloads only the requested window and keeps nothing. RADIS' own NIST fetcher would download and
-        store the species' entire line table instead.</figcaption>
-      </figure>
-
-      <script>
-      document.addEventListener('DOMContentLoaded', function(){
-        var svg = document.getElementById('flowsvg');
-        var detail = document.getElementById('stepdetail');
-        var buttons = document.querySelectorAll('.flowsteps button');
-        var texts = {
-          "1": ["The agent never sees a website. At session start it received five tool schemas; it emits a typed call.",
-                'call_tool("spectrum_calculate", {"molecule":"CO2","wavenum_min":655,"wavenum_max":680,\n  "Tgas":296,"mole_fraction":0.00042,"path_length_cm":100,"quantity":"transmittance"})'],
-          "2": ["Arguments are validated and the validity gate runs before anything touches the network: HITRAN above ~700 K is refused as a structured error, with the better databank suggested.",
-                '{"ok": false, "error": {"code": "out_of_validity_range", ...},\n "notes": ["Consider databank=\'hitemp\' (T < ~2000 K) ..."]}'],
-          "3": ["RADIS — an imported LGPL library, never copied — does the physics on your CPU. On first use its documented fetchers download the line list under the database's own terms (CO2/HITRAN ≈ 38 MB) into ~/.radisdb; after that the call is offline.",
-                'calc_spectrum("CO2", 655–680 cm⁻¹, 296 K, 420 ppm) → line-by-line τ(ν)'],
-          "4": ["The answer returns wrapped: values with units, decimation flagged with the true total, coverage notes, and the source with edition, citation, license and retrieval time.",
-                '{"ok": true, "contract": "0.3", "units": {"values": "dimensionless (0-1)"}, "truncated": true,\n "total_available": 2501, "provenance": {"source": "HITRAN ... via RADIS 0.17.1", ...}}'],
-          "5": ["Every data-serving call feeds the session ledger (repeated identical queries are recorded once — a bibliography needs each source once). provenance_report() returns the session's complete bibliography, ready to paste into a methods section.",
-                '{"ok": true, "contract": "0.3", "data": {"entries": [{"tool": "spectrum_calculate",\n   "citation": "Pannier & Laux (2019) ...; line data: Cite the edition actually\n   fetched ... HITRAN2024: Gordon et al. (2026) ..."}], "entry_count": 3}}']
-        };
-        var current = null;
-        buttons.forEach(function(b){
-          b.addEventListener('click', function(){
-            var step = b.getAttribute('data-target');
-            if (current === step) { // toggle off
-              current = null; svg.classList.remove('focused');
-              buttons.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
-              detail.innerHTML = 'Select a step — teal is the request, amber the enveloped answer, blue the RADIS fetch and cache. Teal also runs along the bottom: the one bounded ASD query open-faraday makes itself.';
-              svg.querySelectorAll('[data-step]').forEach(function(g){ g.classList.remove('on'); });
-              return;
-            }
-            current = step; svg.classList.add('focused');
-            buttons.forEach(function(x){ x.setAttribute('aria-pressed', x===b ? 'true' : 'false'); });
-            svg.querySelectorAll('[data-step]').forEach(function(g){
-              g.classList.toggle('on', g.getAttribute('data-step') === step);
-            });
-            var t = texts[step];
-            detail.innerHTML = t[0] + '<span class="mono">' + t[1] + '</span>';
-          });
-        });
-      });
-      </script>
-
-      <h2>Use case: The CO₂ contribution in one metre of air</h2>
-      <p>
-        The example question: <em>how strongly does the CO₂ in ordinary air absorb
-        thermal infrared near 15&nbsp;µm?</em> This spectral region is dominated by the
-        ν₂ bending mode of CO₂, a central absorption feature of the greenhouse
-        effect. The calculation isolates CO₂: the spectrum contains no other
-        constituent of air. The session was run from Claude Code with
-        open-faraday registered as a local MCP server, driven by this prompt:
-      </p>
-      <blockquote>
-        Using only the open-faraday tools, no values from memory: fetch the CO₂
-        line list between 660 and 670 cm⁻¹ from HITRAN. Then compute the CO₂
-        contribution to transmittance in air at a CO₂ mole fraction of
-        420 ppm (296 K, 1.01325 bar) over a 1 m path between 655 and
-        680 cm⁻¹, and the optical depth (RADIS quantity "absorbance") of the
-        same homogeneous gas over 1 km. Try the same calculation at 1500 K.
-        Finally, give me the provenance report. Report every value with its
-        units and truncation flags.
-      </blockquote>
-
-      <p>
-        <strong>Line data.</strong>
-        <code>lines_fetch_molecular("CO2", 660, 670)</code> returns the first
-        40 line records (the default cap) together with
-        <code>truncated: true, total_available: 1361</code> &mdash; 1361 lines of the
-        main isotopologue (the tool's <code>isotope="1"</code> default) in a
-        10&nbsp;cm&#8315;&#185; window.<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
-        The flag is the point: without machine-readable completeness
-        metadata, an agent is free to mistake 40 records for the full line
-        list.
+        The molecular-line query found 1361 transitions of the principal CO₂
+        isotopologue between 660 and 670&nbsp;cm⁻¹. The tool returned only its
+        first 40 rows, but it did not let 40 masquerade as the whole answer:
+        <code>truncated: true</code>, <code>total_available: 1361</code>, and
+        <code>window_returned_cm-1: 660.007–660.349</code>. Those records cover
+        just 3.4% of the requested window and are the backend's first rows,
+        not its strongest lines. The prescribed next move is to query narrower
+        windows until truncation is false.
       </p>
       <p>
-        A flag says a result was cut; it does not say how much of the question
-        it still answers. Since 0.3.1 the response also reports the window
-        those 40 rows actually cover,
-        <code>window_returned_cm-1: {min: 660.007, max: 660.349}</code>, and
-        says in a note that they are the backend's first rows rather than the
-        strongest lines. Those two numbers change the reading: the 40 records
-        span 0.34&nbsp;cm&#8315;&#185; of the 10&nbsp;cm&#8315;&#185; that was
-        asked for, 3.4% of the window. An agent that reads a truncated list as
-        representative of the range it requested is not slightly off; it is
-        answering from the first thirtieth of it.
-      </p>
-
-      <p>
-        <strong>Spectrum.</strong>
-        <code>spectrum_calculate("CO2", 655–680 cm⁻¹, Tgas=296 K, p=1.01325
-        bar, x=420 ppm, L=1 m)</code> — a CO₂ mole fraction
-        x<sub>CO₂</sub>&nbsp;=&nbsp;420&nbsp;×&nbsp;10⁻⁶. RADIS performs the
-        line-by-line calculation locally, on HITRAN data fetched under
-        HITRAN's own terms.<sup class="cite"><a href="#ref_hitran">[1]</a></sup>
-        RADIS calls τ&nbsp;=&nbsp;−ln&nbsp;T "absorbance"; this post calls it
-        optical depth throughout, to avoid confusion with the base-10
-        absorbance of analytical spectroscopy.
+        This is not bookkeeping trivia. The strongest transition can lie far
+        outside the returned first 3.4% of the window, so taking the largest
+        of those 40 intensities as “the strongest line in the window” is not a
+        noisy estimate; it is an unsupported answer. A Boolean truncation flag
+        says the result is incomplete. The returned sub-window explains how it
+        is incomplete and gives an agent a safe recovery strategy.
       </p>
 
       <h3>The physics in three equations</h3>
       <p>
-        The quantity the tool returns is governed by the Beer–Lambert law.
-        Monochromatic radiation of intensity <var>I</var>₀ entering a
-        homogeneous absorbing column of length <var>L</var> leaves it with
-        intensity <var>I</var>, and the transmittance at wavenumber
-        <var>ν</var> is
+        For a homogeneous absorber, Beer–Lambert relates the transmitted and
+        incident monochromatic intensities:
       </p>
       <div class="eq">
-        <var>T</var>(<var>ν</var>) =
-        <var>I</var>(<var>ν</var>)&thinsp;/&thinsp;<var>I</var>₀(<var>ν</var>) =
-        <var>e</var><sup>−<var>τ</var>(<var>ν</var>)</sup>
+        <var>T</var>(<var>ν̃</var>) =
+        <var>I</var>(<var>ν̃</var>)&thinsp;/&thinsp;<var>I</var>₀(<var>ν̃</var>) =
+        exp[−<var>τ</var>(<var>ν̃</var>)]
       </div>
       <p>
-        so the optical depth <var>τ</var> counts the
-        <var>e</var>-foldings of attenuation: at <var>τ</var>&nbsp;=&nbsp;1
-        the intensity has dropped to 1/<var>e</var>&nbsp;≈&nbsp;37%, at
-        <var>τ</var>&nbsp;=&nbsp;4.49 to 1.13%. For a uniform gas it grows
-        linearly with the amount of absorber along the path,
+        Optical depth <var>τ</var> counts e-foldings of attenuation. For fixed
+        pressure, temperature and composition it scales with absorber number
+        density <var>n</var> and path length <var>L</var>:
       </p>
       <div class="eq">
-        <var>τ</var>(<var>ν</var>) =
-        <var>σ</var>(<var>ν</var>)&thinsp;<var>n</var>&thinsp;<var>L</var>,
+        <var>τ</var>(<var>ν̃</var>) =
+        <var>σ</var>(<var>ν̃</var>)&thinsp;<var>n</var>&thinsp;<var>L</var>,
         &emsp;
-        <var>n</var> = <var>x</var><sub>CO₂</sub>&thinsp;<var>p</var>&thinsp;/&thinsp;(<var>k</var><sub>B</sub>&thinsp;<var>T</var><sub>gas</sub>)
+        <var>n</var> = <var>x</var><sub>CO₂</sub>&thinsp;<var>p</var>
+        / (<var>k</var><sub>B</sub>&thinsp;<var>T</var><sub>gas</sub>)
       </div>
       <p>
-        where <var>σ</var>(<var>ν</var>) is the monochromatic absorption
-        cross-section per molecule (cm²), <var>n</var> the CO₂ number density
-        (cm⁻³) from the ideal-gas law, and <var>L</var> the path length (cm).
-        The units cancel, so <var>τ</var> is dimensionless, and within this
-        homogeneous-gas model the 1&nbsp;km path carries exactly
-        1000&nbsp;× the optical depth of the 1&nbsp;m path, which is what
-        makes the two runs mutually checkable.
-        The cross-section itself is what RADIS assembles line by line from
-        the HITRAN records,
+        RADIS builds the cross-section from the database one transition at a
+        time,
       </p>
       <div class="eq">
-        <var>σ</var>(<var>ν</var>) = Σ<sub><var>i</var></sub>&nbsp;<var>S</var><sub><var>i</var></sub>(<var>T</var><sub>gas</sub>)&thinsp;<var>φ</var><sub><var>i</var></sub>(<var>ν</var> − <var>ν</var><sub><var>i</var></sub>)
+        <var>σ</var>(<var>ν̃</var>) = Σ<sub><var>i</var></sub>
+        <var>S</var><sub><var>i</var></sub>(<var>T</var><sub>gas</sub>)
+        <var>φ</var><sub><var>i</var></sub>(<var>ν̃</var> − <var>ν̃</var><sub><var>i</var></sub>)
       </div>
       <p>
-        a sum over the transitions <var>i</var> in the window: the line
-        intensity <var>S</var><sub><var>i</var></sub> from the database
-        (rescaled to <var>T</var><sub>gas</sub> via the lower-state energy
-        and partition function), and a normalized line-shape function
-        <var>φ</var><sub><var>i</var></sub>, in practice a Voigt profile
-        combining pressure broadening by air with Doppler broadening. Not
-        every transition survives into the sum: RADIS applies an intensity
-        cutoff, here 10⁻²⁷, and the response reports what that did. For this
-        spectrum it found 17&nbsp;028 lines across isotopologues 1–9, summed
-        5315 of them and discarded 11&nbsp;713 below the cutoff. Which lines
-        enter the sum is a physical choice, not a formatting one, and it is
-        reported rather than assumed.
+        where <var>S</var><sub><var>i</var></sub> is the temperature-adjusted
+        line intensity and <var>φ</var><sub><var>i</var></sub> is a normalized
+        Voigt profile combining Doppler and pressure broadening. The spectrum
+        covered isotopologues 1–9 and encountered 17&nbsp;028 lines; with the
+        declared 10⁻²⁷&nbsp;cm⁻¹/(molecule·cm⁻²) intensity cutoff, 5315 entered
+        the sum and 11&nbsp;713 did not. That cutoff changes the physics of the
+        calculated spectrum, so it belongs in the result rather than in
+        forgotten documentation.
       </p>
       <p>
-        The 1361 from the line query above is a different number and answers a
-        different question: it is the completeness total for
-        <code>lines_fetch_molecular</code> over 660–670&nbsp;cm⁻¹ with the
-        principal isotopologue alone. The spectrum spans 655–680&nbsp;cm⁻¹ and
-        uses every isotopologue. Two windows, two isotope selections, two
-        counts — which is why each response carries its own.
+        The ingredients encode different physics. Boltzmann populations and
+        the molecular partition function move intensity among transitions as
+        temperature changes. Thermal molecular speeds give a Gaussian Doppler
+        width; collisions add a Lorentzian pressure width; their convolution
+        is the Voigt profile used here. Close to a dense Q branch, collisional
+        line mixing can also reshape the band, so the sampled maximum is not a
+        universal constant of CO₂. It is a result of a named model under named
+        conditions &mdash; exactly why those conditions have to survive the
+        tool call.
       </p>
 
       <div class="stats">
-        <div><div class="v">667.53<small> cm⁻¹</small></div><div class="l">optical-depth maximum, near the ν₂ Q branch</div></div>
-        <div><div class="v">1.13<small> %</small></div><div class="l">CO₂ transmittance through 1 m at that wavenumber</div></div>
-        <div><div class="v">τ ≈ 4487<small> (dimensionless)</small></div><div class="l">CO₂ optical depth over 1 km, same homogeneous gas</div></div>
-        <div><div class="v">420<small> ppm</small></div><div class="l">CO₂ mole fraction assumed, 296 K, 1 atm</div></div>
+        <div><div class="v">667.53<small> cm⁻¹</small></div><div class="l">sampled optical-depth maximum near the ν₂ Q branch</div></div>
+        <div><div class="v">1.13<small> %</small></div><div class="l">CO₂ transmittance through one metre</div></div>
+        <div><div class="v">τ ≈ 4487</div><div class="l">optical depth through one kilometre</div></div>
+        <div><div class="v">420<small> ppm</small></div><div class="l">CO₂ mole fraction at 296 K and 1 atm</div></div>
       </div>
 
       <figure class="fig" id="spectrumfig">
-        <div class="ttl">Figure 3 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.3.1)</div>
+        <div class="ttl">Figure 1 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.3.1)</div>
         <div class="chartbtns" role="group" aria-label="Select displayed quantity">
           <button type="button" data-series="t1m" aria-pressed="true" style="--sc:#0d9488"><i style="background:#0d9488"></i>Transmittance, 1 m path</button>
           <button type="button" data-series="od1km" aria-pressed="false" style="--sc:#d97706"><i style="background:#d97706"></i>Optical depth, 1 km path (log)</button>
@@ -774,21 +411,11 @@
         <div class="chart-wrap"><canvas id="speccanvas" role="img"
           aria-label="Line chart of the CO2 nu2 band between 655 and 680 inverse centimetres. CO2 transmittance through one metre drops from near 1 in the wings to 0.0113 at the optical-depth maximum at 667.53; CO2 optical depth over one kilometre of the same homogeneous gas, on a log scale, rises from about 5 to 4487 at the same wavenumber."></canvas></div>
         <div class="chart-readout" id="specreadout">hover the curve for the plotted values</div>
-        <figcaption>Output of two <span class="mono">spectrum_calculate</span> calls, identical
-        conditions, path lengths 1&nbsp;m and 1&nbsp;km. Both responses were decimated for transport and
-        flagged (<span class="mono">truncated: true, total_available: 2501</span>;
-        <span class="mono">max_points=501</span> requested, 498 returned). The decimation splits
-        the computed grid into buckets and keeps each bucket's minimum and maximum, so a narrow
-        line cannot be sampled away, and it always keeps both ends of the requested window; where
-        an endpoint is also a bucket extreme the point is kept once, which is why the count lands
-        just under the cap. The
-        marked point is the optical-depth maximum near the ν₂ Q branch, at 667.53&nbsp;cm⁻¹ on
-        this sampled spectrum (the conventional band centre lies near 667.4&nbsp;cm⁻¹; the exact
-        Q-branch shape is sensitive to pressure broadening and line mixing): CO₂ transmittance
-        0.0113 over one metre, optical depth 4487 over one kilometre of the same homogeneous gas. The
-        plotted arrays are the returned values rounded for display — wavenumbers to 2 decimals,
-        transmittance to 4, optical depth to 3 — and all 1494 of them match the responses at that
-        precision. Hover (or tap) for the plotted values; the buttons switch quantity.</figcaption>
+        <figcaption>Two <span class="mono">spectrum_calculate</span> calls under identical
+        conditions, with path lengths of 1&nbsp;m and 1&nbsp;km. The 2501-point grids were
+        extrema-preserving decimated to 498 returned samples and flagged as truncated. The marker
+        is the sampled optical-depth maximum near the ν₂ Q branch. Values are rounded for display;
+        hover or tap to inspect them, or switch to kilometre optical depth on a logarithmic scale.</figcaption>
         <details class="dtable"><summary>Data as table (every 25th point)</summary>
           <div class="tbl"><table id="spectable"><thead><tr><th>wavenumber (cm⁻¹, vac)</th><th>transmittance, 1 m</th><th>optical depth, 1 km</th></tr></thead><tbody></tbody></table></div>
         </details>
@@ -862,7 +489,7 @@
         }
         function pick(clientX){
           // The decimated grid is not uniform — buckets contribute their
-          // extremes, so neighbouring samples can sit 0.01 or 0.09 cm-1 apart.
+          // extremes, so neighbouring samples can sit 0.01 or 0.11 cm-1 apart.
           // Mapping the pointer straight onto an array index therefore reads
           // out a neighbouring record: 175 of the 498 samples, up to 0.07 cm-1
           // away. Convert to a wavenumber and binary-search the nearest.
@@ -904,220 +531,212 @@
       });
       </script>
 
+      <h2>What the kilometre means &mdash; and what it does not</h2>
       <p>
-        At 667.53&nbsp;cm⁻¹, near the centre of the ν₂ band, CO₂ at 420 ppm
-        attenuates about 98.9% of incident monochromatic radiation over one
-        metre under these conditions. That number describes one narrow
-        spectral location, not broadband thermal radiation, and CO₂ alone (no
-        H₂O or other constituents of air), with pressure broadening evaluated
-        for CO₂ diluted in air at 1.01325&nbsp;bar, RADIS' default for
-        molecules. The growing optical depth shows why the strongly absorbing
-        centre of the 15&nbsp;µm band becomes opaque over atmospheric-scale
-        paths. In the real atmosphere, where pressure, temperature and
-        composition vary with altitude, spectral opacity sets the
-        characteristic altitude from which outgoing thermal radiation
-        emerges: strongly absorbing parts of the band probe higher layers
-        than the less opaque wings. The kilometre run keeps pressure and
-        temperature fixed on purpose: a homogeneous-gas illustration of the
-        mechanism, not a vertically resolved atmospheric model.
+        At the sampled maximum, the one-metre response was
+        <var>T</var>&nbsp;=&nbsp;0.011254874675236337, hence
+        −ln&nbsp;<var>T</var>&nbsp;=&nbsp;4.486953939715527. Multiplying by
+        1000 predicts 4486.953939715527 for a kilometre; the separate tool call
+        returned 4486.953939715522. The 5×10⁻¹² residual is a useful contract
+        check, not independent confirmation of the physics: both values come
+        from the same cross-section, and linear scaling with <var>L</var> is
+        built into this homogeneous model.
       </p>
-
-      <div class="callout">
-        <strong>What travelled with the numbers.</strong> Each value arrived
-        in a versioned envelope (<code>contract: "0.3"</code>) with a unit per
-        field, and the two calls do not share one: the metre response labels its
-        values <code>"dimensionless (0-1)"</code>, the kilometre response
-        <code>"dimensionless (base-e optical depth)"</code>, both over
-        <code>"cm-1 (vacuum)"</code>. Same tool, same window, two quantities,
-        and the envelope says which is which rather than leaving it to the axis
-        label. Each carries the provenance record
-        <code>"HITRAN line-by-line calculation via RADIS 0.17.1"</code>, a
-        retrieval timestamp, and the citations for both the data and the
-        code.<sup class="cite"><a href="#ref_hitran">[1]</a></sup><sup class="cite"><a href="#ref_radis">[4]</a></sup>
-        The envelope also refuses to overclaim the edition: RADIS requests
-        the latest HITRAN release without recording which one it cached, and
-        the notes say so, pointing to <code>source_download_date</code>
-        instead. The 2501-point spectrum was decimated for transport and
-        flagged (<code>truncated: true, total_available: 2501</code>), and
-        the two path lengths cross-check via Beer–Lambert on the returned
-        values, not the displayed ones: −ln(0.011254874675236337) =
-        4.486953939715527, and 1000 × that is 4486.953939715527 against a
-        computed kilometre value of 4486.953939715522 — agreement to 5×10⁻¹².
-        Rounded to the figures plotted here the same check reads
-        −1000 ln(0.01125) ≈ 4487.4 against 4487, which is the rounding, not a
-        discrepancy.
+      <p>
+        Nor does “1.13% transmitted” mean that a warm atmosphere becomes black
+        at 15&nbsp;µm. Beer–Lambert describes the incident component that
+        survives. A gas in local thermodynamic equilibrium also emits. For a
+        non-scattering, isothermal slab the radiative-transfer solution is
+      </p>
+      <div class="eq">
+        <var>I</var><sub>out</sub> = <var>I</var><sub>in</sub>e<sup>−<var>τ</var></sup>
+        + <var>B</var><sub><var>ν</var></sub>(<var>T</var>)(1 − e<sup>−<var>τ</var></sup>)
       </div>
-      <p class="small">
-        Every number on this page comes from tool output, rounded for display
-        and not otherwise edited, re-run against open-faraday v0.3.1 on
-        2026-09-18 over stdio with an unmodified MCP client: 1361 lines in the window, 2501 spectral points before
-        decimation, the optical-depth maximum at 667.53&nbsp;cm&#8315;&#185;,
-        &tau;&nbsp;=&nbsp;4487 over the kilometre and 1.13% transmittance over
-        the metre. The calls that produce them are listed at the end of this
-        article.
+      <p>
+        so an optically thick slab forgets the background and approaches its
+        own Planck radiance. In the real atmosphere, temperature, pressure and
+        composition vary with altitude; strongly absorbing parts of the band
+        therefore sample higher layers than the wings. Our kilometre remains a
+        deliberately simple opacity experiment, not a climate model.
       </p>
 
-      <h2>Refusal is a feature</h2>
+      <h2>A number plus its receipt</h2>
       <p>
-        The contract also encodes when a result should <em>not</em> be
-        produced. The same session requested the same band at 1500&nbsp;K,
-        far above HITRAN's intended regime. Line intensities referenced to
-        296&nbsp;K can in principle be rescaled; the real limitation at
-        1500&nbsp;K is line-list completeness, because hot bands and
-        transitions negligible at room temperature grow important while
-        HITRAN's intensity cut-offs target terrestrial atmospheric work.
-        HITEMP<sup class="cite"><a href="#ref_hitemp">[5]</a></sup> is built
-        for that regime. A physics library still computes what it is asked to
-        compute; open-faraday imposes an application-level policy on top and
-        returns:
+        The calculation returned 2501 spectral points. To fit the tool
+        transport it sent 498, retaining both endpoints and each bucket's
+        extrema so narrow peaks and dips survive. The response says the array
+        is non-uniform and must not be integrated as though it were the full
+        grid. That is the core design in miniature: limitations travel with
+        the data instead of living on a web page an agent may never read.
+      </p>
+      <pre><code>{ "ok": true,
+  "contract": "0.3",
+  "units": { "wavenumber": "cm-1 (vacuum)",
+             "values": "dimensionless (0-1)" },
+  "truncated": true,
+  "total_available": 2501,
+  "provenance": { "source": "HITRAN line-by-line calculation via RADIS 0.17.1",
+                  "citation": "…", "accessed_utc": "…" },
+  "notes": ["…extrema-preserving decimation…"] }</code></pre>
+      <p>
+        All five tools &mdash; molecular lines, atomic lines, spectra, CODATA
+        constants and the session provenance report &mdash; use this versioned
+        envelope. Each tool publishes an output schema, and the test suite
+        validates real responses through an unmodified MCP client. That last
+        phrase is earned: version 0.3.0 published a schema its own serialized
+        nulls violated. Version 0.3.1 fixed the schema and added a protocol-level
+        regression test. A scientifically careful interface must make itself
+        falsifiable too.
+      </p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Tool</th><th>Scientific role</th></tr></thead>
+          <tbody>
+            <tr><td><code>spectrum_calculate</code></td><td>Line-by-line molecular or atomic spectra via RADIS, with the effective conditions and numerical defaults returned.</td></tr>
+            <tr><td><code>lines_fetch_molecular</code></td><td>HITRAN or HITEMP transitions, isotopologue selection and honest response caps.</td></tr>
+            <tr><td><code>lines_fetch_atomic</code></td><td>Kurucz or bounded NIST ASD windows, including source-specific uncertainty and coverage notes.</td></tr>
+            <tr><td><code>constants_get</code></td><td>CODATA 2022 values through SciPy, with units, standard uncertainty and exactness.</td></tr>
+            <tr><td><code>provenance_report</code></td><td>A paginated, deduplicated bibliography of successful queries in the session.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The metadata is deliberately stricter than the scientific payload.
+        Different databases expose different columns, so <code>data</code>
+        stays flexible; the envelope around it is typed and validated. Units
+        are field-specific: transmittance is “dimensionless (0–1),” while
+        RADIS' quantity named <code>absorbance</code> is “dimensionless (base-e
+        optical depth).” Atomic wavelengths state that they are vacuum values.
+        A client therefore does not have to infer conventions from a plot label
+        or from the name of a Python function.
+      </p>
+      <p>
+        The provenance is explicit about what it cannot know. This RADIS cache
+        records its download date but not the exact HITRAN edition. The response
+        reports that limitation rather than converting “latest” into a fictional
+        version. Finally, <code>provenance_report()</code> turns the successful
+        calls in the session into a deduplicated bibliography.
+      </p>
+      <p>
+        MCP is useful here because an agent can discover the tools and their
+        schemas, call the local server over standard input/output and receive
+        structured content. It is still only the transport. The same envelope
+        is returned by an in-process Python call, and the same pattern could be
+        implemented over another protocol. The durable contribution is making
+        scientific context executable at the boundary.
+      </p>
+      <p>
+        That contribution has neighbours worth naming. Atmospheric science has
+        required machine-readable units for decades: the
+        <a href="https://cfconventions.org/" target="_blank" rel="noopener">CF
+        conventions</a> oblige every netCDF variable to carry a
+        UDUNITS-parsable <code>units</code> attribute, and cf-checker reports
+        the files that do not. Astronomy carries the same discipline in query
+        responses, where a
+        <a href="https://www.ivoa.net/documents/VOTable/" target="_blank" rel="noopener">VOTable</a>
+        column ships both a VOUnits string and a UCD naming the physical
+        quantity. <span class="mono">pint</span> and
+        <span class="mono">astropy.units</span> go further still and refuse an
+        incoherent operation at runtime. What none of them checks is whether
+        the question should be put to this data at all. A file checker
+        validates an artefact after it has been produced; a quantity in kelvin
+        is as valid at 1500&nbsp;K as at 296&nbsp;K, and a dimension check
+        cannot know that the line list behind it was built for the colder one.
+        That is the check open-faraday moves to the boundary.
+      </p>
+
+      <h2>Refusal is a scientific result</h2>
+      <p>
+        We repeated the request at 1500&nbsp;K using HITRAN. Intensities can be
+        rescaled away from their reference temperature, but at high temperature
+        transitions and hot bands that were negligible near room temperature
+        become important. A terrestrial line list can become incomplete while
+        still producing a beautifully smooth curve.
       </p>
       <pre><code>{ "ok": false,
   "contract": "0.3",
   "error": { "code": "out_of_validity_range",
-             "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500.0 K." },
-  "notes": ["Consider databank='hitemp' (T &lt; ~2000 K) or 'exomol' for higher temperatures.",
-            "ExoMol needs an explicit isotope and a named dataset, e.g. dataset='POKAZATEL'
-             for H2O, 'YT34to10' for CH4, 'Li2015' for CO. The dataset a molecule has is
-             listed per molecule at exomol.com/data/molecules."] }</code></pre>
+             "message": "HITRAN is recommended for T &lt; ~700 K, requested Tgas=1500 K." },
+  "notes": ["Consider databank='hitemp' … or 'exomol' for higher temperatures."] }</code></pre>
       <p>
-        A structured refusal with a suggested alternative beats a plausible
-        but wrong spectrum. The same principle runs through the tool surface:
-        every atomic response carries the coverage caveats of the backend
-        that served it, and only those. A Kurucz response says the
-        A-coefficients are derived from published log gf values and that the
-        list carries no version. A NIST ASD<sup class="cite"><a href="#ref_asd">[6]</a></sup>
-        response says the accuracy grade is a graded bound and not a standard
-        uncertainty. Both say that energy levels are not covered as a table.
-        Only the Kurucz response says the atomic path is CPU-only with
-        broadening partners limited to H, He, H₂ and free electrons, atomic
-        hydrogen the default and air broadening unavailable &mdash; because only
-        Kurucz reaches RADIS at all: on an ASD response that sentence would
-        describe a code path the call never entered. Shipping the union of both
-        lists would have been less work and would have described neither
-        backend accurately. The ~700&nbsp;K and
-        ~2000&nbsp;K ceilings are conservative policy, not fundamental
-        database boundaries; each databank's practical range is molecule- and
-        spectral-region-dependent. Limitations are reported rather than
-        worked around.
+        The ~700&nbsp;K ceiling is open-faraday's conservative policy, not a
+        universal boundary of HITRAN. The scientifically important behavior is
+        that the policy is executable and the refusal names a route forward
+        where one exists &mdash; and says plainly when none does, rather than
+        sending the agent to a databank that has no data for the species.
+        A plausible spectrum outside the chosen validity regime would be the
+        more dangerous answer.
+      </p>
+      <p>
+        open-faraday returns this as a normal structured result with
+        <code>ok: false</code>, not as a broken transport call. That preserves
+        the error code, the physical reason and any suggested alternative for
+        the agent to branch on. “No” is useful scientific output when it says
+        precisely which assumption failed.
       </p>
 
-      <h2>Outlook: the instrument side</h2>
+      <h2>From the chat window to the instrument</h2>
       <p>
-        All of the above starts from a question typed into a chat. The setting
-        we are building toward starts from an instrument, and this is not
-        speculative for us: the lab is open-faraday's first customer. In our
-        laser lab we are extending a microscope into a hyperspectral imaging
-        setup (multi-wavelength illumination, stitched fields of view,
-        deconvolution) where every pixel is not a colour but a spectrum.
+        Our intended next setting is a hyperspectral microscope, where each
+        pixel carries a spectrum rather than three colour values. Calibration
+        checks against known emission lines, feature identification and
+        optical-property retrieval all depend on reference data. If an agent
+        helps plan a scan or flags a feature for another measurement, units,
+        source editions, incomplete windows and validity limits become part of
+        the experimental method.
       </p>
       <p>
-        Many of the physically meaningful steps in interpreting that data
-        lean on reference data: wavelength calibration checks against known
-        emission lines, feature identification queries line positions and
-        strengths, optical-property retrieval combines measurements with
-        tabulated constants. When agents take over parts of this loop
-        (planning a scan, validating a calibration, flagging a feature worth
-        a second look), each step needs the discipline shown above: values
-        with units, sources with editions, limits stated rather than hidden.
-      </p>
-      <p>
-        That is where open-faraday sits: the
-        reference-data layer between the instrument and the agents that work
-        with it, with <code>provenance_report</code> becoming part of each
-        experiment's record. More on the microscope itself once it reaches
-        first light.
-      </p>
-      <p>
-        The interesting part is not making a language model better at looking
-        up spectral lines. It is making scientific context explicit enough
-        that an agent can use it inside an experiment without silently
-        changing units, assumptions, provenance or validity regimes. Today the
-        question comes from a chat window. Eventually it will come from the
-        instrument itself, and at that point units, provenance, completeness
-        and validity regimes stop being interface niceties and become part of
-        the experimental methodology.
-      </p>
-      <p>
-        The objective, in the end, is not to make scientific APIs
-        agent-friendly. It is to make scientific assumptions
-        machine-enforceable.
+        That is the essence of open-faraday. It does not make a language model
+        into a spectroscopist. It makes the assumptions around scientific
+        reference data explicit enough to inspect, validate and record. Today
+        the question comes from a prompt. Eventually it will come from an
+        instrument. In both cases, the rule is the same: a number travels with
+        its scientific receipt, or it does not travel at all.
       </p>
 
-      <h2>Reproduce it</h2>
+      <h2>Reproduce the experiment</h2>
       <p>
-        The prompt in the use-case section drives the whole session. The
-        numbers and the figure on this page are the output of the five tool
-        calls it triggers, rounded for display, with these exact parameters
-        (Python 3.13 or 3.14, <code>pip install '.[spectroscopy]'</code>).
-        They were run on 2026-09-18 over stdio against an unmodified
-        <code>mcp.ClientSession</code>, at tag <code>v0.3.1</code>, commit
-        <code>ede0720f3ee32863ea461bb411e7c36ac35a7908</code>, with
-        <code>uv.lock</code> at SHA-256 <code>bb025957…5451be0</code>. The
-        version string in the MCP handshake is only <code>0.3.1</code>, which
-        does not pin a revision, so the commit is given here. Below are the
-        calls themselves, not a client program — every argument is shown, so
-        an agent or a Python caller can issue them as they stand:
+        The plotted values were re-run on 18 September 2026 through an
+        unmodified MCP client against the current open-faraday main branch,
+        which reports v0.3.1, at commit
+        <code>ed368472be7f7c1c76bc268630bad31ef8596064</code>. All five responses
+        validated against the server's published schemas. These are the four
+        scientific calls; <code>provenance_report()</code> supplies the fifth:
       </p>
-      <pre><code><span class="c"># the lines, with honest truncation</span>
-lines_fetch_molecular(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">660</span>, wavenum_max=<span class="k">670</span>, database=<span class="s">"hitran"</span>)
+      <pre><code>lines_fetch_molecular("CO2", 660, 670, database="hitran")
 
-<span class="c"># the metre of air</span>
-spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">655</span>, wavenum_max=<span class="k">680</span>,
-                   Tgas=<span class="k">296</span>, pressure_bar=<span class="k">1.01325</span>, mole_fraction=<span class="k">0.00042</span>,
-                   path_length_cm=<span class="k">100</span>, quantity=<span class="s">"transmittance"</span>, max_points=<span class="k">501</span>)
+spectrum_calculate("CO2", 655, 680, Tgas=296, pressure_bar=1.01325,
+  mole_fraction=0.00042, path_length_cm=100,
+  quantity="transmittance", max_points=501)
 
-<span class="c"># the kilometre</span>
-spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">655</span>, wavenum_max=<span class="k">680</span>,
-                   Tgas=<span class="k">296</span>, pressure_bar=<span class="k">1.01325</span>, mole_fraction=<span class="k">0.00042</span>,
-                   path_length_cm=<span class="k">100000</span>, quantity=<span class="s">"absorbance"</span>, max_points=<span class="k">501</span>)
+spectrum_calculate("CO2", 655, 680, Tgas=296, pressure_bar=1.01325,
+  mole_fraction=0.00042, path_length_cm=100000,
+  quantity="absorbance", max_points=501)
 
-<span class="c"># the refusal</span>
-spectrum_calculate(molecule=<span class="s">"CO2"</span>, wavenum_min=<span class="k">655</span>, wavenum_max=<span class="k">680</span>,
-                   Tgas=<span class="k">1500</span>, pressure_bar=<span class="k">1.01325</span>, mole_fraction=<span class="k">0.00042</span>,
-                   path_length_cm=<span class="k">100</span>, quantity=<span class="s">"transmittance"</span>,
-                   max_points=<span class="k">501</span>, databank=<span class="s">"hitran"</span>)
+spectrum_calculate("CO2", 655, 680, Tgas=1500, pressure_bar=1.01325,
+  mole_fraction=0.00042, path_length_cm=100,
+  quantity="transmittance", databank="hitran", max_points=501)
 
-<span class="c"># the bibliography</span>
 provenance_report()</code></pre>
 
       <h2>References</h2>
       <ol class="refs">
-        <li id="ref_hitran">I.E. Gordon et&nbsp;al., "The HITRAN2024 molecular
-        spectroscopic database," <i>JQSRT</i> <b>353</b>, 109807 (2026); an
-        older local cache may instead correspond to HITRAN2020: I.E. Gordon
-        et&nbsp;al., <i>JQSRT</i> <b>277</b>, 107949 (2022).
-        <span class="mono">hitran.org</span> — fetched to the local machine by
-        RADIS under HITRAN's terms; no data redistributed here. The exact
-        cached edition is not recorded by RADIS; open-faraday's provenance
-        notes flag this.</li>
-        <li id="ref_kurucz">R.L. Kurucz, "Including all the lines: data
-        releases for spectra and opacities," <i>Can. J. Phys.</i> <b>95</b>,
-        825 (2017); line lists at
-        <span class="mono">kurucz.harvard.edu</span> — accessed via
-        open-faraday <span class="mono">lines_fetch_atomic</span>.</li>
-        <li id="ref_codata">CODATA Task Group on Fundamental Constants,
-        "CODATA recommended values of the fundamental physical constants:
-        2022," NIST, <span class="mono">physics.nist.gov/constants</span> —
-        served by <span class="mono">scipy.constants</span>, accessed via
-        open-faraday <span class="mono">constants_get</span>.</li>
-        <li id="ref_radis">E. Pannier, C.O. Laux, "RADIS: A nonequilibrium
-        line-by-line radiative code for CO₂ and HITRAN-like database species,"
-        <i>JQSRT</i> <b>222–223</b>, 12–25 (2019); DIT optimization:
-        D.C.M. van den Bekerom, E. Pannier, <i>JQSRT</i> <b>261</b>, 107476
-        (2021). <span class="mono">github.com/radis/radis</span> — the retrieval
-        and physics behind <span class="mono">spectrum_calculate</span>,
-        <span class="mono">lines_fetch_molecular</span> and
-        <span class="mono">lines_fetch_atomic</span> on its Kurucz backend.</li>
-        <li id="ref_hitemp">L.S. Rothman et&nbsp;al., "HITEMP, the
-        high-temperature molecular spectroscopic database," <i>JQSRT</i>
-        <b>111</b>, 2139–2150 (2010).</li>
-        <li id="ref_asd">A. Kramida, Yu. Ralchenko, J. Reader, and NIST ASD
-        Team, NIST Atomic Spectra Database,
-        <span class="mono">physics.nist.gov/asd</span> — reached by
-        <span class="mono">lines_fetch_atomic</span> through one
-        window-bounded <span class="mono">astroquery.nist</span> query per
-        call; nothing is downloaded beyond the window and nothing is
-        cached.</li>
+        <li id="ref_hitran">I.E. Gordon et&nbsp;al., “The HITRAN2024 molecular
+        spectroscopic database,” <i>JQSRT</i> <b>353</b>, 109807 (2026).
+        The exact edition in the local RADIS cache could not be established;
+        that limitation is reported by the tool.</li>
+        <li id="ref_radis">E. Pannier and C.O. Laux, “RADIS: A nonequilibrium
+        line-by-line radiative code for CO₂ and HITRAN-like database species,”
+        <i>JQSRT</i> <b>222–223</b>, 12–25 (2019); D.C.M. van den Bekerom and
+        E. Pannier, <i>JQSRT</i> <b>261</b>, 107476 (2021).</li>
+        <li id="ref_noaa"><a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener">NOAA Global Monitoring Laboratory</a>,
+        “Trends in Atmospheric Carbon Dioxide,” monthly average at Mauna Loa,
+        August 2026; last updated 5 September 2026.</li>
+        <li>L.S. Rothman et&nbsp;al., “HITEMP, the high-temperature molecular
+        spectroscopic database,” <i>JQSRT</i> <b>111</b>, 2139–2150 (2010).</li>
+        <li>CODATA Task Group on Fundamental Constants, “CODATA recommended
+        values of the fundamental physical constants: 2022,” served by
+        <span class="mono">scipy.constants</span>.</li>
       </ol>
     </main>
     <footer></footer>
