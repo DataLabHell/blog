@@ -403,7 +403,7 @@
       </div>
 
       <figure class="fig" id="spectrumfig">
-        <div class="ttl">Figure 1 · Tool output — CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.3.1)</div>
+        <div class="ttl">Figure 1 · Tool output, CO₂ ν₂ band, 420 ppm, 296 K, 1.01325 bar (HITRAN via RADIS 0.17.1, open-faraday 0.3.1)</div>
         <div class="chartbtns" role="group" aria-label="Select displayed quantity">
           <button type="button" data-series="t1m" aria-pressed="true" style="--sc:#0d9488"><i style="background:#0d9488"></i>Transmittance, 1 m path</button>
           <button type="button" data-series="od1km" aria-pressed="false" style="--sc:#d97706"><i style="background:#d97706"></i>Optical depth, 1 km path (log)</button>
@@ -466,7 +466,7 @@
             ctx.fillText(s.log ? (v>=1000? (v/1000)+"k" : String(v)) : v.toFixed(2), PAD.l-8, py+3.5);
           });
           ctx.save(); ctx.translate(14,PAD.t+ph/2); ctx.rotate(-Math.PI/2); ctx.textAlign="center";
-          ctx.fillText(s.label + (s.log?" — log scale":""), 0, 0); ctx.restore();
+          ctx.fillText(s.label + (s.log?" (log scale)":""), 0, 0); ctx.restore();
           ctx.textAlign="center"; ctx.fillText("wavenumber (cm⁻¹, vacuum)", PAD.l+pw/2, H-2);
           // series line
           ctx.beginPath();
@@ -488,7 +488,7 @@
           }
         }
         function pick(clientX){
-          // The decimated grid is not uniform — buckets contribute their
+          // The decimated grid is not uniform, so buckets contribute their
           // extremes, so neighbouring samples can sit 0.01 or 0.11 cm-1 apart.
           // Mapping the pointer straight onto an array index therefore reads
           // out a neighbouring record: 175 of the 498 samples, up to 0.07 cm-1
