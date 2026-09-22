@@ -86,5 +86,23 @@
     "author": "Daniel Baldauf",
     "image": "static/posts/open-source-projects.png",
     "desc": "A look at some of the open-source tools we develop at Data Lab Hell (a backend-less Grafana PDF reporter, a one-file cgroups monitor, a binary ULID for Julia, and NVIDIA GPU images for OKD), plus where to find the rest."
+  },
+  {
+    "path": "posts/open-faraday.html",
+    "title": "One Metre of Air, 1.13% of the Light",
+    "date": "2026-09-18",
+    "tags": [
+      "MCP",
+      "LLM",
+      "Agentic AI",
+      "Open Source",
+      "Physics",
+      "Spectroscopy",
+      "Research",
+      "Provenance"
+    ],
+    "author": "Daniel Hauser",
+    "image": "static/posts/open-faraday.png",
+    "desc": "A line-by-line journey through CO₂'s 15 µm band, and how open-faraday gives scientific agents verifiable spectra, units, provenance and the ability to refuse the wrong calculation."
   }
 ]
