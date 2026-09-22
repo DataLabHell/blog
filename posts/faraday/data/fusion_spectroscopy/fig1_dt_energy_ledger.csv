@@ -1,0 +1,8 @@
+item,type,value_MeV
+deuteron (D),reactant_rest,1875.61295
+triton (T),reactant_rest,2808.92114
+alpha (4He),product_rest,3727.37941
+neutron (n),product_rest,939.56542
+Q released,released,17.58925
+alpha KE,kinetic,3.56085
+neutron KE,kinetic,14.02839

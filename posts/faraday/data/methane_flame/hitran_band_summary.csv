@@ -1,0 +1,5 @@
+band_key,molecule,assignment,strongest_nu_cm,strongest_wl_um,strongest_S_cm_per_molec,line_count_total_in_window
+CO2_4.3um,CO2,nu3 asymmetric stretch (4.3 um),2348.301949,4.258396159087802,1.363e-19,157
+CO2_15um,CO2,nu2 bend Q-branch (15 um),667.597309,14.979089737463276,2.929e-19,649
+H2O_6.3um,H2O,nu2 bend (6.3 um),1403.462212,7.125236372235151,2.678e-22,3290
+H2O_2.7um,H2O,nu1/nu3 stretch (2.7 um),3501.567846,2.855863555927798,1.527e-21,6945

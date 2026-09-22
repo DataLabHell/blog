@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Two molecules, one thermal-infrared spectrum — CO₂ vs CH₄ through the Faraday MCP server</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Source+Serif+4:ital,wght@0,400;0,600;1,400&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><style>
+:root{--bg:#070b14; --bg2:#0b1120; --panel:#0e1626; --panel2:#111c30;
+  --ink:#cdd9e8; --muted:#7e8ca6; --faint:#9fb0c8; --line:#1c2942; --line2:#26375a;
+  --co2:#f2a83b; --ch4:#34d6c6; --hot:#ff5d73; --accent:#56d98b; --accent2:#f5a83b; --ok:#5fd38a;
+  --serif:"Source Serif 4",Georgia,serif; --mono:"JetBrains Mono",ui-monospace,monospace;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3{letter-spacing:-.01em}
+h2{padding-top:.5em}
+p{margin:.85em 0}
+.small{font-size:.85rem}
+sub,sup{line-height:0}
+nav.top{position:sticky;top:0;z-index:50;background:rgba(7,11,20,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;align-items:center;gap:18px;height:54px;overflow-x:auto}
+nav.top .brand{font-family:var(--mono);font-size:.82rem;color:var(--co2);letter-spacing:.14em;white-space:nowrap;font-weight:600}
+nav.top a{color:var(--muted);font-size:.82rem;white-space:nowrap}
+nav.top a:hover{color:var(--ink);text-decoration:none}
+.kicker{font-size:.76rem;letter-spacing:.26em;color:var(--ch4);text-transform:uppercase;margin-bottom:20px}
+header.hero h1{font-size:3.05rem;margin:0 0 .35em;background:linear-gradient(180deg,#fff,#9fb2cf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.byline{margin-top:26px}
+.lede{font-size:1.16rem;color:#c5d2e4}
+.abslabel{font-variant:small-caps;margin-right:.15em}
+figure{margin:30px 0;padding:16px 16px 12px}
+figure figcaption{font-size:.86rem;color:var(--muted);margin-top:10px;line-height:1.5}
+figcaption b{color:#cfe}
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:2px 4px 10px}
+.chart-title{font-family:var(--mono);font-size:.84rem;letter-spacing:.04em;color:#dbe6f5}
+.chart-sub{font-family:var(--mono);font-size:.72rem;color:var(--faint)}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;margin:8px 2px 2px}
+.toolbar button{font-family:var(--mono);font-size:.7rem;color:var(--muted);background:var(--panel2);border:1px solid var(--line2);border-radius:7px;padding:4px 9px;cursor:pointer;transition:.15s}
+.toolbar button:hover{color:#fff;border-color:var(--accent);background:#16223a}
+.readout{font-family:var(--mono);font-size:.72rem;color:var(--ch4);min-height:1em}
+.hint{font-family:var(--mono);font-size:.66rem;color:var(--faint);margin:3px 2px 0}
+canvas.plot{width:100%;display:block;border-radius:8px;cursor:crosshair;touch-action:none}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.74rem;color:var(--muted);margin:4px 4px 0}
+.legend i{display:inline-block;width:13px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.legend i.dash{background:transparent;border:1.6px dashed;height:8px;border-radius:0}
+.legend span{white-space:nowrap}
+.tooltip{position:fixed;z-index:80;pointer-events:none;display:none;background:rgba(10,16,28,.97);border:1px solid var(--line2);border-radius:9px;padding:8px 11px;font-family:var(--mono);font-size:.72rem;color:var(--ink);box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:300px;line-height:1.5}
+.tooltip .tk{color:var(--faint)}
+.stat .v.co2{color:var(--co2)!important}
+.stat .v.ch4{color:var(--ch4)!important}
+.tbl{font-size:.9rem}
+.tbl th,.tbl td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line)}
+.tbl th{font-family:var(--mono);font-weight:500}
+.tbl td{color:#c0cde0}
+.tbl td.mono,.tbl th.mono{font-family:var(--mono);font-size:.82rem}
+.tbl tr:hover td{background:rgba(86,217,139,.05)}
+.src-ok{color:var(--ok)}
+.src-bad{color:var(--hot)}
+.eq{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--ch4);border-radius:9px;padding:16px 20px;margin:20px 0;overflow-x:auto;text-align:center}
+.eq math{font-size:1.05em;color:#eef3fb;margin:2px 0}
+.eqnote{font-family:var(--mono);font-size:.72rem;color:var(--faint);margin-top:10px;text-align:left}
+sup.cite{font-size:.68em;line-height:0;font-family:var(--mono)}
+sup.cite a{color:var(--ch4);text-decoration:none}
+sup.cite a:hover{text-decoration:underline}
+ol.refs{font-size:.85rem;color:#b7c4d8;padding-left:2em;line-height:1.5}
+ol.refs li{margin:8px 0;padding-bottom:8px;border-bottom:1px solid var(--line)}
+ol.refs li:target{background:rgba(52,214,198,.10);border-radius:5px}
+ol.refs a{color:var(--accent)}
+.callout{background:linear-gradient(180deg,#10202e,#0c1622);border:1px solid var(--line2);border-left:3px solid var(--co2);border-radius:10px;padding:16px 20px;margin:22px 0;color:#cad8ea}
+.callout.prov{border-left-color:var(--ch4)}
+.callout h4{margin:.1em 0 .5em;font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ch4)}
+details.app>summary{display:flex;justify-content:space-between;align-items:center}
+details.app>summary .x{color:var(--faint);font-size:.8rem}
+details.app[open]>summary{border-bottom:1px solid var(--line)}
+.app-body{padding:8px 18px 18px}
+pre.code{background:#060a12;border:1px solid var(--line);border-radius:9px;padding:15px;overflow-x:auto;font-family:var(--mono);font-size:.74rem;line-height:1.55;color:#b9c6da}
+pre.code .cm{color:#9fb0c8}
+.jsonblock{background:#060a12;border:1px solid var(--line);border-radius:9px;padding:12px 15px;font-family:var(--mono);font-size:.74rem;color:#bcd;overflow-x:auto;margin:10px 0;white-space:pre}
+.dlrow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:nowrap}
+.dlrow:last-child{border-bottom:none}
+.dlrow .meta{flex:1 1 auto;min-width:0;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.dlrow .meta b{color:#dbe6f5;font-weight:500}
+.dlrow .dlbtn{flex:0 0 auto;margin-left:auto;align-self:center}
+.dlbtn{cursor:pointer}
+hr.sec{border:none;border-top:1px solid var(--line);margin:0}
+footer{font-family:var(--mono)}
+.fn{color:var(--faint);font-size:.82rem;border-top:1px solid var(--line);margin-top:34px;padding-top:14px}
+@media (max-width:720px){
+  body{font-size:17px}header.hero h1{font-size:2.2rem}.wrap{padding:0 18px}
+}
+@media print{
+  body{background:#fff;color:#111}nav.top,.fdnav,.fdtop,.fdprogress,.toolbar,.readout,.hint{display:none}
+  details.app[open]>summary,details.app{border-color:#ccc}details.app{break-inside:avoid}
+  details.app:not([open])>.app-body{display:block}figure{break-inside:avoid;border-color:#ccc}
+  canvas.plot{border:1px solid #ccc}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+}
+.fdtoggle{display:none}
+.fdprogress{width:0}
+.fdtop{position:fixed;right:22px;bottom:22px;z-index:90;width:42px;height:42px;border-radius:50%;font-size:1.05rem;cursor:pointer;opacity:0;transform:translateY(8px);transition:.18s;pointer-events:none}
+.fdtop.show{opacity:1;transform:none;pointer-events:auto}
+.fdtop:hover{border-color:var(--accent)}
+.ms-chip{display:inline-block}
+.foot-end{padding-top:16px}
+:target{scroll-margin-top:64px}
+h2{scroll-margin-top:64px}
+@media(max-width:760px){.fdtoggle{display:block}.fdlinks{display:none;flex-basis:100%;flex-direction:column;align-items:stretch;gap:2px;margin:0 0 10px}.fdnav.open .fdlinks{display:flex}.fdlinks a.here::after{display:none}}
+h2 .s{letter-spacing:.02em}
+:root{--fb-card:linear-gradient(180deg,rgba(17,24,36,.96),rgba(13,19,28,.70));
+  --fb-border:rgba(255,255,255,.10);
+  --fb-soft:rgba(255,255,255,.045);}
+header.hero{padding-top:72px;padding-bottom:30px}
+header.hero .wrap{position:relative}
+.ms-chip{display:inline-block}
+.tbl, details.app, .fig, .diagram, .abstract, .stats .stat, .stat, .readout, .callout, .note{box-shadow:0 20px 60px -48px #000}
+.tbl table{margin:0}
+.tbl th,.tbl td{border-color:var(--line,var(--fb-border))}
+.tbl thead th, table thead th{background:#0c1320;color:var(--accent,#56d98b)}
+.layerrow td,tr.divider td{background:rgba(86,217,139,.07)!important;color:var(--accent,#56d98b)!important;font-family:"Space Grotesk",system-ui,sans-serif!important;letter-spacing:.10em;text-transform:uppercase;font-weight:700}
+.dlbtn,.dl-btn,.dlcell a,a[data-file]{font-family:"JetBrains Mono",ui-monospace,monospace!important}
+details.app summary{cursor:pointer;list-style:none;padding:15px 18px;font-family:"Space Grotesk",system-ui,sans-serif;color:#fff;border-bottom:1px solid var(--line,var(--fb-border))}
+details.app summary::-webkit-details-marker{display:none}
+details.app .small{color:var(--muted,#8a96a6);font-size:.9rem}
+@media(max-width:760px){
+  header.hero{padding-top:56px;}
+  h1{font-size:clamp(2.1rem,10vw,3rem)!important;}
+  .stats,.readout{grid-template-columns:1fr!important;}
+  .tbl{border-radius:10px;}
+}
+.authorcard{max-width:var(--prose);margin:22px auto 0;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;justify-content:space-between}
+.authorcard .who{font-family:"Space Grotesk",system-ui,sans-serif;font-size:.92rem;color:var(--muted);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.authorcard .who .nm{color:#fff;font-weight:700}
+.authorcard .who .co{color:var(--ink);font-weight:600}
+.authorcard .who .rl{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-family:"JetBrains Mono",ui-monospace,monospace}
+.authorcard .lk{display:flex;gap:8px;flex-wrap:wrap}
+.authorcard .lk a{display:inline-flex;align-items:center;gap:6px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.76rem;color:var(--muted);border:1px solid var(--line)!important;border-radius:8px;padding:5px 11px;text-decoration:none}
+.authorcard .lk a:hover{color:var(--accent);border-color:var(--accent)!important;background:rgba(255,255,255,.03)}
+.authorcard .lk svg{width:15px;height:15px;fill:currentColor;flex:none}
+:root{--prose:760px;--wide:1100px;--sans:"Space Grotesk",system-ui,sans-serif;--serif:"Source Serif 4",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace;}
+.wrap{padding-left:26px!important;padding-right:26px!important}
+.wrap>p,.wrap>ul,.wrap>ol,.wrap>h2,.wrap>h3,.wrap>.lede,.wrap>.lead,.wrap>.abstract,.wrap>.callout,.wrap>.eq,.wrap>.fn{max-width:var(--prose);margin-left:auto;margin-right:auto}
+header.hero h1{max-width:var(--wide)}
+header.hero .sub,header.hero .dek{max-width:760px}
+figure,.fig,.diagram,.stats,.tbl,.readout,details.app,.dl-grid{max-width:var(--wide);margin-left:auto;margin-right:auto}
+details.app>summary,details.app summary{cursor:pointer;list-style:none;padding:15px 18px!important;font-family:var(--sans)!important;color:#fff!important;border-bottom:1px solid var(--line,rgba(255,255,255,.10))!important}
+details.app>summary::-webkit-details-marker,details.app summary::-webkit-details-marker{display:none}
+.dl-card{min-width:0;box-shadow:0 18px 50px -44px #000}
+.dl-card .dl-name{font-family:var(--mono)!important;font-size:.8rem!important;color:#fff!important;word-break:break-word!important;line-height:1.35}
+.dl-card .dl-meta{font-family:var(--mono)!important;font-size:.67rem!important;color:var(--muted,#8a96a6)!important;margin:6px 0 11px!important;line-height:1.55}
+.dl-card .dl-desc{font-size:.82rem!important;color:#c3cdda!important;margin:6px 0 8px!important;line-height:1.45}
+.dl-card .dl-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.dlbtn,.dl-btn,.dlcell a,a[data-file]{font-family:var(--mono)!important}
+@media(max-width:760px){.wrap{padding-left:18px!important;padding-right:18px!important}.dl-grid{grid-template-columns:1fr!important}}
+</style><link rel="stylesheet" href="/style.css"/><link rel="stylesheet" href="/blog.css"/><link href="faraday-shared.css" rel="stylesheet"/><link rel="stylesheet" href="faraday-blog-theme.css"/><script src="/components.js" defer></script><script src="https://datalabhell.ac.at/cookie-consent.js" defer></script></head><body class="fd-light fd-greenhouse"><header></header><div class="tooltip" id="tooltip"></div><nav class="fdnav"><div class="fdbar"><a class="fdbrand" href="index.html"><span class="d"></span>FARADAY</a><button aria-label="Toggle menu" class="fdtoggle" onclick="this.closest('.fdnav').classList.toggle('open')">☰</button><div class="fdlinks"><a href="/">&larr; Blog</a><a href="index.html">Overview</a><a href="Faraday_fusion_spectroscopy.html">Fusion</a><a href="Faraday_methane_flame_emission.html">Flame</a><a href="Faraday_CO2_vs_CH4_radiative_efficiency.html">Greenhouse</a><a href="https://github.com/DataLabHell/faraday" rel="noopener" target="_blank">github.com/DataLabHell/faraday ↗</a></div></div><div class="fdprogress" id="fdprog"></div></nav><button aria-label="Back to top" class="fdtop" id="fdtop" onclick="window.scrollTo({top:0,behavior:(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)?'auto':'smooth'})">↑</button><script>(function(){var pr=document.getElementById('fdprog'),tp=document.getElementById('fdtop'),de=document.documentElement,pg=(location.pathname.split('/').pop()||'index.html');document.querySelectorAll('.fdlinks a').forEach(function(a){var h=a.getAttribute('href')||'';if(h===pg||((pg===''||pg==='index.html')&&h==='index.html'))a.classList.add('here');});function u(){var s=de.scrollTop||document.body.scrollTop,m=(de.scrollHeight-de.clientHeight)||1;if(pr)pr.style.width=(s/m*100)+'%';if(tp)tp.classList.toggle('show',s>600);}addEventListener('scroll',u,{passive:true});addEventListener('load',u);u();})();</script><header class="hero"><div class="wrap"><a class="fd-hero-back" href="index.html">← Faraday overview</a><div class="kicker">Faraday MCP · Greenhouse</div><h1>Two molecules, one thermal-infrared spectrum</h1><p class="dek">A working demonstration of the Faraday MCP server: six legacy scientific databases, one agent, one end-to-end calculation — why a single molecule of methane traps far more heat than one of carbon dioxide.</p><div class="authorline">July 3, 2026 · Researched &amp; written autonomously by <strong style="white-space:nowrap">Claude Opus 4.8</strong></div></div></header>
+<nav class="fd-switch" aria-label="Faraday articles"><a href="index.html">Overview</a><a href="Faraday_fusion_spectroscopy.html">Fusion</a><a href="Faraday_methane_flame_emission.html">Flame</a><a class="on" href="Faraday_CO2_vs_CH4_radiative_efficiency.html">Greenhouse</a></nav><div class="wrap"><div class="unified-abstract abstract"><p class="lede"><span class="abslabel">Abstract.</span> Authoritative reference data in the physical sciences — fundamental constants, molecular line lists, thermochemistry, reference spectra — remains distributed across heterogeneous, decades-old databases, each with distinct identifiers, units, and access conventions. Combining several of them into a single calculation is consequently laborious and hard to audit after the fact. The <b>Faraday MCP server</b><sup class="cite">[<a href="#ref_mcp">1</a>]</sup> addresses this by exposing six such databases through one typed, machine-callable interface, allowing an autonomous agent to retrieve and compose their contents within a single chain of reasoning while retaining provenance for every value.</p><p>We demonstrate the approach with a line-by-line comparison of the two dominant anthropogenic greenhouse gases, carbon dioxide and methane. Fundamental constants (CODATA<sup class="cite">[<a href="#ref_tiesinga21">3</a>]</sup>), per-transition line parameters (HITRAN<sup class="cite">[<a href="#ref_gordon22">2</a>]</sup>), thermochemistry and reference infrared spectra (NIST<sup class="cite">[<a href="#ref_webbook">4</a>]</sup>), and molecular identities (PubChem<sup class="cite">[<a href="#ref_pubchem">6</a>]</sup>) are retrieved at run time through Faraday and combined into a radiative-transfer treatment of each gas’s infrared absorption. The analysis resolves a familiar apparent paradox — that methane is by far the stronger absorber per molecule, yet carbon dioxide dominates total forcing — by quantifying the competing contributions of per-line intensity, band saturation, atmospheric column, and Planck weighting. Derived quantities are checked against the published radiative-efficiency expressions of Myhre et al. (1998)<sup class="cite">[<a href="#ref_myhre98">8</a>]</sup> and IPCC AR6<sup class="cite">[<a href="#ref_ipcc21">9</a>]</sup>; every result is traceable to the underlying line parameters, and irrelevant or failed lookups are reported rather than folded into the result.</p></div><div class="methodstrip"><div class="h">Built with the Faraday MCP server</div><p>Case-study source set: <span class="ms-chip">CODATA</span><span class="ms-chip">PubChem</span><span class="ms-chip">WebBook</span><span class="ms-chip">NIST spectra</span><span class="ms-chip">HITRAN</span>. Shared project context stays on the <a href="index.html">overview</a>.</p></div><h2 id="case"><span class="s">1</span>The question, and why it needs five sources</h2><p>The greenhouse strength of a gas is set by how strongly it absorbs the thermal infrared that Earth radiates to space, weighted by how much of that radiation is available at the gas’s absorption wavelengths. To compute it from first principles for CO₂ and CH₄ we need, simultaneously:</p><table class="tbl"><thead><tr><th>Ingredient</th><th>Database (via Faraday)</th><th>Used for</th></tr></thead><tbody><tr><td class="mono">h, c, k<sub>B</sub>, c₂, N<sub>A</sub></td><td>CODATA</td><td>Planck function, Doppler widths, column densities</td></tr><tr><td class="mono">M, exact mass, CAS</td><td>PubChem</td><td>Molecular mass → Doppler broadening; identity/provenance</td></tr><tr><td class="mono">ν̃, S, γ<sub>air</sub>, E″</td><td>HITRAN</td><td>Line positions, intensities, broadening → cross-sections</td></tr><tr><td class="mono">C<sub>p</sub>(T), phase data</td><td>NIST WebBook</td><td>Thermodynamic state of each gas; sublimation vs boiling</td></tr><tr><td class="mono">observed IR bands</td><td>NIST spectra</td><td>Independent cross-check of HITRAN band positions</td></tr></tbody></table><p class="small">Two of these rows (WebBook thermochemistry and the IR spectra) are both served by NIST, so the calculation draws on <b>five source endpoints across four distinct providers</b> — out of Faraday’s six upstream archives.</p><p>No single database answers the question. The line lists know nothing of the Planck function; CODATA knows nothing of methane’s bending mode; PubChem supplies the molecular mass that sets the Doppler width but none of the spectroscopy. The value of an MCP layer is precisely that one agent can hold all of them in a single chain of reasoning.</p><h3>The two bands</h3><p>Both molecules absorb through bending vibrations in Earth’s outgoing longwave spectrum; they are absorption bands, not atmospheric windows. Converting the band positions used here — the CO₂ ν₂ origin and the observed CH₄ ν₄ band maximum at 1305.9 cm⁻¹ (the spectroscopic ν₄ origin proper is 1310.76 cm⁻¹) — with CODATA constants (no hard-coded values) gives:</p><div class="eq"><math display="block" alttext="lambda equals ten to the fourth divided by wavenumber nu-tilde, in micrometres; and photon energy E equals h times c times nu-tilde" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>λ</mi><mo>=</mo><mfrac><msup><mn>10</mn><mn>4</mn></msup><mover accent="true"><mi>ν</mi><mo>~</mo></mover></mfrac><mspace width="0.3em"></mspace><mtext>µm</mtext><mo>,</mo><mspace width="1.6em"></mspace><mi>E</mi><mo>=</mo><mi>h</mi><mi>c</mi><mover accent="true"><mi>ν</mi><mo>~</mo></mover></mrow></math><div class="eqnote">Wavenumber ν̃ → wavelength λ and photon energy E (CODATA h, c<sup class="cite">[<a href="#ref_tiesinga21">3</a>]</sup>).</div></div><table class="tbl"><thead><tr><th></th><th>Band</th><th>Wavenumber</th><th>Wavelength</th><th>Photon energy</th><th>HITRAN lines in band</th></tr></thead><tbody><tr><td style="color:#f2a83b">CO₂</td><td>ν₂ bend</td><td class="mono">667.4 cm⁻¹</td><td class="mono">14.98 µm</td><td class="mono">82.7 meV</td><td class="mono">15,327</td></tr><tr><td style="color:#34d6c6">CH₄</td><td>ν₄ bend (band max)</td><td class="mono">1305.9 cm⁻¹</td><td class="mono">7.66 µm</td><td class="mono">161.9 meV</td><td class="mono">17,771</td></tr></tbody></table><h2 id="method"><span class="s">2</span>Method</h2><p>Every value below arrives through a named Faraday tool call with explicit arguments: the agent issues the call, the verbatim JSON is recorded, a <span class="mono">scipy</span> script computes only from those bytes, and a separate pass re-derives every quoted number.</p><p>The numbers in this article are assembled from <b>fourteen</b> Faraday tools spanning the project’s six upstream archives. Fundamental constants — <i>h</i>, <i>c</i>, <i>k</i><sub>B</sub>, <i>N</i><sub>A</sub> and the first and second radiation constants — are pulled with <span class="mono">codata_search</span> and <span class="mono">codata_get</span> (CODATA 2022). Molecular identity, molar masses, synonyms and GHS safety for CO₂ and CH₄ come from <span class="mono">pubchem_search</span>, <span class="mono">pubchem_get_properties</span>, <span class="mono">pubchem_get_synonyms</span> and <span class="mono">pubchem_get_safety</span>. Thermochemistry (Shomate C<sub>p</sub>/H/S) and phase-change points come from <span class="mono">nist_search_compound</span>, <span class="mono">nist_get_thermo</span> and <span class="mono">nist_get_phase_change</span> against the NIST Chemistry WebBook.</p><p>The line-by-line absorption that drives the radiative comparison is retrieved with <span class="mono">hitran_search_molecule</span> and <span class="mono">hitran_get_lines</span> (HITRAN2024); reference spectra are cross-checked through <span class="mono">nist_get_spectrum</span> and <span class="mono">mona_get_spectrum</span>, and atomic lines through <span class="mono">asd_get_lines</span>. Each call — its exact arguments and the verbatim JSON returned — is recorded in <a href="#appB">Appendix B</a>, and the <span class="mono">scipy</span> analysis that consumes those responses is in <a href="#appC">Appendix C</a>.</p><h2 id="results"><span class="s">3</span>Results</h2><div class="stats"><div class="stat"><div class="v ch4">~7,000×</div><div class="k">strongest CH₄ ν₄ line vs strongest CO₂ ν₂ line (line intensity, retrieved HITRAN windows)</div></div><div class="stat"><div class="v co2">222×</div><div class="k">more CO₂ molecules than CH₄ in the captured air-column scenario</div></div><div class="stat"><div class="v co2">5.0×</div><div class="k">more outgoing radiation at the CO₂ band than the CH₄ band (255 K)</div></div><div class="stat"><div class="v ch4">≈33×</div><div class="k">methane’s radiative efficiency per added molecule (per ppb)</div></div></div><h3>3.1 — Per line, methane wins by nearly four orders of magnitude</h3><p>The HITRAN<sup class="cite">[<a href="#ref_gordon22">2</a>]</sup> samples make the first surprise concrete. The strongest sampled CH₄ ν₄ transition has intensity S = 4.78 × 10⁻²⁰ cm·molecule⁻¹; the strongest CO₂ ν₂ transition reaches only 6.95 × 10⁻²⁴. That is a factor of <b>6,875</b> between the strongest lines in the retrieved HITRAN windows shown here — a band-integrated comparison would be the rigorous absolute statement, but the per-line gap already shows the direction and rough scale. Methane’s bend is both infrared-brighter and less burdened by the statistical dilution that spreads CO₂’s intensity across a dense thicket of hot-band and isotopologue lines. Zoom in: each stick is one real transition, tooltipped with its lower-state energy and branch.</p><div class="callout"><h4>What this ratio is — and is not</h4><p>The ~7,000× figure (precisely 6,875×) compares the <i>single strongest line</i> in each retrieved window, line intensity against line intensity. It is not a band-integrated quantity, not a radiative efficiency, and not a GWP: those require every line, spectral overlap, saturation, vertical profiles, and atmospheric lifetime — which is why the established per-molecule radiative-efficiency ratio is ≈33× (section 3.6), not thousands. Read it as a statement about line strengths in these two windows, with the retrieved records to verify it in <a href="#appD">Appendix D</a>.</p></div><figure><div class="chart-head"><span class="chart-title">Line-intensity stick spectrum  ·  HITRAN</span><span class="chart-sub">log scale · 90 + 90 sampled transitions</span></div><div class="legend"><span><i style="background:#f2a83b"></i>CO₂ ν₂ lines</span><span><i style="background:#34d6c6"></i>CH₄ ν₄ lines</span></div><canvas class="plot" id="cv_int" role="img" tabindex="0" aria-label="Line-intensity stick spectrum of CO₂ ν₂ and CH₄ ν₄ HITRAN transitions" aria-describedby="figcap1"></canvas><div class="readout" id="ro_int"></div><div class="hint">drag a box to zoom · drag wide &amp; flat = X-axis only · scroll = X-axis · shift+scroll = Y-axis · shift+drag = pan · double-click = reset</div><div class="toolbar" id="tb_int"></div><figcaption id="figcap1"><b>Fig 1.</b> Per-transition intensities S at 296 K (HITRAN, principal isotopologues). CO₂ ν₂ near 667 cm⁻¹, CH₄ ν₄ near 1306 cm⁻¹. Methane’s lines sit nearly four orders of magnitude above CO₂’s across the retrieved windows. Every point is traceable to a <span class="mono">hitran_get_lines</span> call.</figcaption></figure><h3>3.2 — Line shapes: pressure-broadened Voigt profiles</h3><p>For this illustrative single-layer calculation, 255 K Planck weighting is paired with 1 atm HITRAN air-broadening parameters; it is not a vertically resolved atmosphere. Using the molecular masses from PubChem and k<sub>B</sub> from CODATA, the Doppler (Gaussian) half-widths are tiny — 5.75 × 10⁻⁴ cm⁻¹ for CO₂ and 1.86 × 10⁻³ cm⁻¹ for CH₄ — against air-broadened Lorentz half-widths near 0.07 cm⁻¹ from HITRAN’s γ<sub>air</sub>. Lorentz wings therefore set the cross-section. We synthesise σ(ν̃) as a sum of Voigt profiles (<span class="mono">scipy.special.wofz</span>):</p><div class="eq"><math display="block" alttext="Doppler half-width alpha-sub-D equals nu-tilde-zero over c times the square root of two times natural-log two times Boltzmann constant k-B times temperature T divided by molecular mass m" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>α</mi><mi mathvariant="normal">D</mi></msub><mo>=</mo><mfrac><msub><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mn>0</mn></msub><mi>c</mi></mfrac><msqrt><mrow><mn>2</mn><mi>ln</mi><mn>2</mn><mo>·</mo><mfrac><mrow><msub><mi>k</mi><mi mathvariant="normal">B</mi></msub><mi>T</mi></mrow><mi>m</mi></mfrac></mrow></msqrt></mrow></math><math display="block" alttext="Lorentz half-width gamma-sub-L equals gamma-air times pressure p over reference pressure p-zero, times the ratio of reference temperature T-zero to T raised to the power n-air" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>γ</mi><mi mathvariant="normal">L</mi></msub><mo>=</mo><msub><mi>γ</mi><mtext>air</mtext></msub><mo>·</mo><mfrac><mi>p</mi><msub><mi>p</mi><mn>0</mn></msub></mfrac><msup><mrow><mo>(</mo><mfrac><msub><mi>T</mi><mn>0</mn></msub><mi>T</mi></mfrac><mo>)</mo></mrow><msub><mi>n</mi><mtext>air</mtext></msub></msup></mrow></math><div class="eqnote">Doppler (Gaussian) half-width α<sub>D</sub> and the air-broadened Lorentz half-width γ<sub>L</sub> (HITRAN parameterisation<sup class="cite">[<a href="#ref_gordon22">2</a>]</sup>); molecular mass m from PubChem, k<sub>B</sub> from CODATA.</div></div><div class="eq"><math display="block" alttext="cross-section sigma of nu-tilde equals the sum over lines i of S-sub-i of T times the Voigt profile V evaluated at nu-tilde minus nu-tilde-zero-i" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>σ</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>)</mo><mo>=</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>S</mi><mi>i</mi></msub><mo>(</mo><mi>T</mi><mo>)</mo><mspace width="0.15em"></mspace><mi>V</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>−</mo><msub><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mrow><mn>0</mn><mo>,</mo><mi>i</mi></mrow></msub><mo>)</mo></mrow></math><math display="block" alttext="Voigt profile V equals the real part of the Faddeeva function w of z, divided by alpha-G times the square root of two pi; where z equals delta-nu-tilde plus i gamma-L, over alpha-G times the square root of two" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>V</mi><mo>=</mo><mfrac><mrow><mi>Re</mi><mo>[</mo><mi>w</mi><mo>(</mo><mi>z</mi><mo>)</mo><mo>]</mo></mrow><mrow><msub><mi>α</mi><mi mathvariant="normal">G</mi></msub><msqrt><mrow><mn>2</mn><mi>π</mi></mrow></msqrt></mrow></mfrac><mo>,</mo><mspace width="1.1em"></mspace><mi>z</mi><mo>=</mo><mfrac><mrow><mi>Δ</mi><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>+</mo><mi>i</mi><msub><mi>γ</mi><mi mathvariant="normal">L</mi></msub></mrow><mrow><msub><mi>α</mi><mi mathvariant="normal">G</mi></msub><msqrt><mn>2</mn></msqrt></mrow></mfrac></mrow></math><div class="eqnote">Cross-section as a sum of Voigt profiles V — the Gaussian⊗Lorentzian convolution — evaluated via the Faddeeva function w(z) (scipy.special.wofz)<sup class="cite">[<a href="#ref_armstrong67">7</a>]</sup>, with α<sub>G</sub> = α<sub>D</sub>/√(2 ln 2).</div></div><figure><div class="chart-head"><span class="chart-title">Absorption cross-section  ·  computed (Voigt)</span><span class="chart-sub">log scale · band centres aligned at Δν̃ = 0</span></div><div class="legend"><span><i style="background:#f2a83b"></i>CO₂ ν₂ cross-section</span><span><i style="background:#34d6c6"></i>CH₄ ν₄ cross-section</span></div><canvas class="plot" id="cv_sig" role="img" tabindex="0" aria-label="Absorption cross-section σ versus wavenumber for CO₂ ν₂ and CH₄ ν₄, computed from Voigt profiles" aria-describedby="figcap2"></canvas><div class="readout" id="ro_sig"></div><div class="hint">drag a box to zoom · drag wide &amp; flat = X-axis only · scroll = X-axis · shift+scroll = Y-axis · shift+drag = pan · double-click = reset</div><div class="toolbar" id="tb_sig"></div><figcaption id="figcap2"><b>Fig 2.</b> Cross-section σ(ν̃) built from the sampled lines, each band shifted to its own centre for comparison. Methane’s peak cross-section sits well above CO₂’s, mirroring Fig 1. (Reconstructed from a representative line sample — see §5.)</figcaption></figure><h3>3.3 — Curve of growth: how a line saturates as you add gas</h3><p>A line’s contribution does not grow forever. Its equivalent width W — the integrated fraction of radiation it removes — rises linearly with column density while the line is thin, then bends over into a slow square-root crawl once the core goes black. Tracking the strongest line of each gas and marking the captured scenario columns (N<sub>CO₂</sub> = 9.17 × 10²¹, N<sub>CH₄</sub> = 4.13 × 10¹⁹ molecule cm⁻²) shows where each sits on its growth curve: the strongest CH₄ line is already into saturation at its core (τ ≈ 9.7), while the strongest sampled CO₂ line is still near the thin, linear regime (τ ≈ 0.32).</p><div class="eq"><math display="block" alttext="vertical column N-sub-X equals mixing ratio x-sub-X times surface pressure P-s divided by mean air molecular mass mu-air times gravitational acceleration g" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>N</mi><mi>X</mi></msub><mo>=</mo><msub><mi>x</mi><mi>X</mi></msub><mfrac><msub><mi>P</mi><mi mathvariant="normal">s</mi></msub><mrow><msub><mi>μ</mi><mtext>air</mtext></msub><mi>g</mi></mrow></mfrac></mrow></math><div class="eqnote">Vertical column of gas X from its mixing ratio x<sub>X</sub> and surface pressure P<sub>s</sub> (μ<sub>air</sub> = mean molecular mass of air, g = gravitational acceleration).</div></div><div class="eq"><math display="block" alttext="optical depth tau of nu-tilde equals cross-section sigma of nu-tilde times column N; transmittance script-T of nu-tilde equals e to the minus tau of nu-tilde" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>τ</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>)</mo><mo>=</mo><mi>σ</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>)</mo><mi>N</mi><mo>,</mo><mspace width="1.4em"></mspace><mi mathvariant="script">T</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>)</mo><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>τ</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>)</mo></mrow></msup></mrow></math><math display="block" alttext="equivalent width W equals the integral of one minus e to the minus sigma of nu-tilde times N, with respect to nu-tilde" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>W</mi><mo>=</mo><mo>∫</mo><mrow><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>σ</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>)</mo><mi>N</mi></mrow></msup><mo>)</mo></mrow><mspace width="0.15em"></mspace><mi>d</mi><mover accent="true"><mi>ν</mi><mo>~</mo></mover></mrow></math><div class="eqnote">Optical depth τ, transmittance 𝒯, and the equivalent width W that traces the curve of growth<sup class="cite">[<a href="#ref_pierrehumbert10">10</a>]</sup>.</div></div><figure><div class="chart-head"><span class="chart-title">Curve of growth  ·  equivalent width vs column</span><span class="chart-sub">log–log · vertical lines mark captured scenario columns</span></div><div class="legend"><span><i style="background:#f2a83b"></i>CO₂ strong line</span><span><i style="background:#34d6c6"></i>CH₄ strong line</span><span><i class="dash" style="border-color:#7aa2ff"></i>captured scenario column</span></div><canvas class="plot" id="cv_cog" role="img" tabindex="0" aria-label="Curve of growth: equivalent width versus absorber column for the strongest CO₂ and CH₄ lines" aria-describedby="figcap3"></canvas><div class="readout" id="ro_cog"></div><div class="hint">drag a box to zoom · drag wide &amp; flat = X-axis only · scroll = X-axis · shift+scroll = Y-axis · shift+drag = pan · double-click = reset</div><div class="toolbar" id="tb_cog"></div><figcaption id="figcap3"><b>Fig 3.</b> Equivalent width W versus absorber column N for the strongest sampled line of each gas. The bend from the linear to the saturated regime is the microscopic origin of logarithmic forcing. Dashed lines: captured CO₂ and CH₄ scenario columns.</figcaption></figure><div class="callout"><h4>The band-vs-line subtlety</h4><p>Counter-intuitively, individual CO₂ lines are <i>less</i> saturated than methane’s. CO₂’s band saturation is a <i>collective</i> effect: ~15,000 overlapping transitions, acting on a column 222× larger than methane’s (N<sub>CO₂</sub>/N<sub>CH₄</sub> = 9.17 × 10²¹ / 4.13 × 10¹⁹ ≈ 222, a count of molecules — not an opacity ratio), pile up into a quasi-continuum that is effectively black across the Q-branch — which is why the 15 µm band radiates to space from the cold stratosphere. Adding CO₂ can then only widen the band’s edges (logarithmic forcing), whereas methane’s sparser, unsaturated band still absorbs almost linearly with each added molecule.<sup class="cite">[<a href="#ref_pierrehumbert10">10</a>]</sup></p></div><h3>3.4 — Where the radiation is: Planck weighting</h3><p>Absorbing strongly only matters where there is radiation to absorb. Earth’s outgoing spectrum peaks (in wavenumber) near 500 cm⁻¹ at 255 K — close to the CO₂ band and far from methane’s. Evaluating the Planck function from CODATA constants, there is <b>5.0×</b> more spectral radiance at 667 cm⁻¹ than at 1306 cm⁻¹. This is the one factor that favours CO₂: its band is parked on the thermal-emission peak, while methane’s sits on the cooler short-wave flank.</p><div class="eq"><math display="block" alttext="Planck radiance B of nu-tilde and T equals two h c squared nu-tilde cubed, divided by the quantity e to the c-two nu-tilde over T minus one; where c-two equals h c over Boltzmann constant k-B" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>B</mi><mo>(</mo><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>,</mo><mi>T</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mn>2</mn><mi>h</mi><msup><mi>c</mi><mn>2</mn></msup><msup><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mn>3</mn></msup></mrow><mrow><msup><mi>e</mi><mrow><msub><mi>c</mi><mn>2</mn></msub><mover accent="true"><mi>ν</mi><mo>~</mo></mover><mo>/</mo><mi>T</mi></mrow></msup><mo>−</mo><mn>1</mn></mrow></mfrac><mo>,</mo><mspace width="1.2em"></mspace><msub><mi>c</mi><mn>2</mn></msub><mo>=</mo><mfrac><mrow><mi>h</mi><mi>c</mi></mrow><msub><mi>k</mi><mi mathvariant="normal">B</mi></msub></mfrac></mrow></math><div class="eqnote">Planck spectral radiance per unit wavenumber; c₂ = hc/k<sub>B</sub> is the second radiation constant (CODATA<sup class="cite">[<a href="#ref_tiesinga21">3</a>]</sup>).</div></div><figure><div class="chart-head"><span class="chart-title">Planck spectral radiance  ·  computed (CODATA)</span><span class="chart-sub">T = 255 K (emission) and 288 K (surface)</span></div><div class="legend"><span><i style="background:#7aa2ff"></i>B(255 K) emission level</span><span><i style="background:#c9974a"></i>B(288 K) surface</span><span><i class="dash" style="border-color:#f2a83b"></i>CO₂ band (667 cm⁻¹)</span><span><i class="dash" style="border-color:#34d6c6"></i>CH₄ band (1306 cm⁻¹)</span></div><canvas class="plot" id="cv_pl" role="img" tabindex="0" aria-label="Planck spectral radiance versus wavenumber at 255 K and 288 K, with the CO₂ and CH₄ band positions marked" aria-describedby="figcap4"></canvas><div class="readout" id="ro_pl"></div><div class="hint">drag a box to zoom · drag wide &amp; flat = X-axis only · scroll = X-axis · shift+scroll = Y-axis · shift+drag = pan · double-click = reset</div><div class="toolbar" id="tb_pl"></div><figcaption id="figcap4"><b>Fig 4.</b> Outgoing thermal radiance versus wavenumber. The CO₂ band (amber) sits near the 255 K peak; the CH₄ band (cyan) lies on the lower-radiance flank — so equal absorption buys CO₂ ~5× more intercepted flux.</figcaption></figure><h3>3.5 — Cross-validation against observed spectra</h3><p>Finally, an independent check that the HITRAN positions are physical: the gas-phase IR absorbance spectra served by NIST’s WebBook<sup class="cite">[<a href="#ref_webbook">4</a>]</sup>. The observed CO₂ band peaks at 667 cm⁻¹ (with its strong ν₃ stretch — literature band origin 2349 cm⁻¹, sampled-grid maximum at 2358 cm⁻¹ in this retrieved spectrum) and methane’s at 1306 cm⁻¹ — exactly where HITRAN places them, from a completely separate measurement and data pipeline.</p><figure><div class="chart-head"><span class="chart-title">Observed IR absorbance  ·  NIST Chemistry WebBook</span><span class="chart-sub">500 points each · 450–2446 cm⁻¹</span></div><div class="legend"><span><i style="background:#f2a83b"></i>CO₂ observed IR</span><span><i style="background:#34d6c6"></i>CH₄ observed IR</span></div><canvas class="plot" id="cv_ir" role="img" tabindex="0" aria-label="Observed NIST WebBook IR absorbance spectra of CO₂ and CH₄ across 450 to 2446 inverse centimetres" aria-describedby="figcap5"></canvas><div class="readout" id="ro_ir"></div><div class="hint">drag a box to zoom · drag wide &amp; flat = X-axis only · scroll = X-axis · shift+scroll = Y-axis · shift+drag = pan · double-click = reset</div><div class="toolbar" id="tb_ir"></div><figcaption id="figcap5"><b>Fig 5.</b> Measured IR absorbance (relative units) via <span class="mono">nist_get_spectrum</span>. Band maxima coincide with the HITRAN line clusters of Fig 1 — two independent sources agreeing on where the molecules absorb.</figcaption></figure><h3>3.6 — Putting it together: per-molecule potency</h3><p>The pieces now compose. Methane’s lines are ~7,000× stronger in these retrieved windows and its band is far from saturated, so each added methane molecule absorbs almost in full; CO₂’s band is saturated, so each added CO₂ molecule does very little except at the band edges, even though CO₂ enjoys a 5.0× Planck-placement advantage and a 222× larger column. Net of these competing factors, the established per-molecule (per-ppb) radiative efficiencies are <span class="mono">CO₂ ≈ 1.25 × 10⁻⁵</span> and <span class="mono">CH₄ ≈ 4.11 × 10⁻⁴ W m⁻² ppb⁻¹</span> (IPCC/Myhre<sup class="cite">[<a href="#ref_myhre98">8</a>, <a href="#ref_ipcc21">9</a>]</sup> simplified expressions, cited literature — not Faraday data), a ratio of <b>≈33×</b> in methane’s favour. The Faraday-sourced spectroscopy supplies the <i>mechanism</i> behind that famous number; the absolute value is the benchmark it matches.</p><div class="eq"><math display="block" alttext="delta F for CO2 equals 5.35 times the natural log of C over C-zero, which implies dF over dC equals 5.35 over C" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Δ</mi><msub><mi>F</mi><mrow><mi>CO</mi><mn>2</mn></mrow></msub><mo>=</mo><mn>5.35</mn><mspace width="0.2em"></mspace><mi>ln</mi><mrow><mo>(</mo><mfrac><mi>C</mi><msub><mi>C</mi><mn>0</mn></msub></mfrac><mo>)</mo></mrow><mspace width="0.8em"></mspace><mo>⟹</mo><mspace width="0.8em"></mspace><mfrac><mrow><mi>d</mi><mi>F</mi></mrow><mrow><mi>d</mi><mi>C</mi></mrow></mfrac><mo>=</mo><mfrac><mn>5.35</mn><mi>C</mi></mfrac></mrow></math><math display="block" alttext="delta F for CH4 equals 0.036 times the square root of M minus the square root of M-zero, which implies dF over dM equals 0.036 over two times the square root of M" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>Δ</mi><msub><mi>F</mi><mrow><mi>CH</mi><mn>4</mn></mrow></msub><mo>=</mo><mn>0.036</mn><mrow><mo>(</mo><msqrt><mi>M</mi></msqrt><mo>−</mo><msqrt><msub><mi>M</mi><mn>0</mn></msub></msqrt><mo>)</mo></mrow><mspace width="0.8em"></mspace><mo>⟹</mo><mspace width="0.8em"></mspace><mfrac><mrow><mi>d</mi><mi>F</mi></mrow><mrow><mi>d</mi><mi>M</mi></mrow></mfrac><mo>=</mo><mfrac><mn>0.036</mn><mrow><mn>2</mn><msqrt><mi>M</mi></msqrt></mrow></mfrac></mrow></math><div class="eqnote">Simplified radiative-forcing expressions and their per-unit-abundance derivatives (Myhre et al. 1998<sup class="cite">[<a href="#ref_myhre98">8</a>]</sup>; IPCC AR6<sup class="cite">[<a href="#ref_ipcc21">9</a>]</sup>). C in ppm, M in ppb; the CH₄–N₂O overlap term is neglected.</div></div><p>And the resolution of the opening paradox: methane wins per molecule, CO₂ wins per planet — because there is 222× more of it, and because it sits on the peak of Earth’s thermal glow.</p><h2 id="strengths"><span class="s">4</span>What Faraday is genuinely good for</h2><p>The honest case for this architecture, on the evidence above. <b>Cross-source chaining</b> is the real win: resolving a species, pulling its line list, scaling it with the right constants, and cross-checking against an observed spectrum happened in one uninterrupted agent workflow, with no manual reformatting between NIST’s, HITRAN’s and PubChem’s conventions. <b>Provenance is intrinsic</b> — because every number arrived through a typed call, the appendices can list each call verbatim, and the calculation reads from the shipped derived Parquet products plus the HITRAN line samples regenerated via those same documented MCP calls (the raw HITRAN/IR tables are not redistributed; see Appendix D). <b>Identifier reconciliation</b> is handled for you: CO₂ is CID 280 to PubChem, C124389 to the WebBook, molecule 2 / isotopologue 7 to HITRAN, and Faraday lets one chain hop between them. For a scientist, the practical effect is that a legacy, human-oriented data landscape becomes machine-actionable in a single reasoning step.</p><h2 id="limits"><span class="s">5</span>Limitations</h2><p>Scientific honesty requires stating exactly what this run could and could not do.</p><ul><li><b>HITRAN response limits forced line sampling.</b> The full bands hold 15,327 (CO₂) and 17,771 (CH₄) principal-isotopologue lines; a single call for ~500 lines overflowed the response budget (~300 KB). We therefore retrieved representative P/Q/R windows (90 lines each). Band-centre optical depth and per-molecule efficiency are dominated by the strongest lines, which are captured, so the <i>mechanism</i> and ordering are robust — but the synthesised cross-sections (Figs 2–3) are illustrative, not a full line-by-line opacity, and they <i>under</i>-represent CO₂’s true collective saturation.</li><li><b>No absolute forcing is computed from Faraday data.</b> A real W m⁻² figure needs the complete line lists and a vertically-resolved radiative-transfer model with temperature and pressure profiles. The per-ppb efficiencies in §3.6 are the cited IPCC/Myhre benchmark, clearly external; Faraday supplies the spectroscopic mechanism, not the radiative-transfer integration.</li><li><b>Cross-sections use HITRAN’s 296 K reference</b> while Planck weighting uses 255 K; full temperature scaling needs partition sums (TIPS) not exposed here.</li><li><b>NIST ASD was not used for this molecular problem.</b> The captured run logged earlier ASD challenge/timeout behavior separately; because atomic lines are irrelevant to this calculation, the molecular result does not depend on ASD availability.</li><li><b>MoNA is reachable</b> (re-tested 2026-06-01): it returns real experimental mass spectra for valid MassBank accession IDs — e.g. <span class="mono">AU100601</span> yields a 27-peak ESI-MS/MS of sulfaclozine. The earlier "404" reflected an invalid query ID, not an outage. Mass spectra play no role in IR radiative transfer, so MoNA is not used in this analysis.</li><li><b>PubChem returned no GHS classification</b> for either gas (both are asphyxiation/flammability hazards in practice); the safety endpoint simply had no structured record to serve.</li><li><b>Atmospheric abundances are external scenario inputs</b> (NOAA GML<sup class="cite">[<a href="#ref_noaa">11</a>]</sup>: CO₂ ≈ 427 ppm, CH₄ ≈ 1922 ppb for this captured run), not Faraday data. Refresh those values before using the scenario as a live “today” estimate.</li></ul><h2 id="outlook"><span class="s">6</span>Outlook</h2><p>The deeper point is not this one calculation but the pattern it demonstrates. Authoritative reference data lives in fragmented, decades-old, human-facing interfaces — JCAMP-DX files, fixed-width line lists, Shomate tables, constants pages — each a small act of friction. An MCP layer turns that friction into a typed API an agent can compose. A multi-agent pipeline built on these tools is easy to picture: a <i>retrieval</i> agent that resolves species and pulls primary data; an <i>analysis</i> agent that runs the physics under unit and provenance checks; a <i>verification</i> agent that re-derives every number from the raw products and the literature; and a <i>writing</i> agent that produces a transparent, fully traceable artifact like this one. The scientist’s role shifts from plumbing formats to posing the question and auditing the chain — which is exactly the work worth a human’s attention.</p><h2 id="references">References</h2><p>Spectroscopy and constants were retrieved at run time through the Faraday MCP server; the citations below are the authoritative upstream sources and the methods on which the calculations rest.</p><ol class="refs"><li id="ref_mcp">Anthropic, “Model Context Protocol” specification (2024). modelcontextprotocol.io.</li><li id="ref_gordon22">I. E. Gordon, L. S. Rothman, R. J. Hargreaves, et al., “The HITRAN2024 molecular spectroscopic database,” J. Quant. Spectrosc. Radiat. Transfer 109807 (2026). doi:10.1016/j.jqsrt.2026.109807.</li><li id="ref_tiesinga21">P. J. Mohr, D. B. Newell, B. N. Taylor, E. Tiesinga, “CODATA recommended values of the fundamental physical constants: 2022,” Rev. Mod. Phys. 97, 025002 (2025); J. Phys. Chem. Ref. Data 54, 033105 (2025).</li><li id="ref_webbook">P. J. Linstrom and W. G. Mallard, Eds., NIST Chemistry WebBook, NIST Standard Reference Database No. 69, National Institute of Standards and Technology. doi:10.18434/T4D303.</li><li id="ref_janaf">M. W. Chase, Jr., NIST-JANAF Thermochemical Tables, 4th ed., J. Phys. Chem. Ref. Data, Monograph 9 (1998).</li><li id="ref_pubchem">S. Kim, J. Chen, T. Cheng, et al., “PubChem 2023 update,” Nucleic Acids Res. 51(D1), D1373–D1380 (2023).</li><li id="ref_armstrong67">B. H. Armstrong, “Spectrum line profiles: The Voigt function,” J. Quant. Spectrosc. Radiat. Transfer 7, 61–88 (1967).</li><li id="ref_myhre98">G. Myhre, E. J. Highwood, K. P. Shine, F. Stordal, “New estimates of radiative forcing due to well mixed greenhouse gases,” Geophys. Res. Lett. 25, 2715–2718 (1998).</li><li id="ref_ipcc21">IPCC, Climate Change 2021: The Physical Science Basis. Contribution of WG I to the Sixth Assessment Report, Cambridge University Press (2021).</li><li id="ref_pierrehumbert10">R. T. Pierrehumbert, Principles of Planetary Climate, Cambridge University Press (2010).</li><li id="ref_noaa">X. Lan, P. Tans, K. W. Thoning, “Trends in globally-averaged CO₂ and CH₄,” NOAA Global Monitoring Laboratory (2025). gml.noaa.gov/ccgg/trends.</li><li id="ref_asd">A. Kramida, Yu. Ralchenko, J. Reader, and NIST ASD Team, NIST Atomic Spectra Database (ver. 5.12; data content last updated November 2024), National Institute of Standards and Technology. doi:10.18434/T4W30F.</li><li id="ref_massbank">H. Horai, M. Arita, S. Kanaya, et al., “MassBank: a public repository for sharing mass spectral data for life sciences,” J. Mass Spectrom. 45, 703–714 (2010); MassBank of North America (MoNA), Fiehn Lab, UC Davis.</li></ol><h2 id="appendix">Appendices</h2><div class="appendix-hub"><details class="app" id="appA" open=""><summary>Appendix A · The prompt <span class="x">▾</span></summary><div class="app-body"><pre class="code">PROJECT INSTRUCTION (Faraday MCP Server):
+create a state of the art open source project for a science based MCP server for data retrieval. i want you to be scientifically firm and correct and precise but also see the bigger picture by means of applications that change the way scientist interact with legacy data infrastructure.
+
+USER INVOCATION:
+/anthropic-skills:faraday-mcp-blog
+
+CLARIFYING ANSWERS:
+  • Subject molecule  → "the one that is atmospherically most relevant"
+  • Scope             → "what is most suiting to demonstrate strong science impact"
+(The model chose a CO₂-vs-CH₄ comparison from these answers.)
+
+======================================================================
+SKILL PROMPT (verbatim):
+======================================================================
+
+---
+name: faraday-mcp-blog
+description: &gt;
+  Produces a rigorously scientific, beautifully designed, fully reproducible
+  standalone HTML blog post that documents the Faraday MCP server — covering
+  all six data sources (NIST ASD, HITRAN, NIST Chemistry WebBook, PubChem,
+  CODATA, MoNA), a real cross-source scientific use case, interactive charts,
+  a zoomable Mermaid architecture diagram, downloadable Parquet data products,
+  and complete appendices for transparency and reproducibility.
+
+  Use this skill whenever the user asks to:
+  - write, generate, or produce a blog post about the Faraday MCP server
+  - document or demonstrate what Faraday MCP can do
+  - create a scientific showcase using Faraday tools
+  - produce a reproducible science article from MCP tool outputs
+  - generate an HTML artifact from Faraday data with interactive charts
+
+  Also trigger when the user says things like "faraday blog", "faraday article",
+  "document the mcp server", "showcase faraday", or "write up the faraday usecase".
+---
+
+# Faraday MCP Blog Post Skill
+
+Produces a single self-contained HTML blog post that demonstrates the Faraday
+MCP server end-to-end: real tool calls, real data, real calculations, interactive
+visualizations, downloadable Parquet files, and full provenance transparency.
+
+---
+
+## Execution Phases
+
+Work through these phases in order. Do not draft prose until Phase 1 is complete.
+Do not finalize HTML until Phase 4 (review) is complete.
+
+---
+
+### PHASE 1 — DISCOVERY (run tools first, write nothing yet)
+
+1. Use the Faraday MCP tools to query all six data sources. Execute at least
+   one real tool call per source — no placeholders, no invented data.
+
+2. **HARD CONSTRAINT**: ALL data must come exclusively through Faraday MCP tool
+   calls. Do NOT fetch data directly from NIST, HITRAN, PubChem, or any other
+   website via HTTP, browser, or any non-MCP route. If a source is unreachable
+   via MCP, document the failure as a limitation — do not route around it.
+
+3. Identify a scientifically meaningful cross-source use case requiring ≥4 data
+   sources to answer one coherent question. Strong candidates:
+   - Molecular energy budgets
+   - Spectroscopic identification pipelines
+   - Atmospheric opacity / radiative transfer
+   - Astrochemistry cross-checks
+
+4. Perform quantitative analysis using `scipy.constants` for all physical
+   constants — no hardcoded values. Show the math.
+
+---
+
+### PHASE 2 — DATA PRODUCTS
+
+For every dataset retrieved via MCP:
+
+1. Serialize as Parquet using `pyarrow`. Include all returned fields — no
+   truncated columns.
+2. Name descriptively: `{source}_{entity}_{query}.parquet`
+   e.g. `hitran_H2O_lines_600_1400cm.parquet`
+3. Embed each file in the HTML as a base64-encoded download link. The page
+   must be fully self-contained — no server required.
+4. Build a data manifest table: source, filename, row count, columns, file size.
+
+---
+
+### PHASE 3 — ARTICLE STRUCTURE
+
+Write a **10–15 minute read** with this exact section order:
+
+| §   | Title | Content |
+|-----|-------|---------|
+| 0   | Hero | One-sentence thesis: what Faraday enables that wasn't easy before |
+| 1   | Tool landscape | Each data source: what it is, what it covers, canonical use case. ≤1 paragraph each + summary table |
+| 2   | Architecture overview | Mermaid diagram (Phase 6) + 2–3 paragraphs on call flow: client → MCP protocol → dispatcher → upstream APIs → return path |
+| 3   | The use case | Scientific question, why multiple sources are required, step-by-step workflow with real data |
+| 4   | Results | Quantitative outputs as interactive charts (Phase 5) |
+| 5   | Data products | Manifest table with download buttons |
+| 6   | Strengths | Honest assessment of what Faraday is genuinely good for |
+| 7   | Limitations | Specific coverage gaps, resolution limits, failed MCP calls |
+| 8   | Outlook | What a multi-agent pipeline using these tools looks like |
+| App A | MCP calls | All tool calls as formatted JSON blocks |
+| App B | Calculation code | Self-contained Python (scipy + pyarrow only); reads from Parquet files |
+| App C | Prompt | The exact prompt that generated this article, verbatim |
+| App D | Provenance | Generation metadata + footer callout (see below) |
+
+**Appendix D — required provenance statement**
+
+Include a structured metadata block AND a highlighted callout box in the
+article footer containing this verbatim text (do not soften, hedge, or paraphrase):
+
+&gt; "This article was generated autonomously by Claude Opus 4.8 running in
+&gt; Cowork mode via the Claude Desktop App with maximum effort
+&gt; enabled. The only context provided to the model was the open-source Faraday
+&gt; GitHub repository. All scientific data was retrieved exclusively through
+&gt; Faraday MCP tool calls — no direct database queries, no web scraping, no
+&gt; manually supplied datasets. The complete prompt, all MCP call parameters,
+&gt; redistributable data products, regenerate-on-demand notes for restricted raw
+&gt; sources, and all calculation code are provided in the appendices above."
+
+Structured metadata fields:
+```
+Generated by:      Claude Opus 4.8
+Interface:         Claude Desktop App, Cowork mode
+Effort level:      Maximum effort reasoning setting in Claude Desktop
+Context provided:  Faraday GitHub repository (open source, public) — no other
+                   context, documents, or data sources were provided to the model
+MCP server:        Faraday MCP (locally running instance)
+Data access:       Exclusively via Faraday MCP tool calls — no direct HTTP requests
+Date generated:    [ISO 8601 date at generation time]
+Prompt:            See Appendix C
+```
+
+---
+
+### PHASE 4 — REVIEW &amp; VERIFICATION (hard gate — do not finalize HTML until complete)
+
+Treat this as a separate agent reviewing the drafting agent's work.
+
+**Numbers**
+- Re-derive every numerical result independently from raw MCP outputs and
+  `scipy.constants` values. Correct any discrepancy.
+- Check all unit conversions explicitly (cm⁻¹ → nm → eV → J etc.).
+- Verify all order-of-magnitude estimates are physically reasonable.
+- Confirm every constant matches its `scipy.constants` name and CODATA value.
+
+**Calculations**
+- Trace each formula in the prose to a line in Appendix B code.
+- Run Appendix B mentally end-to-end; confirm outputs match §§ 3–4.
+- Check for compounding rounding errors across multi-step calculations.
+
+**Graphs and visualizations**
+- Axis labels, units, and tick values must match the Parquet data.
+- Tooltip values on hover must match the underlying data to full floating-point
+  precision (display rounding is permitted but raw value must be in tooltip).
+- Confirm zoom reveals additional point density — no downsampling.
+- Spectral / energy-level diagrams must use actual retrieved values, not schematics.
+
+**Mermaid diagram**
+- Every edge tool name must match an actual Phase 1 tool call (exact spelling).
+- Data flow direction arrows must be logically correct.
+- Pan/zoom controls must be present and functional.
+
+**Cross-checks**
+- Manifest row counts match actual Parquet record counts.
+- Appendix A JSON matches exact Phase 1 call parameters (no paraphrasing).
+- Appendix C is verbatim prompt.
+- Appendix D callout box is present in the footer with verbatim text.
+
+**Audit trail**: Document every correction as an HTML comment:
+`&lt;!-- REVIEW: corrected X → Y --&gt;`
+
+---
+
+### PHASE 5 — INTERACTIVE GRAPHICS (vanilla JS only — no charting libraries)
+
+#### All charts (§ 4 and anywhere else data is visualized)
+
+Implement as HTML5 Canvas or inline SVG + vanilla JavaScript.
+
+**Zoom &amp; pan**
+- Mouse wheel / trackpad pinch → zoom both axes simultaneously (or per-axis for spectra)
+- Click and drag → pan
+- Double-click → reset to default view
+- Must render ALL data points at every zoom level — no downsampling
+
+**Data points &amp; tooltips**
+- Every discrete point rendered as a visible marker (circle / cross / diamond)
+- Hover tooltip: x-value + unit, y-value + unit, source database, MCP tool name
+- Tooltip follows cursor, does not overflow viewport
+- High-density datasets (&gt;500 points): 2px dots at full zoom-out, scale to 6px+
+  when &lt;50 points visible in the current view
+
+**Axes &amp; labels**
+- Dynamic rescaling during zoom with correct tick intervals at every zoom level
+- Labels include physical quantity name and unit
+- "Current view range" readout below each chart:
+  e.g. `Viewing: 667.2 – 668.1 cm⁻¹ · 14 points`
+
+**Toolbar above each chart**
+- `[Reset zoom]` `[Download PNG]` `[Copy data as CSV]`
+- PNG download captures current zoom state
+- CSV export contains only currently visible points at full precision
+
+#### Mermaid diagram interactivity
+
+Apply after Mermaid renders the SVG, via injected vanilla JS:
+
+- Mouse wheel → zoom centered on cursor
+- Click and drag → pan
+- Double-click → reset to fit-to-container
+- **Node hover**: tooltip with node description, associated tool name(s),
+  one-line description of what data that source provides
+- **Edge hover**: highlight the full call path (client → MCP → data source →
+  return), dim all other edges and nodes
+- Toolbar: `[Reset view]` `[Download SVG]`
+
+---
+
+### PHASE 6 — MERMAID ARCHITECTURE DIAGRAM
+
+**Architecture nodes**
+- Top: LLM/agent client, labelled `Claude Opus 4.8 · Cowork · Max Effort`
+- Middle: MCP protocol layer (label with transport: stdio or SSE)
+- Centre: Faraday MCP Server (dispatcher)
+- Leaves: all six upstream data sources, each labelled with:
+  `{source name} · {tool count} tools · {data type}`
+  e.g. `HITRAN · 2 tools · molecular line parameters`
+- Return path: data → MCP server → optional Parquet serialization → client
+
+**Call flow overlay**
+- Annotate edges with actual tool names from Phase 1
+- Subgraph 1: "Upstream Scientific Databases" (six sources)
+- Subgraph 2: "Data Products" (Parquet serialization + download links)
+
+**Rendering**
+- Mermaid JS CDN: `https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js`
+  (the ONE permitted external JS dependency alongside Google Fonts)
+- Custom dark theme matching the article aesthetic
+- Must be readable at 800px width without horizontal scroll
+- Apply Phase 5 pan/zoom controller after render
+
+---
+
+### PHASE 7 — HTML DESIGN
+
+Single self-contained HTML file. No server required.
+
+**Aesthetic**: Dark scientific — deep navy/black background, instrument-readout
+accent color, monospaced data elements.
+
+**Typography**: Sharp serif for body (Source Serif, Lora, or Charter via Google
+Fonts) + monospace for code and data.
+
+**Interactions**
+- All charts interactive per Phase 5
+- Mermaid diagram pan/zoom + hover per Phase 5
+- Smooth scroll, sticky nav
+- Collapsible appendix sections (collapsed by default on screen)
+- Parquet download buttons styled as terminal export actions
+
+**Print**: `@media print` — appendices expand, charts render as static snapshots.
+
+**External dependencies**: Mermaid CDN + Google Fonts only. All interactivity
+is vanilla JS. Zero other external libraries.
+
+---
+
+## Quality Bar (failure conditions)
+
+| Check | Failure condition |
+|-------|------------------|
+| Data sourcing | Any number not traceable to a Faraday MCP tool call or `scipy.constants` |
+| Charts | Any static image where an interactive chart was required |
+| Mermaid | Static diagram without pan/zoom and edge-highlight hover |
+| Tooltips | Values that diverge from underlying data precision |
+| Parquet files | Mock CSV embedded as fake Parquet |
+| Review gate | HTML finalized before Phase 4 complete |
+| Provenance | Callout box absent, softened, or paraphrased |
+| Mermaid client node | Not labelled `Claude Opus 4.8 · Cowork · Max Effort` |
+| Appendix B | Code that re-queries external sources instead of reading Parquet files |
+| Limitations | No mention of MCP calls that failed or returned empty results |
+</pre></div></details>
+<details class="app" id="appB" open=""><summary>Appendix B · MCP tool-call log <span class="x">▾</span></summary><div class="app-body"><p class="small">Each block is the exact tool and arguments issued to Faraday; the green line is the returned result summary. All scientific data in this article originates here.</p><h3>CODATA constants</h3><div class="jsonblock">{
+  "tool": "codata_search",
+  "arguments": {
+    "query": "radiation constant"
+  }
+}
+<span style="color:#5fd38a">→ 3 hits incl. second radiation constant = 1.438776877e-2 m K</span></div><div class="jsonblock">{
+  "tool": "codata_get",
+  "arguments": {
+    "constant_name": "Planck constant"
+  }
+}
+<span style="color:#5fd38a">→ 6.62607015e-34 J Hz^-1 (exact)</span></div><div class="jsonblock">{
+  "tool": "codata_get",
+  "arguments": {
+    "constant_name": "speed of light in vacuum"
+  }
+}
+<span style="color:#5fd38a">→ 299792458 m s^-1 (exact)</span></div><div class="jsonblock">{
+  "tool": "codata_get",
+  "arguments": {
+    "constant_name": "Boltzmann constant"
+  }
+}
+<span style="color:#5fd38a">→ 1.380649e-23 J K^-1 (exact)</span></div><div class="jsonblock">{
+  "tool": "codata_get",
+  "arguments": {
+    "constant_name": "Avogadro constant"
+  }
+}
+<span style="color:#5fd38a">→ 6.02214076e23 mol^-1 (exact)</span></div><div class="jsonblock">{
+  "tool": "codata_get",
+  "arguments": {
+    "constant_name": "molar gas constant"
+  }
+}
+<span style="color:#5fd38a">→ 8.314462618 J mol^-1 K^-1 (exact)</span></div><div class="jsonblock">{
+  "tool": "codata_get",
+  "arguments": {
+    "constant_name": "second radiation constant"
+  }
+}
+<span style="color:#5fd38a">→ 1.438776877e-2 m K (exact)</span></div><h3>PubChem identity / safety</h3><div class="jsonblock">{
+  "tool": "pubchem_search",
+  "arguments": {
+    "query": "carbon dioxide"
+  }
+}
+<span style="color:#5fd38a">→ CID 280, CO2, 44.009 g/mol</span></div><div class="jsonblock">{
+  "tool": "pubchem_search",
+  "arguments": {
+    "query": "methane"
+  }
+}
+<span style="color:#5fd38a">→ CID 297, CH4, 16.043 g/mol</span></div><div class="jsonblock">{
+  "tool": "pubchem_get_properties",
+  "arguments": {
+    "identifier": "280",
+    "identifier_type": "cid"
+  }
+}
+<span style="color:#5fd38a">→ exact mass 43.989829239, XLogP 0.9, TPSA 34.1, CAS 124-38-9</span></div><div class="jsonblock">{
+  "tool": "pubchem_get_properties",
+  "arguments": {
+    "identifier": "297",
+    "identifier_type": "cid"
+  }
+}
+<span style="color:#5fd38a">→ exact mass 16.0313001276, XLogP 0.6, TPSA 0, CAS 74-82-8</span></div><div class="jsonblock">{
+  "tool": "pubchem_get_synonyms",
+  "arguments": {
+    "identifier": "280",
+    "identifier_type": "cid"
+  }
+}
+<span style="color:#5fd38a">→ CAS 124-38-9 (+49 synonyms)</span></div><div class="jsonblock">{
+  "tool": "pubchem_get_synonyms",
+  "arguments": {
+    "identifier": "297",
+    "identifier_type": "cid"
+  }
+}
+<span style="color:#5fd38a">→ CAS 74-82-8 (+ natural gas, marsh gas, ...)</span></div><div class="jsonblock">{
+  "tool": "pubchem_get_safety",
+  "arguments": {
+    "cid": "280"
+  }
+}
+<span style="color:#5fd38a">→ No GHS classification data returned</span></div><div class="jsonblock">{
+  "tool": "pubchem_get_safety",
+  "arguments": {
+    "cid": "297"
+  }
+}
+<span style="color:#5fd38a">→ No GHS classification data returned</span></div><h3>NIST Chemistry WebBook — thermochem / phase</h3><div class="jsonblock">{
+  "tool": "nist_search_compound",
+  "arguments": {
+    "query": "carbon dioxide"
+  }
+}
+<span style="color:#5fd38a">→ nist_id C124389 (CAS 124-38-9)</span></div><div class="jsonblock">{
+  "tool": "nist_search_compound",
+  "arguments": {
+    "query": "methane"
+  }
+}
+<span style="color:#5fd38a">→ nist_id C74828 (CAS 74-82-8)</span></div><div class="jsonblock">{
+  "tool": "nist_get_thermo",
+  "arguments": {
+    "compound_id": "C124389"
+  }
+}
+<span style="color:#5fd38a">→ Shomate gas, 298-1200 &amp; 1200-6000 K</span></div><div class="jsonblock">{
+  "tool": "nist_get_thermo",
+  "arguments": {
+    "compound_id": "C74828"
+  }
+}
+<span style="color:#5fd38a">→ Shomate gas, 298-1300 &amp; 1300-6000 K</span></div><div class="jsonblock">{
+  "tool": "nist_get_phase_change",
+  "arguments": {
+    "compound_id": "C124389"
+  }
+}
+<span style="color:#5fd38a">→ Tc 304.18 K, triple 216.58 K / 5.185 bar, ΔsubH 26.1 kJ/mol</span></div><div class="jsonblock">{
+  "tool": "nist_get_phase_change",
+  "arguments": {
+    "compound_id": "C74828"
+  }
+}
+<span style="color:#5fd38a">→ Tb 111 K, Tc 190.6 K, ΔvapH 8.6 kJ/mol</span></div><h3>NIST molecular spectra (IR)</h3><div class="jsonblock">{
+  "tool": "nist_get_spectrum",
+  "arguments": {
+    "compound_id": "C124389",
+    "spectrum_type": "IR",
+    "max_peaks": 500
+  }
+}
+<span style="color:#5fd38a">→ 500 of 880 pts, 450-2446 cm^-1; MAXY 0.9343 @ 2358</span></div><div class="jsonblock">{
+  "tool": "nist_get_spectrum",
+  "arguments": {
+    "compound_id": "C74828",
+    "spectrum_type": "IR",
+    "max_peaks": 500
+  }
+}
+<span style="color:#5fd38a">→ 500 of 880 pts, 450-2446 cm^-1; ν4 peak @ 1306</span></div><h3>HITRAN line-by-line</h3><div class="jsonblock">{
+  "tool": "hitran_search_molecule",
+  "arguments": {
+    "query": "CO2"
+  }
+}
+<span style="color:#5fd38a">→ molecule_id 2, principal iso 7 (12C16O2)</span></div><div class="jsonblock">{
+  "tool": "hitran_search_molecule",
+  "arguments": {
+    "query": "CH4"
+  }
+}
+<span style="color:#5fd38a">→ molecule_id 6, principal iso 32 (12CH4)</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CO2",
+    "min_wavenumber_cm1": 600,
+    "max_wavenumber_cm1": 750,
+    "max_lines": 1
+  }
+}
+<span style="color:#5fd38a">→ line_count_total = 15327</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CO2",
+    "min_wavenumber_cm1": 666,
+    "max_wavenumber_cm1": 668,
+    "max_lines": 40
+  }
+}
+<span style="color:#5fd38a">→ 40 of 151 (Q-branch); strongest S=5.02e-24</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CO2",
+    "min_wavenumber_cm1": 651,
+    "max_wavenumber_cm1": 655,
+    "max_lines": 25
+  }
+}
+<span style="color:#5fd38a">→ 25 of 449 (P-branch); strongest S=6.95e-24</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CO2",
+    "min_wavenumber_cm1": 678,
+    "max_wavenumber_cm1": 682,
+    "max_lines": 25
+  }
+}
+<span style="color:#5fd38a">→ 25 of 560 (R-branch)</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CH4",
+    "min_wavenumber_cm1": 1200,
+    "max_wavenumber_cm1": 1400,
+    "max_lines": 1
+  }
+}
+<span style="color:#5fd38a">→ line_count_total = 17771</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CH4",
+    "min_wavenumber_cm1": 1304,
+    "max_wavenumber_cm1": 1308,
+    "max_lines": 40
+  }
+}
+<span style="color:#5fd38a">→ 40 of 396 (Q-branch); strongest S=4.78e-20</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CH4",
+    "min_wavenumber_cm1": 1289,
+    "max_wavenumber_cm1": 1293,
+    "max_lines": 25
+  }
+}
+<span style="color:#5fd38a">→ 25 of 674 (P-branch)</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CH4",
+    "min_wavenumber_cm1": 1318,
+    "max_wavenumber_cm1": 1322,
+    "max_lines": 25
+  }
+}
+<span style="color:#5fd38a">→ 25 of 227 (R-branch)</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CO2",
+    "min_wavenumber_cm1": 600,
+    "max_wavenumber_cm1": 750,
+    "max_lines": 500
+  }
+}
+<span style="color:#5fd38a">→ OVERFLOW (302 KB) — re-sampled in narrower windows above</span></div><div class="jsonblock">{
+  "tool": "hitran_get_lines",
+  "arguments": {
+    "molecule": "CH4",
+    "min_wavenumber_cm1": 1200,
+    "max_wavenumber_cm1": 1400,
+    "max_lines": 500
+  }
+}
+<span style="color:#5fd38a">→ OVERFLOW (310 KB) — re-sampled in narrower windows above</span></div><h3>Sources re-probed 2026-06-01</h3><div class="jsonblock">{
+  "tool": "asd_get_lines",
+  "arguments": {
+    "element": "C I",
+    "low_wl_nm": 150,
+    "high_wl_nm": 900,
+    "max_lines": 20
+  }
+}
+<span style="color:#5fd38a">→ STILL BROKEN: Cloudflare challenge page, not line data</span></div><div class="jsonblock">{
+  "tool": "asd_get_lines",
+  "arguments": {
+    "element": "H I",
+    "low_wl_nm": 380,
+    "high_wl_nm": 700,
+    "max_lines": 20
+  }
+}
+<span style="color:#5fd38a">→ STILL BROKEN: request timed out</span></div><div class="jsonblock">{
+  "tool": "mona_get_spectrum",
+  "arguments": {
+    "spectrum_id": "AU100601"
+  }
+}
+<span style="color:#5fd38a">→ LIVE: 27-peak ESI-MS/MS of sulfaclozine (InChIKey QKLPUVXBJHRFQZ-UHFFFAOYSA-N)</span></div><div class="jsonblock">{
+  "tool": "mona_get_spectrum",
+  "arguments": {
+    "spectrum_id": "MassBank:AU100501"
+  }
+}
+<span style="color:#5fd38a">→ 404 — invalid accession id (not an outage)</span></div></div></details>
+<details class="app" id="appC" open=""><summary>Appendix C · Analysis code <span class="x">▾</span></summary><div class="app-body"><p class="small">The analysis script reads the shipped CODATA/PubChem/thermo/phase Parquet products of Appendix D <em>plus</em> the two HITRAN line samples that you regenerate from the Appendix B <span class="mono">hitran_get_lines</span> calls (not redistributed); it uses <span class="mono">scipy.constants</span> for physical constants, cross-checked against the Faraday CODATA pull where recorded. <span class="mono">build_parquet.py</span> validates the four redistributable products and writes their manifest; running <span class="mono">analysis.py</span> before regenerating the HITRAN samples exits with a clear pointer rather than crashing.</p><h3>analysis.py</h3><div class="dl-actions"><a class="dlbtn" download="analysis.py" href="data/co2_vs_ch4/analysis.py" aria-label="Download analysis.py">↓ analysis.py</a></div><pre class="code">"""
+analysis.py  (Appendix C)
+=========================
+Self-contained line-by-line analysis of the CO2 nu2 (15 um) vs CH4 nu4 (7.66 um)
+bands.  Reads the shipped CODATA/PubChem derived Parquet products in this
+directory PLUS two HITRAN line-sample tables that are NOT redistributed and must
+be regenerated first (see the load guard below); uses scipy.constants for every
+physical constant (cross-checked against the Faraday-retrieved CODATA values).
+Writes results.json consumed by the article.
+
+Dependencies: numpy, scipy, pyarrow  (no network, no hard-coded spectroscopy).
+"""
+import json, os
+import numpy as np
+from scipy import constants as sc
+from scipy.special import wofz
+import pyarrow.parquet as pq
+
+HERE = os.path.dirname(__file__)
+PQ = HERE
+
+def load(name):
+    return pq.read_table(os.path.join(PQ, name)).to_pydict()
+
+# ---------------------------------------------------------------------------
+# Constants from scipy.constants  (CODATA), cross-checked vs Faraday CODATA pull
+# ---------------------------------------------------------------------------
+h   = sc.h                                              # J s
+c   = sc.c                                              # m s^-1
+kB  = sc.k                                              # J K^-1
+NA  = sc.N_A                                            # mol^-1
+c2  = sc.physical_constants["second radiation constant"][0]   # m K  (= h c / kB)
+c_cm = c * 100.0                                        # cm s^-1
+
+cod = load("codata_constants.parquet")
+faraday_const = dict(zip(cod["name"], cod["value"]))
+const_check = {
+    "planck_constant":           (h,  faraday_const["planck_constant"]),
+    "speed_of_light":            (c,  faraday_const["speed_of_light"]),
+    "boltzmann_constant":        (kB, faraday_const["boltzmann_constant"]),
+    "avogadro_constant":         (NA, faraday_const["avogadro_constant"]),
+    "second_radiation_constant": (c2, faraday_const["second_radiation_constant"]),
+}
+const_check = {k: {"scipy": float(a), "faraday": float(b),
+                   "rel_diff": abs(a - b) / b} for k, (a, b) in const_check.items()}
+assert all(v["rel_diff"] &lt; 1e-9 for v in const_check.values()), "CODATA mismatch"
+# also verify the identity c2 = h c / kB
+c2_identity = h * c / kB
+
+# ---------------------------------------------------------------------------
+# Molecular / scenario inputs
+# ---------------------------------------------------------------------------
+pcp = load("pubchem_CO2_CH4_properties.parquet")
+MW = dict(zip(pcp["species"], pcp["MolecularWeight"]))      # g/mol  (PubChem)
+m_CO2 = MW["CO2"] * 1e-3 / NA                                # kg
+m_CH4 = MW["CH4"] * 1e-3 / NA
+
+# External scenario parameters captured for the article run. NOAA abundances are
+# time-dependent, so refresh these before presenting the scenario as "today".
+xCO2, xCH4 = 427e-6, 1922e-9
+Psurf, g, Mair = 101325.0, 9.80665, 28.96e-3
+T_emit, T_surf = 255.0, 288.0
+N_air_cm2 = Psurf / ((Mair / NA) * g) / 1e4                  # molec / cm^2 (column)
+N_CO2 = xCO2 * N_air_cm2
+N_CH4 = xCH4 * N_air_cm2
+
+# ---------------------------------------------------------------------------
+# Helper physics
+# ---------------------------------------------------------------------------
+def to_um(nu):       return 1.0e4 / nu                       # cm^-1 -&gt; micron
+def to_eV(nu):       return h * c * (nu * 100.0) / sc.e        # cm^-1 -&gt; eV
+
+def doppler_hwhm(nu0, T, m):
+    """Gaussian (Doppler) half-width at half-max in cm^-1."""
+    return (nu0 / c_cm) * np.sqrt(2.0 * np.log(2.0) * kB * T / m) * c_cm / c  # = nu0/c*sqrt(...)
+
+def voigt_phi(nu, nu0, gammaL, gammaD_hwhm):
+    """Area-normalised Voigt profile [1/cm^-1].  gammaD_hwhm = Gaussian HWHM."""
+    sigmaG = gammaD_hwhm / np.sqrt(2.0 * np.log(2.0))         # Gaussian std
+    z = ((nu - nu0) + 1j * gammaL) / (sigmaG * np.sqrt(2.0))
+    return np.real(wofz(z)) / (sigmaG * np.sqrt(2.0 * np.pi))
+
+def cross_section(nu_grid, lines, T, m):
+    """Sum Voigt line cross-sections [cm^2/molec]; lines at HITRAN T_ref=296 K, 1 atm air."""
+    sigma = np.zeros_like(nu_grid)
+    for nu0, S, gair in lines:
+        gD = doppler_hwhm(nu0, T, m)
+        sigma += S * voigt_phi(nu_grid, nu0, gair, gD)
+    return sigma
+
+def planck_wn(nu_cm1, T):
+    """Spectral radiance B per unit wavenumber [W m^-2 sr^-1 (cm^-1)^-1]."""
+    nu_m = np.asarray(nu_cm1, float) * 100.0
+    x = h * c * nu_m / (kB * T)
+    return (2.0 * h * c**2 * nu_m**3 / np.expm1(x)) * 100.0
+
+# ---------------------------------------------------------------------------
+# Load HITRAN samples
+#
+# These two line-sample tables are NOT redistributed (upstream HITRAN terms).
+# Regenerate them via the Faraday calls recorded in Appendix B, then write each
+# as Parquet into this directory with these exact filenames and columns:
+#   hitran_CO2_lines_651_682cm.parquet  &lt;- hitran_get_lines(CO2, 651..682 cm^-1)
+#   hitran_CH4_lines_1289_1322cm.parquet &lt;- hitran_get_lines(CH4, 1289..1322 cm^-1)
+#   columns: wavenumber_cm1, intensity_cm_per_molec_cm2, gamma_air_cm1_atm,
+#            lower_state_energy_cm1, source_window
+# ---------------------------------------------------------------------------
+_HITRAN = ("hitran_CO2_lines_651_682cm.parquet",
+           "hitran_CH4_lines_1289_1322cm.parquet")
+_missing = [f for f in _HITRAN if not os.path.exists(os.path.join(PQ, f))]
+if _missing:
+    raise SystemExit(
+        "HITRAN line samples not found: " + ", ".join(_missing) + "\n"
+        "These are not redistributed -- regenerate via hitran_get_lines "
+        "(Appendix B) first, writing the exact filenames/columns documented "
+        "above into this directory, then re-run analysis.py."
+    )
+co2 = load("hitran_CO2_lines_651_682cm.parquet")
+ch4 = load("hitran_CH4_lines_1289_1322cm.parquet")
+
+def triples(d):
+    return list(zip(d["wavenumber_cm1"], d["intensity_cm_per_molec_cm2"], d["gamma_air_cm1_atm"]))
+
+co2_lines, ch4_lines = triples(co2), triples(ch4)
+
+# band-origin assignments (spectroscopic) + observed cross-check from NIST IR
+nu0_CO2, nu0_CH4 = 667.4, 1305.9
+
+# ---------------------------------------------------------------------------
+# R1  band identity / conversions
+# ---------------------------------------------------------------------------
+R1 = {
+    "CO2": {"nu0_cm1": nu0_CO2, "wavelength_um": to_um(nu0_CO2), "energy_meV": to_eV(nu0_CO2) * 1e3,
+            "assignment": "nu2 bending fundamental", "iso": "12C16O2"},
+    "CH4": {"nu0_cm1": nu0_CH4, "wavelength_um": to_um(nu0_CH4), "energy_meV": to_eV(nu0_CH4) * 1e3,
+            "assignment": "nu4 bending fundamental", "iso": "12CH4"},
+}
+
+# ---------------------------------------------------------------------------
+# R2  per-line intensity contrast
+# ---------------------------------------------------------------------------
+S_co2 = np.array(co2["intensity_cm_per_molec_cm2"])
+S_ch4 = np.array(ch4["intensity_cm_per_molec_cm2"])
+R2 = {
+    "CO2": {"S_max": float(S_co2.max()), "S_median": float(np.median(S_co2)), "n_lines": len(S_co2),
+            "band_total_lines": 15327},
+    "CH4": {"S_max": float(S_ch4.max()), "S_median": float(np.median(S_ch4)), "n_lines": len(S_ch4),
+            "band_total_lines": 17771},
+    "Smax_ratio_CH4_over_CO2": float(S_ch4.max() / S_co2.max()),
+    "Smedian_ratio_CH4_over_CO2": float(np.median(S_ch4) / np.median(S_co2)),
+}
+
+# ---------------------------------------------------------------------------
+# R3  line widths + cross-section spectra over Q-branch windows
+# ---------------------------------------------------------------------------
+gD_CO2 = doppler_hwhm(nu0_CO2, T_emit, m_CO2)
+gD_CH4 = doppler_hwhm(nu0_CH4, T_emit, m_CH4)
+R3 = {
+    "CO2": {"doppler_hwhm_cm1_255K": gD_CO2, "lorentz_hwhm_cm1_1atm_typ": float(np.median(co2["gamma_air_cm1_atm"]))},
+    "CH4": {"doppler_hwhm_cm1_255K": gD_CH4, "lorentz_hwhm_cm1_1atm_typ": float(np.median(ch4["gamma_air_cm1_atm"]))},
+}
+
+def window_sigma(lines, lo, hi, npts=600):
+    grid = np.linspace(lo, hi, npts)
+    sig = cross_section(grid, [(n, S, g) for (n, S, g) in lines if lo - 5 &lt;= n &lt;= hi + 5], 296.0,
+                        m_CO2 if lines is co2_lines else m_CH4)
+    return grid, sig
+
+g_co2, s_co2 = window_sigma(co2_lines, 666.0, 668.0)
+g_ch4, s_ch4 = window_sigma(ch4_lines, 1304.0, 1308.0)
+
+# optical depth at present columns (from sampled lines -&gt; lower bound)
+tau_co2 = s_co2 * N_CO2
+tau_ch4 = s_ch4 * N_CH4
+R3["CO2"]["sigma_peak_cm2_666_668"] = float(s_co2.max())
+R3["CH4"]["sigma_peak_cm2_1304_1308"] = float(s_ch4.max())
+R3["CO2"]["tau_peak_present_sampled"] = float(tau_co2.max())
+R3["CH4"]["tau_peak_present_sampled"] = float(tau_ch4.max())
+
+# ---------------------------------------------------------------------------
+# R4  curve of growth for the strongest sampled line of each gas
+# ---------------------------------------------------------------------------
+def strongest(lines):
+    return max(lines, key=lambda t: t[1])
+
+def curve_of_growth(line, m, Ncols):
+    nu0, S, gair = line
+    gD = doppler_hwhm(nu0, 296.0, m)
+    grid = np.linspace(nu0 - 20.0, nu0 + 20.0, 6000)  # wide enough that W is never window-limited in range
+    phi = voigt_phi(grid, nu0, gair, gD)
+    W = []
+    for N in Ncols:
+        W.append(np.trapezoid(1.0 - np.exp(-S * N * phi), grid))   # equivalent width [cm^-1]
+    return nu0, S, gair, np.array(W)
+
+Ncols = np.logspace(17, 23, 60)  # present columns (4e19, 9e21) sit mid-range; avoids window-limited tail
+co2_strong = strongest(co2_lines)
+ch4_strong = strongest(ch4_lines)
+nu_c, S_c, g_c, W_co2 = curve_of_growth(co2_strong, m_CO2, Ncols)
+nu_m, S_m, g_m, W_ch4 = curve_of_growth(ch4_strong, m_CH4, Ncols)
+
+def tau_core(line, N, m):
+    nu0, S, gair = line
+    gD = doppler_hwhm(nu0, 296.0, m)
+    return S * N * voigt_phi(np.array([nu0]), nu0, gair, gD)[0]
+
+R4 = {
+    "CO2_strong_line": {"nu0_cm1": nu_c, "S": S_c, "gamma_air": g_c,
+                        "tau_core_present": float(tau_core(co2_strong, N_CO2, m_CO2))},
+    "CH4_strong_line": {"nu0_cm1": nu_m, "S": S_m, "gamma_air": g_m,
+                        "tau_core_present": float(tau_core(ch4_strong, N_CH4, m_CH4))},
+    "N_CO2_present": N_CO2, "N_CH4_present": N_CH4, "N_air_column": N_air_cm2,
+}
+
+# ---------------------------------------------------------------------------
+# R5  Planck weighting (why band placement matters)
+# ---------------------------------------------------------------------------
+nu_planck = np.linspace(400.0, 1600.0, 241)
+B255 = planck_wn(nu_planck, T_emit)
+B288 = planck_wn(nu_planck, T_surf)
+B_CO2_255 = float(planck_wn(nu0_CO2, T_emit))
+B_CH4_255 = float(planck_wn(nu0_CH4, T_emit))
+nu_peak_255 = float(nu_planck[int(np.argmax(B255))])
+R5 = {
+    "B_at_CO2band_255K": B_CO2_255, "B_at_CH4band_255K": B_CH4_255,
+    "planck_ratio_CO2_over_CH4": B_CO2_255 / B_CH4_255,
+    "planck_peak_cm1_255K": nu_peak_255,
+}
+
+# ---------------------------------------------------------------------------
+# R6  per-molecule (= per-ppb) radiative efficiency  -- EXTERNAL benchmark
+#     IPCC/Myhre et al. (1998) simplified expressions; captured abundances from
+#     the NOAA scenario above.
+#     CO2:  dF/dC = 5.35 / C           [W m^-2 per ppm]
+#     CH4:  dF/dM = 0.036 / (2 sqrt(M)) [W m^-2 per ppb]  (CH4-N2O overlap neglected)
+# ---------------------------------------------------------------------------
+C_ppm, M_ppb = 427.0, 1922.0
+dF_dC_CO2_per_ppb = (5.35 / C_ppm) / 1000.0        # W/m^2 per ppb
+dF_dM_CH4_per_ppb = 0.036 / (2.0 * np.sqrt(M_ppb)) # W/m^2 per ppb
+R6 = {
+    "method": "IPCC/Myhre 1998 simplified expressions (EXTERNAL literature, not Faraday data)",
+    "CO2_efficiency_W_m2_per_ppb": dF_dC_CO2_per_ppb,
+    "CH4_efficiency_W_m2_per_ppb": float(dF_dM_CH4_per_ppb),
+    "ratio_CH4_over_CO2_per_molecule": float(dF_dM_CH4_per_ppb / dF_dC_CO2_per_ppb),
+}
+
+# ---------------------------------------------------------------------------
+# Assemble results + chart arrays
+# ---------------------------------------------------------------------------
+def stick(d):
+    return {"nu": list(d["wavenumber_cm1"]), "S": list(d["intensity_cm_per_molec_cm2"]),
+            "Elow": list(d["lower_state_energy_cm1"]), "branch": list(d["source_window"])}
+
+results = {
+    "constants_cross_check": const_check,
+    "c2_identity_hc_over_k": c2_identity,
+    "scenario": {"xCO2_ppm": C_ppm, "xCH4_ppb": M_ppb, "N_air_column_cm2": N_air_cm2,
+                 "N_CO2_cm2": N_CO2, "N_CH4_cm2": N_CH4, "T_emit": T_emit, "T_surf": T_surf,
+                 "column_ratio_CO2_over_CH4": N_CO2 / N_CH4},
+    "R1_identity": R1, "R2_intensity": R2, "R3_widths": R3,
+    "R4_curve_of_growth": R4, "R5_planck": R5, "R6_efficiency_benchmark": R6,
+    "charts": {
+        "stick_CO2": stick(co2), "stick_CH4": stick(ch4),
+        "sigma_CO2": {"nu": g_co2.tolist(), "sigma": s_co2.tolist(), "tau": tau_co2.tolist()},
+        "sigma_CH4": {"nu": g_ch4.tolist(), "sigma": s_ch4.tolist(), "tau": tau_ch4.tolist()},
+        "cog": {"N": Ncols.tolist(), "W_CO2": W_co2.tolist(), "W_CH4": W_ch4.tolist(),
+                "N_CO2_present": N_CO2, "N_CH4_present": N_CH4},
+        "planck": {"nu": nu_planck.tolist(), "B255": B255.tolist(), "B288": B288.tolist(),
+                   "nu0_CO2": nu0_CO2, "nu0_CH4": nu0_CH4},
+    },
+}
+
+with open(os.path.join(HERE, "results.json"), "w") as f:
+    json.dump(results, f, indent=2)
+
+# ---- console summary (sanity) ----
+print("CONST cross-check max rel-diff:",
+      max(v["rel_diff"] for v in const_check.values()))
+print(f"c2 identity hc/k = {c2_identity:.10e} m K  (CODATA {c2:.10e})")
+print(f"N_air column      = {N_air_cm2:.3e} molec/cm^2")
+print(f"N_CO2 / N_CH4     = {N_CO2/N_CH4:.1f}x")
+print(f"R1 CO2  {R1['CO2']['wavelength_um']:.2f} um  {R1['CO2']['energy_meV']:.1f} meV")
+print(f"R1 CH4  {R1['CH4']['wavelength_um']:.2f} um  {R1['CH4']['energy_meV']:.1f} meV")
+print(f"R2 S_max CH4/CO2  = {R2['Smax_ratio_CH4_over_CO2']:.0f}x  "
+      f"(CO2 {R2['CO2']['S_max']:.3e}, CH4 {R2['CH4']['S_max']:.3e})")
+print(f"R3 Doppler HWHM   CO2 {gD_CO2:.2e}  CH4 {gD_CH4:.2e} cm^-1  vs Lorentz ~0.07")
+print(f"R3 tau_peak(sampled) CO2 {tau_co2.max():.1f}  CH4 {tau_ch4.max():.1f}")
+print(f"R4 tau_core strong line  CO2 {R4['CO2_strong_line']['tau_core_present']:.2f}  "
+      f"CH4 {R4['CH4_strong_line']['tau_core_present']:.2f}")
+print(f"R5 Planck B(255) CO2band/CH4band = {R5['planck_ratio_CO2_over_CH4']:.2f}x  "
+      f"(peak {nu_peak_255:.0f} cm^-1)")
+print(f"R6 per-ppb efficiency CH4/CO2 = {R6['ratio_CH4_over_CO2_per_molecule']:.1f}x "
+      f"(CO2 {R6['CO2_efficiency_W_m2_per_ppb']:.2e}, CH4 {R6['CH4_efficiency_W_m2_per_ppb']:.2e})")</pre><h3>build_parquet.py</h3><div class="dl-actions"><a class="dlbtn" download="build_parquet.py" href="data/co2_vs_ch4/build_parquet.py">↓ build_parquet.py</a></div><pre class="code">"""
+build_parquet.py
+================
+Validate the shipped CO2/CH4 Parquet products and write a manifest.json.
+
+The original generated-source modules used to create these files are not part
+of the checked-in blog artifact. This script therefore treats the flat Parquet
+files in this directory as the published data layer and records their shape,
+columns, byte size, source, and note for reproducibility/audit purposes.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pyarrow.parquet as pq
+
+HERE = Path(__file__).parent
+
+# Only the openly redistributable derived tables ship beside the article.
+# The raw HITRAN line lists and full NIST WebBook IR spectra are NOT
+# redistributed (upstream terms forbid it); regenerate them from the
+# hitran_get_lines / nist_get_spectrum calls in Appendix B before re-running
+# analysis.py. They are deliberately absent from this manifest.
+PRODUCTS = {
+    "codata_constants.parquet": (
+        "NIST CODATA 2022",
+        "Fundamental constants via Faraday codata_get / codata_search",
+    ),
+    "pubchem_CO2_CH4_properties.parquet": (
+        "PubChem",
+        "Molecular identity/properties via Faraday PubChem tools "
+        "(NCBI places no restrictions on molecular data but cannot grant "
+        "third-party rights; CAS Registry Numbers omitted)",
+    ),
+    "nist_shomate_thermo.parquet": (
+        "NIST Chemistry WebBook",
+        "Gas-phase Shomate Cp/H/S coefficients via nist_get_thermo",
+    ),
+    "nist_phase_change_summary.parquet": (
+        "NIST Chemistry WebBook",
+        "Selected phase-change values via nist_get_phase_change",
+    ),
+}
+
+
+def main() -&gt; None:
+    manifest = []
+    for filename, (source, note) in PRODUCTS.items():
+        path = HERE / filename
+        if not path.exists():
+            # Should not happen for the redistributable set, but skip rather
+            # than abort so a partial bundle still yields a manifest.
+            print(f"WARNING: missing {filename} -- skipped")
+            continue
+        table = pq.read_table(path)
+        manifest.append({
+            "source": source,
+            "filename": filename,
+            "rows": table.num_rows,
+            "columns": table.column_names,
+            "bytes": path.stat().st_size,
+            "note": note,
+        })
+        print(
+            f"validated {filename:42s} "
+            f"rows={table.num_rows:4d} cols={table.num_columns}"
+        )
+
+    out = HERE / "manifest.json"
+    out.write_text(json.dumps(manifest, indent=2) + "\n")
+    print(f"wrote {out.name}: {len(manifest)} Parquet products")
+
+
+if __name__ == "__main__":
+    main()</pre></div></details>
+<details class="app" id="appD" open=""><summary>Appendix D · Data (downloadable) <span class="x">▾</span></summary><div class="app-body"><div class="callout"><h4>Data availability &amp; legal notice</h4><p>To respect the upstream providers' terms, the raw HITRAN line lists and full NIST Chemistry WebBook IR spectra this article draws on are <em>not</em> redistributed here — those compilations are not licensed for redistribution under this project's Apache-2.0 licence. Only small derived and figure tables are included; regenerate the full raw data on demand via the Faraday MCP tool calls in the appendix. See <a href="data/DATA_NOTICE.md"><code>data/DATA_NOTICE.md</code></a>.</p></div><p class="small">Only the openly redistributable datasets ship beside this page as Apache Parquet: the CODATA constants, the PubChem properties, and the small NIST thermochemistry and phase-change tables. The full HITRAN line lists and the NIST WebBook IR spectra are <em>not</em> redistributed here — third-party terms forbid it (see <a href="data/DATA_NOTICE.md"><code>data/DATA_NOTICE.md</code></a>). Regenerate them via the Faraday MCP calls shown in Appendix B, writing them into <code>data/co2_vs_ch4/</code>, before re-running the analysis.</p><div class="dl-grid"><div class="dl-card"><div class="dl-name">codata_constants.parquet</div><div class="dl-meta">NIST CODATA 2022 · 8 rows · 2,231 B<br/><span style="color:#9fb0c8">cols: name, value, unit, uncertainty, tool, arg</span></div><div class="dl-actions"><a class="dlbtn" data-file="codata_constants.parquet" download="codata_constants.parquet" href="data/co2_vs_ch4/codata_constants.parquet" aria-label="Download codata_constants.parquet">↓ .parquet</a> </div></div><div class="dl-card"><div class="dl-name">pubchem_CO2_CH4_properties.parquet</div><div class="dl-meta">PubChem · 2 rows · 4,380 B<br/><span style="color:#9fb0c8">cols: species, CID, IUPACName, MolecularFormula, MolecularWeight, ExactMass, SMILES, InChI, InChIKey, XLogP, TPSA, HBondAcceptorCount, HeavyAtomCount, GHS</span></div><div class="dl-actions"><a class="dlbtn" data-file="pubchem_CO2_CH4_properties.parquet" download="pubchem_CO2_CH4_properties.parquet" href="data/co2_vs_ch4/pubchem_CO2_CH4_properties.parquet" aria-label="Download pubchem_CO2_CH4_properties.parquet">↓ .parquet</a> </div></div><div class="dl-card"><div class="dl-name">nist_shomate_thermo.parquet</div><div class="dl-meta">NIST Chemistry WebBook · 4 rows · 3,639 B<br/><span style="color:#9fb0c8">cols: species, nist_id, T_min, T_max, A, B, C, D, E, F, G, H</span></div><div class="dl-actions"><a class="dlbtn" data-file="nist_shomate_thermo.parquet" download="nist_shomate_thermo.parquet" href="data/co2_vs_ch4/nist_shomate_thermo.parquet" aria-label="Download nist_shomate_thermo.parquet">↓ .parquet</a> </div></div><div class="dl-card"><div class="dl-name">nist_phase_change_summary.parquet</div><div class="dl-meta">NIST Chemistry WebBook · 20 rows · 1,412 B<br/><span style="color:#9fb0c8">cols: species, property, value</span></div><div class="dl-actions"><a class="dlbtn" data-file="nist_phase_change_summary.parquet" download="nist_phase_change_summary.parquet" href="data/co2_vs_ch4/nist_phase_change_summary.parquet" aria-label="Download nist_phase_change_summary.parquet">↓ .parquet</a> </div></div><div class="dl-card"><div class="dl-name">manifest.json</div><div class="dl-meta">Dataset manifest · 1,560 B<br/><span style="color:#9fb0c8">written by build_parquet.py — schema &amp; row counts for every Parquet file</span></div><div class="dl-actions"><a class="dlbtn" data-file="manifest.json" download="manifest.json" href="data/co2_vs_ch4/manifest.json" aria-label="Download manifest.json">↓ .json</a> </div></div><div class="dl-card"><div class="dl-name">provenance.txt</div><div class="dl-meta">Provenance note · 506 B<br/><span style="color:#9fb0c8">source databases and retrieval context for this dataset</span></div><div class="dl-actions"><a class="dlbtn" data-file="provenance.txt" download="provenance.txt" href="data/co2_vs_ch4/provenance.txt" aria-label="Download provenance.txt">↓ .txt</a> </div></div><div class="dl-card"><div class="dl-name">project_instruction.txt</div><div class="dl-meta">Project instruction · 12,620 B<br/><span style="color:#9fb0c8">the full task brief the agent worked from (see also Appendix A)</span></div><div class="dl-actions"><a class="dlbtn" data-file="project_instruction.txt" download="project_instruction.txt" href="data/co2_vs_ch4/project_instruction.txt" aria-label="Download project_instruction.txt">↓ .txt</a> </div></div></div></div></details><p class="fn">Atmospheric abundances: NOAA Global Monitoring Laboratory (<a href="https://gml.noaa.gov/ccgg/trends/">gml.noaa.gov/ccgg/trends</a>). Per-ppb radiative efficiencies: IPCC / Myhre et al. (1998) simplified expressions. Spectroscopy &amp; constants: CODATA 2022, PubChem, NIST Chemistry WebBook, HITRAN — all retrieved via the Faraday MCP server.</p></div></div><nav class="fd-more" aria-label="More in the Faraday series"><div class="fd-more-h">Explore the Faraday series</div><div class="fd-more-grid"><a href="index.html">Overview — Faraday overview<small>Why Faraday exists, how it works, and all three investigations</small></a><a href="Faraday_fusion_spectroscopy.html">Fusion — The Light That Runs the Reactor<small>Fusion plasma spectroscopy, from the ASD and CODATA</small></a><a href="Faraday_methane_flame_emission.html">Flame — What a Flame Radiates<small>A methane flame's spectrum, from six legacy archives</small></a><a href="https://github.com/DataLabHell/faraday" target="_blank" rel="noopener">github.com/DataLabHell/faraday ↗</a></div></nav><div class="pagefoot"><div class="wrap"><div class="prov"><div class="badge2">Provenance</div><p style="font-size:.92rem;color:#b7c2d0;max-width:var(--prose);margin:.6rem auto 0">Generated autonomously by Claude (Opus) in Cowork mode with the highest-effort reasoning setting available in that UI, with the open-source Faraday repository as the only provided context. Every scientific value was retrieved exclusively through Faraday MCP tool calls — no direct database queries, no web scraping, no hand-supplied datasets. The prompt, MCP call log, analysis code, and downloadable data are in the appendices; a separate verification pass re-derives every quoted number where the checked-in artifacts provide the needed inputs.</p></div><div class="foot-end"><span>FARADAY · Two molecules, one thermal-infrared spectrum</span><span><a href="index.html">← Overview</a> · <a href="Faraday_fusion_spectroscopy.html">Fusion</a> · <a href="Faraday_methane_flame_emission.html">Flame</a></span></div></div></div><!-- REVIEW (Phase 4, independent verification agent + independent numeric re-derivation):
+  corrected CSV export btoa() -> encodeURIComponent() (btoa throws on non-Latin-1 chars nu/CO2 in series names)
+  corrected curve-of-growth integration window +/-3 -> +/-20 cm^-1 and N range 1e24 -> 1e23 (removes window-limited high-N tail)
+  corrected "four orders of magnitude" -> "nearly four orders" (S_max ratio 6875x = 10^3.84)
+  corrected Planck-peak wording "right beside the CO2 band" -> "close to the CO2 band and far from CH4"
+  corrected canvas axis labels to consistent ASCII (Unicode super/subscripts unreliable via canvas fillText; tooltips keep Unicode)
+  verified: every headline number re-derived independently to rel-diff < 2e-3; 4/4 redistributable Parquet decode+read OK;
+            tag balance OK; window.FARADAY parses; provenance statement verbatim and unmodified --><script>window.FARADAY={"charts": {"stick_CO2": {"nu": [666.002, 666.016, 666.023, 666.08, 666.088, 666.122, 666.126, 666.129, 666.138, 666.18, 666.209, 666.218, 666.221, 666.226, 666.232, 666.265, 666.271, 666.307, 666.324, 666.411, 666.422, 666.423, 666.425, 666.455, 666.488, 666.527, 666.533, 666.536, 666.546, 666.568, 666.572, 666.573, 666.651, 666.654, 666.655, 666.66, 666.677, 666.677, 666.683, 666.71, 651.0, 651.007, 651.01, 651.015, 651.03, 651.034, 651.036, 651.036, 651.051, 651.06, 651.074, 651.075, 651.09, 651.099, 651.124, 651.149, 651.151, 651.179, 651.179, 651.196, 651.201, 651.205, 651.205, 651.207, 651.208, 678.007, 678.021, 678.025, 678.036, 678.042, 678.052, 678.052, 678.056, 678.057, 678.069, 678.087, 678.088, 678.092, 678.108, 678.118, 678.129, 678.136, 678.148, 678.149, 678.151, 678.166, 678.175, 678.188, 678.2, 678.209], "S": [1.685e-28, 9.878e-29, 3.832e-28, 1.051e-29, 2.44e-25, 5.692e-29, 2.275e-28, 4.126e-29, 1.004e-26, 1.157e-29, 1.099e-30, 2.515e-30, 8.459e-26, 1.137e-27, 1.146e-30, 5.636e-30, 3.618e-28, 1.229e-27, 3.262e-28, 8.323e-28, 7.363e-26, 2.199e-26, 4.13e-27, 1.529e-28, 5.021e-24, 2.314e-30, 9.439e-30, 2.915e-29, 1.413e-29, 1.298e-27, 2.004e-25, 1.406e-29, 1.299e-30, 2.075e-29, 5.257e-26, 1.22e-29, 1.309e-27, 5.887e-27, 3.616e-28, 1.345e-30, 7.419e-28, 6.044e-25, 1.144e-29, 4.061e-30, 1.17e-29, 3.086e-30, 9.322e-27, 1.193e-24, 1.184e-29, 3.424e-30, 1.187e-29, 2.638e-30, 3.954e-25, 1.18e-29, 1.164e-29, 4.463e-30, 1.14e-29, 1.598e-29, 1.108e-29, 2.867e-27, 6.948e-24, 2.436e-29, 2.684e-29, 1.312e-30, 5.97e-28, 1.489e-30, 1.725e-30, 4.108e-28, 1.919e-30, 7.714e-28, 2.628e-28, 2.075e-30, 1.804e-30, 3.998e-28, 2.197e-30, 2.523e-30, 2.286e-30, 9.475e-30, 2.346e-30, 7.473e-25, 2.378e-30, 2.173e-26, 1.584e-29, 2.445e-30, 2.386e-30, 2.108e-30, 2.371e-30, 2.122e-30, 2.336e-30, 3.909e-30], "Elow": [4648.68, 4690.58, 4239.84, 5250.14, 2925.15, 4673.3, 4574.15, 3069.0, 3576.34, 4895.67, 2238.62, 5570.28, 3074.66, 3344.04, 5678.9, 5279.0, 4375.65, 4216.96, 4257.74, 2632.5, 3283.81, 3595.59, 3926.63, 4463.54, 2292.32, 4065.52, 5203.71, 4406.9, 4951.36, 4172.57, 3254.12, 4968.54, 4519.86, 5031.78, 2673.48, 5030.39, 4139.63, 3730.0, 4229.12, 5434.4, 3675.59, 2360.76, 5198.18, 5445.66, 5209.99, 5484.01, 3650.19, 2746.22, 5222.59, 4420.4, 5235.97, 4989.43, 2888.65, 5250.14, 5265.1, 3457.33, 5280.84, 4922.99, 5297.37, 4023.18, 2619.81, 4916.19, 4619.06, 5434.4, 4519.55, 5523.15, 5531.82, 2712.48, 5541.28, 4446.7, 4346.15, 5551.52, 5245.89, 4677.4, 5562.56, 5534.77, 5574.38, 5384.57, 5586.99, 2881.24, 5600.39, 3390.84, 5123.83, 5499.88, 5614.58, 5589.95, 5629.55, 5771.47, 5645.31, 5389.19], "branch": ["666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "666-668", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "651-655", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682", "678-682"]}, "stick_CH4": {"nu": [1304.01, 1304.01, 1304.02, 1304.03, 1304.04, 1304.06, 1304.07, 1304.07, 1304.07, 1304.11, 1304.11, 1304.11, 1304.13, 1304.15, 1304.15, 1304.15, 1304.19, 1304.2, 1304.2, 1304.21, 1304.23, 1304.24, 1304.27, 1304.32, 1304.32, 1304.32, 1304.34, 1304.34, 1304.37, 1304.42, 1304.44, 1304.44, 1304.46, 1304.47, 1304.48, 1304.48, 1304.48, 1304.5, 1304.51, 1304.52, 1289.01, 1289.02, 1289.03, 1289.03, 1289.03, 1289.04, 1289.05, 1289.05, 1289.1, 1289.1, 1289.1, 1289.11, 1289.11, 1289.11, 1289.12, 1289.13, 1289.13, 1289.14, 1289.14, 1289.19, 1289.22, 1289.23, 1289.23, 1289.23, 1289.23, 1318.05, 1318.05, 1318.07, 1318.08, 1318.15, 1318.16, 1318.18, 1318.18, 1318.2, 1318.2, 1318.22, 1318.24, 1318.25, 1318.26, 1318.26, 1318.27, 1318.27, 1318.27, 1318.28, 1318.33, 1318.34, 1318.35, 1318.35, 1318.37, 1318.39], "S": [4.948e-27, 9.924e-22, 1.444e-25, 3.657e-23, 5.542e-26, 4.21e-23, 5.852e-30, 1.214e-27, 1.547e-24, 4.483e-26, 5.471e-25, 2.252e-27, 3.212e-27, 1.226e-25, 9.284e-26, 2.918e-27, 2.076e-26, 2.148e-26, 8.841e-23, 2.845e-25, 4.777e-20, 4.392e-25, 7.596e-27, 6.393e-26, 2.517e-27, 1.146e-26, 1.793e-25, 6.949e-21, 4.693e-26, 1.41e-27, 9.494e-25, 2.122e-24, 4.231e-25, 3.166e-20, 2.97e-25, 4.062e-27, 3.944e-23, 2.74e-27, 1.081e-22, 1.287e-27, 3.155e-25, 4.013e-28, 1.303e-26, 1.465e-24, 1.803e-28, 6.917e-25, 2.657e-26, 6.161e-24, 2.033e-24, 1.171e-27, 1.04e-25, 5.482e-26, 1.269e-26, 2.993e-26, 3.146e-25, 4.391e-23, 1.677e-26, 2.452e-26, 1.189e-29, 2.53e-25, 1.863e-26, 8.373e-26, 2.606e-28, 8.346e-26, 1.141e-29, 4.785e-25, 9.454e-27, 3.743e-27, 1.404e-29, 4.477e-27, 1.552e-25, 2.627e-27, 2.157e-27, 3.914e-26, 1.271e-22, 2.103e-25, 1.552e-27, 2.58e-25, 3.126e-27, 1.028e-27, 2.324e-27, 4.672e-27, 3.017e-27, 7.819e-27, 3.859e-27, 3.765e-23, 2.927e-23, 9.139e-27, 1.001e-26, 2.391e-25], "Elow": [2007.2, 1252.0, 2357.74, 376.734, 1525.59, 1694.51, 2395.48, 2243.49, 1437.32, 2940.55, 1756.55, 2628.53, 2493.47, 1524.94, 3109.28, 1931.57, 1912.67, 1822.76, 1780.71, 2632.96, 104.775, 2115.75, 3631.15, 1368.28, 3363.94, 2306.65, 1436.87, 690.018, 1598.19, 2657.85, 2626.66, 1437.2, 2231.47, 293.165, 2231.55, 3164.06, 689.877, 2764.81, 293.127, 2050.57, 2115.75, 4188.48, 2184.56, 2455.62, 2396.79, 2634.84, 3357.92, 2229.61, 2123.17, 2240.63, 3143.84, 2508.33, 2183.69, 2964.26, 2861.08, 1641.16, 2173.29, 1992.41, 3355.82, 2819.52, 2963.91, 2240.99, 1778.2, 2798.46, 3355.82, 1639.9, 1755.8, 2657.85, 2862.04, 2319.23, 1729.81, 1728.19, 2368.71, 1437.32, 1367.73, 2961.51, 2539.03, 2789.01, 3042.09, 2796.56, 2539.0, 3042.09, 2368.64, 3042.09, 2538.93, 1386.39, 1596.92, 2656.2, 2639.8, 1409.01], "branch": ["1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1304-1308", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1289-1293", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322", "1318-1322"]}, "sigma_CO2": {"nu": [666.0, 666.003, 666.007, 666.01, 666.013, 666.017, 666.02, 666.023, 666.027, 666.03, 666.033, 666.037, 666.04, 666.043, 666.047, 666.05, 666.053, 666.057, 666.06, 666.063, 666.067, 666.07, 666.073, 666.077, 666.08, 666.083, 666.087, 666.09, 666.093, 666.097, 666.1, 666.104, 666.107, 666.11, 666.114, 666.117, 666.12, 666.124, 666.127, 666.13, 666.134, 666.137, 666.14, 666.144, 666.147, 666.15, 666.154, 666.157, 666.16, 666.164, 666.167, 666.17, 666.174, 666.177, 666.18, 666.184, 666.187, 666.19, 666.194, 666.197, 666.2, 666.204, 666.207, 666.21, 666.214, 666.217, 666.22, 666.224, 666.227, 666.23, 666.234, 666.237, 666.24, 666.244, 666.247, 666.25, 666.254, 666.257, 666.26, 666.264, 666.267, 666.27, 666.274, 666.277, 666.28, 666.284, 666.287, 666.29, 666.294, 666.297, 666.301, 666.304, 666.307, 666.311, 666.314, 666.317, 666.321, 666.324, 666.327, 666.331, 666.334, 666.337, 666.341, 666.344, 666.347, 666.351, 666.354, 666.357, 666.361, 666.364, 666.367, 666.371, 666.374, 666.377, 666.381, 666.384, 666.387, 666.391, 666.394, 666.397, 666.401, 666.404, 666.407, 666.411, 666.414, 666.417, 666.421, 666.424, 666.427, 666.431, 666.434, 666.437, 666.441, 666.444, 666.447, 666.451, 666.454, 666.457, 666.461, 666.464, 666.467, 666.471, 666.474, 666.477, 666.481, 666.484, 666.487, 666.491, 666.494, 666.497, 666.501, 666.504, 666.508, 666.511, 666.514, 666.518, 666.521, 666.524, 666.528, 666.531, 666.534, 666.538, 666.541, 666.544, 666.548, 666.551, 666.554, 666.558, 666.561, 666.564, 666.568, 666.571, 666.574, 666.578, 666.581, 666.584, 666.588, 666.591, 666.594, 666.598, 666.601, 666.604, 666.608, 666.611, 666.614, 666.618, 666.621, 666.624, 666.628, 666.631, 666.634, 666.638, 666.641, 666.644, 666.648, 666.651, 666.654, 666.658, 666.661, 666.664, 666.668, 666.671, 666.674, 666.678, 666.681, 666.684, 666.688, 666.691, 666.694, 666.698, 666.701, 666.705, 666.708, 666.711, 666.715, 666.718, 666.721, 666.725, 666.728, 666.731, 666.735, 666.738, 666.741, 666.745, 666.748, 666.751, 666.755, 666.758, 666.761, 666.765, 666.768, 666.771, 666.775, 666.778, 666.781, 666.785, 666.788, 666.791, 666.795, 666.798, 666.801, 666.805, 666.808, 666.811, 666.815, 666.818, 666.821, 666.825, 666.828, 666.831, 666.835, 666.838, 666.841, 666.845, 666.848, 666.851, 666.855, 666.858, 666.861, 666.865, 666.868, 666.871, 666.875, 666.878, 666.881, 666.885, 666.888, 666.891, 666.895, 666.898, 666.902, 666.905, 666.908, 666.912, 666.915, 666.918, 666.922, 666.925, 666.928, 666.932, 666.935, 666.938, 666.942, 666.945, 666.948, 666.952, 666.955, 666.958, 666.962, 666.965, 666.968, 666.972, 666.975, 666.978, 666.982, 666.985, 666.988, 666.992, 666.995, 666.998, 667.002, 667.005, 667.008, 667.012, 667.015, 667.018, 667.022, 667.025, 667.028, 667.032, 667.035, 667.038, 667.042, 667.045, 667.048, 667.052, 667.055, 667.058, 667.062, 667.065, 667.068, 667.072, 667.075, 667.078, 667.082, 667.085, 667.088, 667.092, 667.095, 667.098, 667.102, 667.105, 667.109, 667.112, 667.115, 667.119, 667.122, 667.125, 667.129, 667.132, 667.135, 667.139, 667.142, 667.145, 667.149, 667.152, 667.155, 667.159, 667.162, 667.165, 667.169, 667.172, 667.175, 667.179, 667.182, 667.185, 667.189, 667.192, 667.195, 667.199, 667.202, 667.205, 667.209, 667.212, 667.215, 667.219, 667.222, 667.225, 667.229, 667.232, 667.235, 667.239, 667.242, 667.245, 667.249, 667.252, 667.255, 667.259, 667.262, 667.265, 667.269, 667.272, 667.275, 667.279, 667.282, 667.285, 667.289, 667.292, 667.295, 667.299, 667.302, 667.306, 667.309, 667.312, 667.316, 667.319, 667.322, 667.326, 667.329, 667.332, 667.336, 667.339, 667.342, 667.346, 667.349, 667.352, 667.356, 667.359, 667.362, 667.366, 667.369, 667.372, 667.376, 667.379, 667.382, 667.386, 667.389, 667.392, 667.396, 667.399, 667.402, 667.406, 667.409, 667.412, 667.416, 667.419, 667.422, 667.426, 667.429, 667.432, 667.436, 667.439, 667.442, 667.446, 667.449, 667.452, 667.456, 667.459, 667.462, 667.466, 667.469, 667.472, 667.476, 667.479, 667.482, 667.486, 667.489, 667.492, 667.496, 667.499, 667.503, 667.506, 667.509, 667.513, 667.516, 667.519, 667.523, 667.526, 667.529, 667.533, 667.536, 667.539, 667.543, 667.546, 667.549, 667.553, 667.556, 667.559, 667.563, 667.566, 667.569, 667.573, 667.576, 667.579, 667.583, 667.586, 667.589, 667.593, 667.596, 667.599, 667.603, 667.606, 667.609, 667.613, 667.616, 667.619, 667.623, 667.626, 667.629, 667.633, 667.636, 667.639, 667.643, 667.646, 667.649, 667.653, 667.656, 667.659, 667.663, 667.666, 667.669, 667.673, 667.676, 667.679, 667.683, 667.686, 667.689, 667.693, 667.696, 667.699, 667.703, 667.706, 667.71, 667.713, 667.716, 667.72, 667.723, 667.726, 667.73, 667.733, 667.736, 667.74, 667.743, 667.746, 667.75, 667.753, 667.756, 667.76, 667.763, 667.766, 667.77, 667.773, 667.776, 667.78, 667.783, 667.786, 667.79, 667.793, 667.796, 667.8, 667.803, 667.806, 667.81, 667.813, 667.816, 667.82, 667.823, 667.826, 667.83, 667.833, 667.836, 667.84, 667.843, 667.846, 667.85, 667.853, 667.856, 667.86, 667.863, 667.866, 667.87, 667.873, 667.876, 667.88, 667.883, 667.886, 667.89, 667.893, 667.896, 667.9, 667.903, 667.907, 667.91, 667.913, 667.917, 667.92, 667.923, 667.927, 667.93, 667.933, 667.937, 667.94, 667.943, 667.947, 667.95, 667.953, 667.957, 667.96, 667.963, 667.967, 667.97, 667.973, 667.977, 667.98, 667.983, 667.987, 667.99, 667.993, 667.997, 668.0], "sigma": [9.82581e-25, 1.01106e-24, 1.04081e-24, 1.07185e-24, 1.10423e-24, 1.13796e-24, 1.17306e-24, 1.20951e-24, 1.24729e-24, 1.28635e-24, 1.32662e-24, 1.36798e-24, 1.41029e-24, 1.45335e-24, 1.49694e-24, 1.54076e-24, 1.58449e-24, 1.62774e-24, 1.67009e-24, 1.71108e-24, 1.75024e-24, 1.7871e-24, 1.82118e-24, 1.85206e-24, 1.87938e-24, 1.90285e-24, 1.92228e-24, 1.93761e-24, 1.94886e-24, 1.95619e-24, 1.95986e-24, 1.96022e-24, 1.95768e-24, 1.95271e-24, 1.94581e-24, 1.93746e-24, 1.92816e-24, 1.91837e-24, 1.90852e-24, 1.89898e-24, 1.89009e-24, 1.88215e-24, 1.87539e-24, 1.87004e-24, 1.86624e-24, 1.86414e-24, 1.86384e-24, 1.86541e-24, 1.86889e-24, 1.87431e-24, 1.88167e-24, 1.89096e-24, 1.90213e-24, 1.91513e-24, 1.92989e-24, 1.9463e-24, 1.96427e-24, 1.98367e-24, 2.00438e-24, 2.02626e-24, 2.04916e-24, 2.07296e-24, 2.09752e-24, 2.12274e-24, 2.14851e-24, 2.17477e-24, 2.20149e-24, 2.22866e-24, 2.25632e-24, 2.28453e-24, 2.3134e-24, 2.34306e-24, 2.37367e-24, 2.4054e-24, 2.43845e-24, 2.47302e-24, 2.50933e-24, 2.54758e-24, 2.58797e-24, 2.63072e-24, 2.67602e-24, 2.72406e-24, 2.77504e-24, 2.82914e-24, 2.88654e-24, 2.94742e-24, 3.01197e-24, 3.08036e-24, 3.1528e-24, 3.22947e-24, 3.31059e-24, 3.39636e-24, 3.48703e-24, 3.58283e-24, 3.68402e-24, 3.79088e-24, 3.90371e-24, 4.02284e-24, 4.14859e-24, 4.28134e-24, 4.42148e-24, 4.56943e-24, 4.72563e-24, 4.89055e-24, 5.0647e-24, 5.24861e-24, 5.44284e-24, 5.64799e-24, 5.86469e-24, 6.0936e-24, 6.3354e-24, 6.59081e-24, 6.86059e-24, 7.14551e-24, 7.44638e-24, 7.764e-24, 8.09922e-24, 8.45287e-24, 8.8258e-24, 9.21884e-24, 9.63278e-24, 1.00684e-23, 1.05264e-23, 1.10073e-23, 1.15117e-23, 1.20397e-23, 1.25916e-23, 1.31669e-23, 1.37652e-23, 1.43851e-23, 1.5025e-23, 1.56825e-23, 1.63543e-23, 1.70363e-23, 1.77231e-23, 1.84086e-23, 1.90853e-23, 1.97446e-23, 2.03773e-23, 2.0973e-23, 2.15211e-23, 2.20109e-23, 2.24319e-23, 2.27747e-23, 2.3031e-23, 2.31947e-23, 2.32617e-23, 2.32305e-23, 2.31021e-23, 2.28804e-23, 2.25712e-23, 2.21825e-23, 2.17237e-23, 2.12051e-23, 2.06376e-23, 2.0032e-23, 1.93988e-23, 1.87475e-23, 1.80869e-23, 1.74247e-23, 1.67672e-23, 1.61197e-23, 1.54864e-23, 1.48704e-23, 1.42739e-23, 1.36984e-23, 1.31445e-23, 1.26126e-23, 1.21023e-23, 1.16132e-23, 1.11445e-23, 1.06955e-23, 1.02652e-23, 9.85301e-24, 9.45801e-24, 9.07957e-24, 8.7171e-24, 8.37007e-24, 8.03803e-24, 7.72056e-24, 7.41725e-24, 7.12771e-24, 6.85153e-24, 6.5883e-24, 6.33756e-24, 6.09886e-24, 5.8717e-24, 5.65558e-24, 5.44998e-24, 5.25438e-24, 5.06824e-24, 4.89106e-24, 4.72231e-24, 4.5615e-24, 4.40816e-24, 4.26182e-24, 4.12204e-24, 3.98843e-24, 3.8606e-24, 3.7382e-24, 3.62089e-24, 3.50839e-24, 3.40042e-24, 3.29672e-24, 3.19708e-24, 3.10129e-24, 3.00917e-24, 2.92053e-24, 2.83524e-24, 2.75314e-24, 2.67411e-24, 2.59802e-24, 2.52476e-24, 2.45421e-24, 2.38627e-24, 2.32085e-24, 2.25784e-24, 2.19715e-24, 2.13869e-24, 2.08236e-24, 2.0281e-24, 1.9758e-24, 1.9254e-24, 1.87681e-24, 1.82996e-24, 1.78477e-24, 1.74119e-24, 1.69913e-24, 1.65853e-24, 1.61934e-24, 1.58149e-24, 1.54493e-24, 1.5096e-24, 1.47546e-24, 1.44244e-24, 1.41051e-24, 1.37962e-24, 1.34972e-24, 1.32078e-24, 1.29275e-24, 1.2656e-24, 1.2393e-24, 1.2138e-24, 1.18909e-24, 1.16511e-24, 1.14186e-24, 1.11929e-24, 1.09739e-24, 1.07612e-24, 1.05547e-24, 1.0354e-24, 1.01591e-24, 9.96958e-25, 9.78534e-25, 9.60617e-25, 9.43189e-25, 9.26232e-25, 9.09729e-25, 8.93665e-25, 8.78023e-25, 8.6279e-25, 8.47951e-25, 8.33493e-25, 8.19402e-25, 8.05667e-25, 7.92275e-25, 7.79216e-25, 7.66478e-25, 7.5405e-25, 7.41924e-25, 7.30088e-25, 7.18535e-25, 7.07254e-25, 6.96238e-25, 6.85478e-25, 6.74967e-25, 6.64696e-25, 6.54659e-25, 6.44848e-25, 6.35256e-25, 6.25878e-25, 6.16707e-25, 6.07736e-25, 5.9896e-25, 5.90374e-25, 5.81971e-25, 5.73747e-25, 5.65697e-25, 5.57816e-25, 5.50098e-25, 5.4254e-25, 5.35138e-25, 5.27886e-25, 5.20781e-25, 5.13819e-25, 5.06996e-25, 5.00309e-25, 4.93753e-25, 4.87326e-25, 4.81024e-25, 4.74844e-25, 4.68782e-25, 4.62836e-25, 4.57003e-25, 4.51279e-25, 4.45663e-25, 4.40152e-25, 4.34742e-25, 4.29431e-25, 4.24218e-25, 4.19099e-25, 4.14073e-25, 4.09136e-25, 4.04288e-25, 3.99526e-25, 3.94847e-25, 3.9025e-25, 3.85734e-25, 3.81295e-25, 3.76933e-25, 3.72646e-25, 3.68431e-25, 3.64288e-25, 3.60215e-25, 3.56209e-25, 3.5227e-25, 3.48397e-25, 3.44587e-25, 3.40839e-25, 3.37152e-25, 3.33525e-25, 3.29957e-25, 3.26445e-25, 3.22989e-25, 3.19588e-25, 3.16241e-25, 3.12946e-25, 3.09703e-25, 3.06509e-25, 3.03365e-25, 3.00269e-25, 2.97221e-25, 2.94219e-25, 2.91262e-25, 2.88349e-25, 2.85481e-25, 2.82654e-25, 2.7987e-25, 2.77127e-25, 2.74424e-25, 2.7176e-25, 2.69135e-25, 2.66548e-25, 2.63999e-25, 2.61485e-25, 2.59008e-25, 2.56566e-25, 2.54158e-25, 2.51784e-25, 2.49443e-25, 2.47135e-25, 2.44858e-25, 2.42613e-25, 2.40399e-25, 2.38215e-25, 2.36061e-25, 2.33936e-25, 2.31839e-25, 2.29771e-25, 2.2773e-25, 2.25717e-25, 2.2373e-25, 2.21769e-25, 2.19834e-25, 2.17924e-25, 2.16039e-25, 2.14179e-25, 2.12342e-25, 2.10529e-25, 2.0874e-25, 2.06973e-25, 2.05228e-25, 2.03505e-25, 2.01804e-25, 2.00125e-25, 1.98466e-25, 1.96828e-25, 1.9521e-25, 1.93612e-25, 1.92033e-25, 1.90474e-25, 1.88934e-25, 1.87412e-25, 1.85909e-25, 1.84424e-25, 1.82956e-25, 1.81506e-25, 1.80073e-25, 1.78658e-25, 1.77258e-25, 1.75876e-25, 1.74509e-25, 1.73158e-25, 1.71823e-25, 1.70504e-25, 1.69199e-25, 1.6791e-25, 1.66635e-25, 1.65375e-25, 1.64128e-25, 1.62896e-25, 1.61678e-25, 1.60474e-25, 1.59283e-25, 1.58105e-25, 1.5694e-25, 1.55788e-25, 1.54649e-25, 1.53522e-25, 1.52408e-25, 1.51305e-25, 1.50215e-25, 1.49136e-25, 1.48069e-25, 1.47013e-25, 1.45969e-25, 1.44936e-25, 1.43913e-25, 1.42902e-25, 1.41901e-25, 1.4091e-25, 1.3993e-25, 1.38961e-25, 1.38001e-25, 1.37051e-25, 1.36111e-25, 1.35181e-25, 1.3426e-25, 1.33348e-25, 1.32446e-25, 1.31553e-25, 1.30669e-25, 1.29794e-25, 1.28928e-25, 1.2807e-25, 1.27221e-25, 1.2638e-25, 1.25548e-25, 1.24723e-25, 1.23907e-25, 1.23099e-25, 1.22299e-25, 1.21507e-25, 1.20722e-25, 1.19945e-25, 1.19175e-25, 1.18413e-25, 1.17658e-25, 1.1691e-25, 1.1617e-25, 1.15436e-25, 1.14709e-25, 1.1399e-25, 1.13276e-25, 1.1257e-25, 1.1187e-25, 1.11177e-25, 1.1049e-25, 1.0981e-25, 1.09136e-25, 1.08468e-25, 1.07806e-25, 1.0715e-25, 1.065e-25, 1.05856e-25, 1.05218e-25, 1.04586e-25, 1.03959e-25, 1.03338e-25, 1.02723e-25, 1.02113e-25, 1.01508e-25, 1.00909e-25, 1.00315e-25, 9.97267e-26, 9.91432e-26, 9.85648e-26, 9.79915e-26, 9.74232e-26, 9.68599e-26, 9.63014e-26, 9.57477e-26, 9.51988e-26, 9.46546e-26, 9.41151e-26, 9.35802e-26, 9.30498e-26, 9.2524e-26, 9.20026e-26, 9.14856e-26, 9.09729e-26, 9.04646e-26, 8.99605e-26, 8.94606e-26, 8.89649e-26, 8.84733e-26, 8.79857e-26, 8.75022e-26, 8.70227e-26, 8.65471e-26, 8.60754e-26, 8.56075e-26, 8.51435e-26, 8.46832e-26, 8.42267e-26, 8.37738e-26, 8.33246e-26, 8.2879e-26, 8.2437e-26, 8.19985e-26, 8.15635e-26, 8.11319e-26, 8.07038e-26, 8.02791e-26, 7.98577e-26, 7.94396e-26, 7.90248e-26, 7.86132e-26, 7.82049e-26, 7.77997e-26, 7.73977e-26, 7.69988e-26, 7.6603e-26, 7.62102e-26, 7.58204e-26, 7.54337e-26, 7.50498e-26, 7.46689e-26, 7.4291e-26, 7.39158e-26, 7.35435e-26, 7.3174e-26, 7.28073e-26, 7.24434e-26, 7.20822e-26, 7.17237e-26, 7.13678e-26, 7.10146e-26, 7.0664e-26, 7.0316e-26, 6.99706e-26, 6.96277e-26, 6.92873e-26, 6.89495e-26, 6.86141e-26, 6.82811e-26, 6.79506e-26, 6.76224e-26, 6.72967e-26, 6.69732e-26, 6.66522e-26, 6.63334e-26, 6.60169e-26, 6.57026e-26, 6.53907e-26, 6.50809e-26, 6.47733e-26, 6.44679e-26, 6.41647e-26, 6.38636e-26, 6.35646e-26, 6.32677e-26, 6.29729e-26, 6.26801e-26, 6.23894e-26, 6.21007e-26, 6.18141e-26, 6.15294e-26, 6.12466e-26, 6.09658e-26, 6.0687e-26, 6.041e-26, 6.01349e-26, 5.98618e-26, 5.95904e-26, 5.9321e-26, 5.90533e-26, 5.87875e-26, 5.85234e-26, 5.82611e-26, 5.80006e-26, 5.77418e-26, 5.74848e-26, 5.72295e-26, 5.69759e-26, 5.67239e-26, 5.64737e-26, 5.6225e-26, 5.59781e-26, 5.57327e-26], "tau": [0.00901456, 0.00927584, 0.00954873, 0.00983357, 0.0101306, 0.0104401, 0.0107621, 0.0110965, 0.0114431, 0.0118015, 0.0121709, 0.0125504, 0.0129385, 0.0133336, 0.0137335, 0.0141355, 0.0145367, 0.0149335, 0.015322, 0.0156981, 0.0160574, 0.0163955, 0.0167082, 0.0169915, 0.0172421, 0.0174574, 0.0176357, 0.0177763, 0.0178795, 0.0179468, 0.0179805, 0.0179838, 0.0179605, 0.0179149, 0.0178515, 0.017775, 0.0176897, 0.0175999, 0.0175094, 0.0174219, 0.0173404, 0.0172675, 0.0172056, 0.0171564, 0.0171216, 0.0171023, 0.0170996, 0.0171139, 0.0171459, 0.0171956, 0.0172632, 0.0173484, 0.0174509, 0.0175701, 0.0177055, 0.0178561, 0.0180209, 0.0181989, 0.0183889, 0.0185896, 0.0187998, 0.0190181, 0.0192435, 0.0194748, 0.0197112, 0.0199522, 0.0201973, 0.0204466, 0.0207003, 0.0209591, 0.021224, 0.0214961, 0.0217769, 0.022068, 0.0223712, 0.0226884, 0.0230215, 0.0233724, 0.023743, 0.0241352, 0.0245508, 0.0249916, 0.0254593, 0.0259556, 0.0264822, 0.0270407, 0.0276329, 0.0282604, 0.0289249, 0.0296284, 0.0303726, 0.0311595, 0.0319913, 0.0328702, 0.0337985, 0.0347789, 0.0358141, 0.036907, 0.0380607, 0.0392786, 0.0405643, 0.0419216, 0.0433547, 0.0448677, 0.0464654, 0.0481527, 0.0499346, 0.0518168, 0.0538048, 0.0559049, 0.0581232, 0.0604665, 0.0629416, 0.0655556, 0.0683158, 0.0712298, 0.0743052, 0.0775498, 0.0809712, 0.084577, 0.0883746, 0.0923711, 0.0965727, 0.100985, 0.105612, 0.110457, 0.11552, 0.120798, 0.126287, 0.131974, 0.137845, 0.143877, 0.150041, 0.156297, 0.162599, 0.168887, 0.175095, 0.181145, 0.186949, 0.192414, 0.197443, 0.201936, 0.205799, 0.208943, 0.211295, 0.212797, 0.213411, 0.213125, 0.211948, 0.209913, 0.207077, 0.20351, 0.199301, 0.194543, 0.189337, 0.183781, 0.177971, 0.171997, 0.165936, 0.159861, 0.153828, 0.147888, 0.142078, 0.136426, 0.130954, 0.125674, 0.120593, 0.115712, 0.111031, 0.106543, 0.102244, 0.0981242, 0.0941772, 0.0903952, 0.0867713, 0.0832994, 0.0799739, 0.0767901, 0.0737439, 0.0708312, 0.0680486, 0.0653922, 0.0628585, 0.0604435, 0.0581431, 0.0559532, 0.0538692, 0.0518864, 0.0500001, 0.0482056, 0.0464979, 0.0448724, 0.0433242, 0.0418489, 0.0404421, 0.0390995, 0.0378171, 0.0365913, 0.0354186, 0.0342956, 0.0332194, 0.0321873, 0.0311967, 0.0302454, 0.0293312, 0.0284524, 0.0276072, 0.026794, 0.0260115, 0.0252583, 0.0245333, 0.0238352, 0.0231631, 0.0225158, 0.0218926, 0.0212923, 0.0207142, 0.0201574, 0.0196211, 0.0191044, 0.0186065, 0.0181267, 0.0176643, 0.0172185, 0.0167887, 0.0163742, 0.0159743, 0.0155884, 0.015216, 0.0148564, 0.0145092, 0.0141738, 0.0138497, 0.0135364, 0.0132335, 0.0129405, 0.0126571, 0.0123828, 0.0121173, 0.0118602, 0.0116111, 0.0113698, 0.0111359, 0.0109091, 0.0106892, 0.0104758, 0.0102688, 0.0100679, 0.00987275, 0.00968326, 0.00949918, 0.00932031, 0.00914646, 0.00897743, 0.00881305, 0.00865316, 0.00849759, 0.00834619, 0.00819881, 0.00805531, 0.00791555, 0.00777941, 0.00764677, 0.0075175, 0.00739148, 0.00726863, 0.00714881, 0.00703195, 0.00691794, 0.00680668, 0.0066981, 0.0065921, 0.00648861, 0.00638755, 0.00628883, 0.00619239, 0.00609817, 0.00600608, 0.00591607, 0.00582808, 0.00574204, 0.00565789, 0.00557559, 0.00549508, 0.00541631, 0.00533922, 0.00526377, 0.00518991, 0.00511761, 0.0050468, 0.00497747, 0.00490955, 0.00484302, 0.00477784, 0.00471397, 0.00465137, 0.00459002, 0.00452988, 0.00447091, 0.00441309, 0.00435639, 0.00430078, 0.00424623, 0.00419271, 0.0041402, 0.00408868, 0.00403811, 0.00398848, 0.00393976, 0.00389193, 0.00384497, 0.00379886, 0.00375357, 0.00370909, 0.0036654, 0.00362247, 0.0035803, 0.00353886, 0.00349814, 0.00345813, 0.00341879, 0.00338013, 0.00334211, 0.00330474, 0.00326799, 0.00323186, 0.00319632, 0.00316137, 0.00312698, 0.00309316, 0.00305988, 0.00302714, 0.00299493, 0.00296322, 0.00293202, 0.00290131, 0.00287108, 0.00284133, 0.00281203, 0.00278318, 0.00275478, 0.00272681, 0.00269927, 0.00267214, 0.00264542, 0.0026191, 0.00259318, 0.00256763, 0.00254246, 0.00251767, 0.00249323, 0.00246915, 0.00244541, 0.00242202, 0.00239896, 0.00237623, 0.00235383, 0.00233174, 0.00230996, 0.00228848, 0.0022673, 0.00224642, 0.00222582, 0.00220551, 0.00218547, 0.00216571, 0.00214621, 0.00212698, 0.00210801, 0.00208928, 0.00207081, 0.00205258, 0.00203459, 0.00201684, 0.00199932, 0.00198203, 0.00196496, 0.00194811, 0.00193147, 0.00191505, 0.00189884, 0.00188284, 0.00186703, 0.00185143, 0.00183602, 0.0018208, 0.00180577, 0.00179092, 0.00177626, 0.00176178, 0.00174748, 0.00173335, 0.00171939, 0.0017056, 0.00169197, 0.00167851, 0.0016652, 0.00165206, 0.00163907, 0.00162623, 0.00161355, 0.00160101, 0.00158862, 0.00157637, 0.00156426, 0.0015523, 0.00154047, 0.00152877, 0.00151721, 0.00150578, 0.00149447, 0.0014833, 0.00147225, 0.00146132, 0.00145051, 0.00143983, 0.00142926, 0.00141881, 0.00140847, 0.00139824, 0.00138813, 0.00137813, 0.00136823, 0.00135844, 0.00134875, 0.00133917, 0.00132969, 0.00132031, 0.00131103, 0.00130185, 0.00129276, 0.00128377, 0.00127488, 0.00126607, 0.00125736, 0.00124873, 0.0012402, 0.00123175, 0.00122339, 0.00121511, 0.00120692, 0.00119881, 0.00119078, 0.00118283, 0.00117496, 0.00116717, 0.00115946, 0.00115182, 0.00114426, 0.00113677, 0.00112936, 0.00112202, 0.00111475, 0.00110755, 0.00110042, 0.00109336, 0.00108636, 0.00107944, 0.00107258, 0.00106578, 0.00105905, 0.00105239, 0.00104578, 0.00103924, 0.00103276, 0.00102634, 0.00101998, 0.00101368, 0.00100744, 0.00100125, 0.000995123, 0.000989051, 0.000983034, 0.000977073, 0.000971165, 0.000965311, 0.00095951, 0.000953761, 0.000948064, 0.000942417, 0.000936821, 0.000931275, 0.000925778, 0.000920329, 0.000914929, 0.000909576, 0.00090427, 0.00089901, 0.000893797, 0.000888628, 0.000883504, 0.000878425, 0.000873389, 0.000868396, 0.000863447, 0.000858539, 0.000853673, 0.000848849, 0.000844066, 0.000839322, 0.000834619, 0.000829955, 0.000825331, 0.000820744, 0.000816197, 0.000811686, 0.000807213, 0.000802778, 0.000798378, 0.000794015, 0.000789687, 0.000785395, 0.000781138, 0.000776915, 0.000772727, 0.000768572, 0.000764451, 0.000760363, 0.000756307, 0.000752284, 0.000748293, 0.000744334, 0.000740406, 0.00073651, 0.000732644, 0.000728808, 0.000725003, 0.000721227, 0.00071748, 0.000713763, 0.000710075, 0.000706415, 0.000702784, 0.00069918, 0.000695605, 0.000692056, 0.000688535, 0.00068504, 0.000681573, 0.000678131, 0.000674715, 0.000671326, 0.000667961, 0.000664622, 0.000661308, 0.000658019, 0.000654754, 0.000651514, 0.000648298, 0.000645105, 0.000641936, 0.00063879, 0.000635668, 0.000632568, 0.000629491, 0.000626436, 0.000623403, 0.000620393, 0.000617404, 0.000614437, 0.000611491, 0.000608567, 0.000605663, 0.00060278, 0.000599918, 0.000597076, 0.000594254, 0.000591452, 0.00058867, 0.000585908, 0.000583165, 0.000580441, 0.000577737, 0.000575051, 0.000572384, 0.000569735, 0.000567105, 0.000564493, 0.000561899, 0.000559323, 0.000556764, 0.000554224, 0.0005517, 0.000549194, 0.000546705, 0.000544232, 0.000541777, 0.000539338, 0.000536915, 0.000534509, 0.000532119, 0.000529745, 0.000527387, 0.000525044, 0.000522718, 0.000520406, 0.00051811, 0.000515829, 0.000513563, 0.000511312]}, "sigma_CH4": {"nu": [1304.0, 1304.01, 1304.01, 1304.02, 1304.03, 1304.03, 1304.04, 1304.05, 1304.05, 1304.06, 1304.07, 1304.07, 1304.08, 1304.09, 1304.09, 1304.1, 1304.11, 1304.11, 1304.12, 1304.13, 1304.13, 1304.14, 1304.15, 1304.15, 1304.16, 1304.17, 1304.17, 1304.18, 1304.19, 1304.19, 1304.2, 1304.21, 1304.21, 1304.22, 1304.23, 1304.23, 1304.24, 1304.25, 1304.25, 1304.26, 1304.27, 1304.27, 1304.28, 1304.29, 1304.29, 1304.3, 1304.31, 1304.31, 1304.32, 1304.33, 1304.33, 1304.34, 1304.35, 1304.35, 1304.36, 1304.37, 1304.37, 1304.38, 1304.39, 1304.39, 1304.4, 1304.41, 1304.41, 1304.42, 1304.43, 1304.43, 1304.44, 1304.45, 1304.45, 1304.46, 1304.47, 1304.47, 1304.48, 1304.49, 1304.49, 1304.5, 1304.51, 1304.51, 1304.52, 1304.53, 1304.53, 1304.54, 1304.55, 1304.55, 1304.56, 1304.57, 1304.57, 1304.58, 1304.59, 1304.59, 1304.6, 1304.61, 1304.61, 1304.62, 1304.63, 1304.63, 1304.64, 1304.65, 1304.65, 1304.66, 1304.67, 1304.67, 1304.68, 1304.69, 1304.69, 1304.7, 1304.71, 1304.71, 1304.72, 1304.73, 1304.73, 1304.74, 1304.75, 1304.75, 1304.76, 1304.77, 1304.77, 1304.78, 1304.79, 1304.79, 1304.8, 1304.81, 1304.81, 1304.82, 1304.83, 1304.83, 1304.84, 1304.85, 1304.85, 1304.86, 1304.87, 1304.87, 1304.88, 1304.89, 1304.89, 1304.9, 1304.91, 1304.91, 1304.92, 1304.93, 1304.93, 1304.94, 1304.95, 1304.95, 1304.96, 1304.97, 1304.97, 1304.98, 1304.99, 1304.99, 1305.0, 1305.01, 1305.02, 1305.02, 1305.03, 1305.04, 1305.04, 1305.05, 1305.06, 1305.06, 1305.07, 1305.08, 1305.08, 1305.09, 1305.1, 1305.1, 1305.11, 1305.12, 1305.12, 1305.13, 1305.14, 1305.14, 1305.15, 1305.16, 1305.16, 1305.17, 1305.18, 1305.18, 1305.19, 1305.2, 1305.2, 1305.21, 1305.22, 1305.22, 1305.23, 1305.24, 1305.24, 1305.25, 1305.26, 1305.26, 1305.27, 1305.28, 1305.28, 1305.29, 1305.3, 1305.3, 1305.31, 1305.32, 1305.32, 1305.33, 1305.34, 1305.34, 1305.35, 1305.36, 1305.36, 1305.37, 1305.38, 1305.38, 1305.39, 1305.4, 1305.4, 1305.41, 1305.42, 1305.42, 1305.43, 1305.44, 1305.44, 1305.45, 1305.46, 1305.46, 1305.47, 1305.48, 1305.48, 1305.49, 1305.5, 1305.5, 1305.51, 1305.52, 1305.52, 1305.53, 1305.54, 1305.54, 1305.55, 1305.56, 1305.56, 1305.57, 1305.58, 1305.58, 1305.59, 1305.6, 1305.6, 1305.61, 1305.62, 1305.62, 1305.63, 1305.64, 1305.64, 1305.65, 1305.66, 1305.66, 1305.67, 1305.68, 1305.68, 1305.69, 1305.7, 1305.7, 1305.71, 1305.72, 1305.72, 1305.73, 1305.74, 1305.74, 1305.75, 1305.76, 1305.76, 1305.77, 1305.78, 1305.78, 1305.79, 1305.8, 1305.8, 1305.81, 1305.82, 1305.82, 1305.83, 1305.84, 1305.84, 1305.85, 1305.86, 1305.86, 1305.87, 1305.88, 1305.88, 1305.89, 1305.9, 1305.9, 1305.91, 1305.92, 1305.92, 1305.93, 1305.94, 1305.94, 1305.95, 1305.96, 1305.96, 1305.97, 1305.98, 1305.98, 1305.99, 1306.0, 1306.0, 1306.01, 1306.02, 1306.02, 1306.03, 1306.04, 1306.04, 1306.05, 1306.06, 1306.06, 1306.07, 1306.08, 1306.08, 1306.09, 1306.1, 1306.1, 1306.11, 1306.12, 1306.12, 1306.13, 1306.14, 1306.14, 1306.15, 1306.16, 1306.16, 1306.17, 1306.18, 1306.18, 1306.19, 1306.2, 1306.2, 1306.21, 1306.22, 1306.22, 1306.23, 1306.24, 1306.24, 1306.25, 1306.26, 1306.26, 1306.27, 1306.28, 1306.28, 1306.29, 1306.3, 1306.3, 1306.31, 1306.32, 1306.32, 1306.33, 1306.34, 1306.34, 1306.35, 1306.36, 1306.36, 1306.37, 1306.38, 1306.38, 1306.39, 1306.4, 1306.4, 1306.41, 1306.42, 1306.42, 1306.43, 1306.44, 1306.44, 1306.45, 1306.46, 1306.46, 1306.47, 1306.48, 1306.48, 1306.49, 1306.5, 1306.5, 1306.51, 1306.52, 1306.52, 1306.53, 1306.54, 1306.54, 1306.55, 1306.56, 1306.56, 1306.57, 1306.58, 1306.58, 1306.59, 1306.6, 1306.6, 1306.61, 1306.62, 1306.62, 1306.63, 1306.64, 1306.64, 1306.65, 1306.66, 1306.66, 1306.67, 1306.68, 1306.68, 1306.69, 1306.7, 1306.7, 1306.71, 1306.72, 1306.72, 1306.73, 1306.74, 1306.74, 1306.75, 1306.76, 1306.76, 1306.77, 1306.78, 1306.78, 1306.79, 1306.8, 1306.8, 1306.81, 1306.82, 1306.82, 1306.83, 1306.84, 1306.84, 1306.85, 1306.86, 1306.86, 1306.87, 1306.88, 1306.88, 1306.89, 1306.9, 1306.9, 1306.91, 1306.92, 1306.92, 1306.93, 1306.94, 1306.94, 1306.95, 1306.96, 1306.96, 1306.97, 1306.98, 1306.98, 1306.99, 1307.0, 1307.01, 1307.01, 1307.02, 1307.03, 1307.03, 1307.04, 1307.05, 1307.05, 1307.06, 1307.07, 1307.07, 1307.08, 1307.09, 1307.09, 1307.1, 1307.11, 1307.11, 1307.12, 1307.13, 1307.13, 1307.14, 1307.15, 1307.15, 1307.16, 1307.17, 1307.17, 1307.18, 1307.19, 1307.19, 1307.2, 1307.21, 1307.21, 1307.22, 1307.23, 1307.23, 1307.24, 1307.25, 1307.25, 1307.26, 1307.27, 1307.27, 1307.28, 1307.29, 1307.29, 1307.3, 1307.31, 1307.31, 1307.32, 1307.33, 1307.33, 1307.34, 1307.35, 1307.35, 1307.36, 1307.37, 1307.37, 1307.38, 1307.39, 1307.39, 1307.4, 1307.41, 1307.41, 1307.42, 1307.43, 1307.43, 1307.44, 1307.45, 1307.45, 1307.46, 1307.47, 1307.47, 1307.48, 1307.49, 1307.49, 1307.5, 1307.51, 1307.51, 1307.52, 1307.53, 1307.53, 1307.54, 1307.55, 1307.55, 1307.56, 1307.57, 1307.57, 1307.58, 1307.59, 1307.59, 1307.6, 1307.61, 1307.61, 1307.62, 1307.63, 1307.63, 1307.64, 1307.65, 1307.65, 1307.66, 1307.67, 1307.67, 1307.68, 1307.69, 1307.69, 1307.7, 1307.71, 1307.71, 1307.72, 1307.73, 1307.73, 1307.74, 1307.75, 1307.75, 1307.76, 1307.77, 1307.77, 1307.78, 1307.79, 1307.79, 1307.8, 1307.81, 1307.81, 1307.82, 1307.83, 1307.83, 1307.84, 1307.85, 1307.85, 1307.86, 1307.87, 1307.87, 1307.88, 1307.89, 1307.89, 1307.9, 1307.91, 1307.91, 1307.92, 1307.93, 1307.93, 1307.94, 1307.95, 1307.95, 1307.96, 1307.97, 1307.97, 1307.98, 1307.99, 1307.99, 1308.0], "sigma": [2.70966e-20, 2.85702e-20, 2.99155e-20, 3.11035e-20, 3.2159e-20, 3.31531e-20, 3.41768e-20, 3.53149e-20, 3.66335e-20, 3.81793e-20, 3.99862e-20, 4.20818e-20, 4.44927e-20, 4.72481e-20, 5.03825e-20, 5.39366e-20, 5.79589e-20, 6.25068e-20, 6.76474e-20, 7.34579e-20, 8.00262e-20, 8.74498e-20, 9.58335e-20, 1.05285e-19, 1.15903e-19, 1.27768e-19, 1.40911e-19, 1.55282e-19, 1.70707e-19, 1.86829e-19, 2.03066e-19, 2.18589e-19, 2.32358e-19, 2.4324e-19, 2.50217e-19, 2.52623e-19, 2.50334e-19, 2.43808e-19, 2.33967e-19, 2.21966e-19, 2.08964e-19, 1.95954e-19, 1.83685e-19, 1.72662e-19, 1.63174e-19, 1.55337e-19, 1.49125e-19, 1.44383e-19, 1.40832e-19, 1.38087e-19, 1.35702e-19, 1.33262e-19, 1.30504e-19, 1.27404e-19, 1.24165e-19, 1.21134e-19, 1.18684e-19, 1.17134e-19, 1.16718e-19, 1.1759e-19, 1.19839e-19, 1.2351e-19, 1.286e-19, 1.35042e-19, 1.42683e-19, 1.51237e-19, 1.6024e-19, 1.69027e-19, 1.76744e-19, 1.82446e-19, 1.85268e-19, 1.84639e-19, 1.80442e-19, 1.73047e-19, 1.63189e-19, 1.51766e-19, 1.39641e-19, 1.27514e-19, 1.15879e-19, 1.05035e-19, 9.51286e-20, 8.62007e-20, 7.82247e-20, 7.11366e-20, 6.48545e-20, 5.92918e-20, 5.4364e-20, 4.99927e-20, 4.61074e-20, 4.26456e-20, 3.95529e-20, 3.6782e-20, 3.42921e-20, 3.20481e-20, 3.00198e-20, 2.81812e-20, 2.65097e-20, 2.49861e-20, 2.35936e-20, 2.23177e-20, 2.11458e-20, 2.00668e-20, 1.90712e-20, 1.81506e-20, 1.72975e-20, 1.65054e-20, 1.57686e-20, 1.5082e-20, 1.4441e-20, 1.38417e-20, 1.32804e-20, 1.27539e-20, 1.22594e-20, 1.17943e-20, 1.13562e-20, 1.0943e-20, 1.05529e-20, 1.01841e-20, 9.83501e-21, 9.50429e-21, 9.19062e-21, 8.89281e-21, 8.60979e-21, 8.34057e-21, 8.08424e-21, 7.83999e-21, 7.60703e-21, 7.38467e-21, 7.17226e-21, 6.96921e-21, 6.77494e-21, 6.58896e-21, 6.41079e-21, 6.23998e-21, 6.07613e-21, 5.91886e-21, 5.7678e-21, 5.62263e-21, 5.48303e-21, 5.34873e-21, 5.21944e-21, 5.09493e-21, 4.97494e-21, 4.85926e-21, 4.74768e-21, 4.64e-21, 4.53605e-21, 4.43564e-21, 4.33861e-21, 4.24482e-21, 4.15411e-21, 4.06635e-21, 3.98141e-21, 3.89916e-21, 3.8195e-21, 3.74231e-21, 3.6675e-21, 3.59495e-21, 3.52458e-21, 3.45631e-21, 3.39004e-21, 3.3257e-21, 3.26322e-21, 3.20251e-21, 3.14352e-21, 3.08617e-21, 3.03041e-21, 2.97618e-21, 2.92342e-21, 2.87208e-21, 2.8221e-21, 2.77344e-21, 2.72605e-21, 2.67988e-21, 2.6349e-21, 2.59106e-21, 2.54833e-21, 2.50666e-21, 2.46602e-21, 2.42638e-21, 2.3877e-21, 2.34996e-21, 2.31311e-21, 2.27714e-21, 2.24202e-21, 2.20771e-21, 2.1742e-21, 2.14146e-21, 2.10946e-21, 2.07818e-21, 2.0476e-21, 2.01771e-21, 1.98847e-21, 1.95987e-21, 1.93189e-21, 1.90451e-21, 1.87772e-21, 1.8515e-21, 1.82583e-21, 1.8007e-21, 1.77609e-21, 1.75199e-21, 1.72838e-21, 1.70525e-21, 1.68259e-21, 1.66038e-21, 1.63861e-21, 1.61727e-21, 1.59635e-21, 1.57584e-21, 1.55573e-21, 1.536e-21, 1.51665e-21, 1.49767e-21, 1.47905e-21, 1.46077e-21, 1.44283e-21, 1.42523e-21, 1.40795e-21, 1.39098e-21, 1.37433e-21, 1.35797e-21, 1.34191e-21, 1.32613e-21, 1.31063e-21, 1.2954e-21, 1.28044e-21, 1.26574e-21, 1.2513e-21, 1.2371e-21, 1.22314e-21, 1.20943e-21, 1.19594e-21, 1.18268e-21, 1.16964e-21, 1.15682e-21, 1.1442e-21, 1.1318e-21, 1.1196e-21, 1.10759e-21, 1.09578e-21, 1.08416e-21, 1.07272e-21, 1.06147e-21, 1.05039e-21, 1.03948e-21, 1.02875e-21, 1.01818e-21, 1.00778e-21, 9.97536e-22, 9.87449e-22, 9.77514e-22, 9.6773e-22, 9.58094e-22, 9.48601e-22, 9.3925e-22, 9.30037e-22, 9.2096e-22, 9.12016e-22, 9.03203e-22, 8.94518e-22, 8.85958e-22, 8.77521e-22, 8.69205e-22, 8.61007e-22, 8.52925e-22, 8.44958e-22, 8.37102e-22, 8.29356e-22, 8.21717e-22, 8.14185e-22, 8.06756e-22, 7.99428e-22, 7.92201e-22, 7.85072e-22, 7.78039e-22, 7.71101e-22, 7.64255e-22, 7.57501e-22, 7.50837e-22, 7.44261e-22, 7.37771e-22, 7.31366e-22, 7.25044e-22, 7.18805e-22, 7.12646e-22, 7.06566e-22, 7.00565e-22, 6.94639e-22, 6.88789e-22, 6.83013e-22, 6.7731e-22, 6.71678e-22, 6.66117e-22, 6.60624e-22, 6.552e-22, 6.49842e-22, 6.44551e-22, 6.39323e-22, 6.3416e-22, 6.29059e-22, 6.2402e-22, 6.19041e-22, 6.14122e-22, 6.09261e-22, 6.04459e-22, 5.99713e-22, 5.95023e-22, 5.90388e-22, 5.85807e-22, 5.81279e-22, 5.76804e-22, 5.72381e-22, 5.68009e-22, 5.63686e-22, 5.59413e-22, 5.55189e-22, 5.51013e-22, 5.46883e-22, 5.428e-22, 5.38763e-22, 5.34771e-22, 5.30823e-22, 5.26919e-22, 5.23059e-22, 5.1924e-22, 5.15463e-22, 5.11728e-22, 5.08033e-22, 5.04378e-22, 5.00763e-22, 4.97186e-22, 4.93648e-22, 4.90148e-22, 4.86684e-22, 4.83258e-22, 4.79868e-22, 4.76513e-22, 4.73194e-22, 4.69909e-22, 4.66658e-22, 4.63441e-22, 4.60258e-22, 4.57107e-22, 4.53989e-22, 4.50902e-22, 4.47847e-22, 4.44823e-22, 4.4183e-22, 4.38866e-22, 4.35933e-22, 4.33029e-22, 4.30154e-22, 4.27308e-22, 4.2449e-22, 4.217e-22, 4.18937e-22, 4.16201e-22, 4.13492e-22, 4.1081e-22, 4.08154e-22, 4.05523e-22, 4.02918e-22, 4.00338e-22, 3.97783e-22, 3.95252e-22, 3.92746e-22, 3.90263e-22, 3.87804e-22, 3.85368e-22, 3.82955e-22, 3.80564e-22, 3.78196e-22, 3.7585e-22, 3.73526e-22, 3.71224e-22, 3.68943e-22, 3.66682e-22, 3.64443e-22, 3.62224e-22, 3.60025e-22, 3.57846e-22, 3.55687e-22, 3.53548e-22, 3.51428e-22, 3.49327e-22, 3.47245e-22, 3.45181e-22, 3.43136e-22, 3.41109e-22, 3.391e-22, 3.37108e-22, 3.35134e-22, 3.33178e-22, 3.31238e-22, 3.29316e-22, 3.2741e-22, 3.25521e-22, 3.23648e-22, 3.21792e-22, 3.19951e-22, 3.18126e-22, 3.16317e-22, 3.14523e-22, 3.12744e-22, 3.1098e-22, 3.09232e-22, 3.07498e-22, 3.05778e-22, 3.04073e-22, 3.02383e-22, 3.00706e-22, 2.99044e-22, 2.97395e-22, 2.95759e-22, 2.94138e-22, 2.92529e-22, 2.90934e-22, 2.89352e-22, 2.87782e-22, 2.86226e-22, 2.84682e-22, 2.8315e-22, 2.81631e-22, 2.80124e-22, 2.7863e-22, 2.77147e-22, 2.75676e-22, 2.74217e-22, 2.72769e-22, 2.71333e-22, 2.69908e-22, 2.68494e-22, 2.67091e-22, 2.657e-22, 2.64319e-22, 2.62949e-22, 2.61589e-22, 2.60241e-22, 2.58902e-22, 2.57574e-22, 2.56256e-22, 2.54949e-22, 2.53651e-22, 2.52363e-22, 2.51085e-22, 2.49816e-22, 2.48558e-22, 2.47308e-22, 2.46069e-22, 2.44838e-22, 2.43617e-22, 2.42405e-22, 2.41202e-22, 2.40007e-22, 2.38822e-22, 2.37646e-22, 2.36478e-22, 2.35318e-22, 2.34168e-22, 2.33025e-22, 2.31891e-22, 2.30766e-22, 2.29648e-22, 2.28539e-22, 2.27438e-22, 2.26344e-22, 2.25259e-22, 2.24181e-22, 2.23111e-22, 2.22049e-22, 2.20994e-22, 2.19947e-22, 2.18907e-22, 2.17875e-22, 2.16849e-22, 2.15831e-22, 2.14821e-22, 2.13817e-22, 2.12821e-22, 2.11831e-22, 2.10848e-22, 2.09872e-22, 2.08903e-22, 2.07941e-22, 2.06985e-22, 2.06036e-22, 2.05093e-22, 2.04157e-22, 2.03227e-22, 2.02303e-22, 2.01386e-22, 2.00475e-22, 1.9957e-22, 1.98672e-22, 1.97779e-22, 1.96893e-22, 1.96012e-22, 1.95137e-22, 1.94268e-22, 1.93405e-22, 1.92548e-22, 1.91696e-22, 1.9085e-22, 1.9001e-22, 1.89175e-22, 1.88346e-22, 1.87522e-22, 1.86704e-22, 1.8589e-22, 1.85083e-22, 1.8428e-22, 1.83483e-22, 1.8269e-22, 1.81903e-22, 1.81121e-22, 1.80344e-22, 1.79573e-22, 1.78806e-22, 1.78043e-22, 1.77286e-22, 1.76534e-22, 1.75786e-22, 1.75043e-22, 1.74305e-22, 1.73572e-22, 1.72843e-22, 1.72119e-22, 1.71399e-22, 1.70684e-22, 1.69973e-22, 1.69267e-22, 1.68565e-22, 1.67867e-22, 1.67174e-22, 1.66485e-22, 1.658e-22, 1.6512e-22, 1.64444e-22, 1.63772e-22, 1.63104e-22, 1.6244e-22, 1.6178e-22, 1.61124e-22, 1.60472e-22, 1.59824e-22, 1.5918e-22, 1.5854e-22, 1.57904e-22, 1.57271e-22, 1.56643e-22, 1.56018e-22, 1.55397e-22, 1.54779e-22, 1.54166e-22, 1.53556e-22, 1.52949e-22, 1.52346e-22, 1.51747e-22, 1.51151e-22, 1.50559e-22, 1.4997e-22, 1.49385e-22, 1.48803e-22, 1.48224e-22, 1.47649e-22, 1.47077e-22, 1.46509e-22, 1.45944e-22, 1.45382e-22, 1.44823e-22, 1.44268e-22, 1.43715e-22, 1.43166e-22, 1.4262e-22, 1.42077e-22, 1.41538e-22, 1.41001e-22, 1.40467e-22, 1.39937e-22, 1.39409e-22, 1.38884e-22, 1.38363e-22, 1.37844e-22, 1.37328e-22, 1.36815e-22, 1.36305e-22, 1.35798e-22, 1.35294e-22, 1.34792e-22, 1.34293e-22, 1.33797e-22, 1.33304e-22, 1.32814e-22, 1.32326e-22, 1.31841e-22, 1.31358e-22, 1.30878e-22, 1.30401e-22, 1.29927e-22], "tau": [1.11896, 1.17982, 1.23537, 1.28443, 1.32802, 1.36907, 1.41134, 1.45834, 1.51279, 1.57663, 1.65125, 1.73778, 1.83734, 1.95113, 2.08057, 2.22733, 2.39344, 2.58124, 2.79352, 3.03347, 3.30471, 3.61127, 3.95748, 4.34777, 4.78628, 5.27623, 5.81896, 6.41243, 7.04939, 7.71516, 8.3857, 9.02674, 9.59531, 10.0447, 10.3328, 10.4322, 10.3376, 10.0682, 9.66174, 9.16618, 8.62926, 8.09198, 7.58533, 7.13013, 6.73833, 6.41472, 6.15819, 5.96234, 5.8157, 5.70237, 5.60387, 5.5031, 5.38924, 5.26119, 5.12743, 5.00226, 4.9011, 4.83711, 4.81993, 4.85591, 4.94881, 5.10041, 5.31057, 5.57661, 5.89216, 6.24539, 6.61719, 6.98003, 7.29871, 7.53418, 7.65073, 7.62475, 7.45144, 7.14604, 6.73895, 6.26723, 5.76653, 5.26575, 4.78527, 4.33745, 3.92837, 3.55969, 3.23032, 2.93761, 2.67819, 2.44848, 2.24498, 2.06447, 1.90402, 1.76107, 1.63335, 1.51893, 1.41611, 1.32344, 1.23968, 1.16375, 1.09473, 1.03181, 0.974308, 0.921619, 0.873224, 0.828668, 0.787555, 0.749536, 0.714306, 0.681597, 0.651171, 0.622816, 0.596348, 0.571598, 0.54842, 0.526679, 0.506258, 0.48705, 0.468958, 0.451896, 0.435786, 0.420555, 0.406141, 0.392484, 0.37953, 0.367232, 0.355545, 0.344427, 0.333842, 0.323755, 0.314135, 0.304953, 0.296182, 0.287796, 0.279774, 0.272094, 0.264736, 0.257683, 0.250916, 0.244422, 0.238183, 0.232189, 0.226424, 0.220878, 0.215539, 0.210397, 0.205442, 0.200665, 0.196057, 0.191611, 0.187318, 0.183171, 0.179165, 0.175291, 0.171546, 0.167921, 0.164414, 0.161017, 0.157728, 0.15454, 0.151451, 0.148455, 0.145549, 0.14273, 0.139993, 0.137336, 0.134756, 0.132249, 0.129813, 0.127445, 0.125142, 0.122903, 0.120724, 0.118603, 0.11654, 0.11453, 0.112573, 0.110667, 0.108809, 0.106999, 0.105234, 0.103513, 0.101835, 0.100198, 0.0986011, 0.0970424, 0.095521, 0.0940356, 0.0925851, 0.0911684, 0.0897845, 0.0884323, 0.0871109, 0.0858193, 0.0845566, 0.0833219, 0.0821145, 0.0809335, 0.0797782, 0.0786477, 0.0775414, 0.0764586, 0.0753985, 0.0743607, 0.0733444, 0.0723491, 0.0713741, 0.0704189, 0.069483, 0.0685659, 0.067667, 0.0667859, 0.0659221, 0.0650751, 0.0642445, 0.0634298, 0.0626308, 0.0618469, 0.0610778, 0.0603231, 0.0595824, 0.0588554, 0.0581418, 0.0574412, 0.0567534, 0.0560779, 0.0554145, 0.054763, 0.0541229, 0.0534942, 0.0528764, 0.0522694, 0.0516728, 0.0510865, 0.0505102, 0.0499437, 0.0493868, 0.0488392, 0.0483007, 0.0477712, 0.0472504, 0.0467381, 0.0462342, 0.0457384, 0.0452507, 0.0447707, 0.0442985, 0.0438337, 0.0433762, 0.0429259, 0.0424827, 0.0420463, 0.0416167, 0.0411937, 0.0407771, 0.0403669, 0.0399628, 0.0395649, 0.0391729, 0.0387867, 0.0384063, 0.0380314, 0.0376621, 0.0372981, 0.0369395, 0.036586, 0.0362376, 0.0358942, 0.0355556, 0.0352219, 0.0348929, 0.0345685, 0.0342486, 0.0339332, 0.0336221, 0.0333153, 0.0330127, 0.0327143, 0.0324199, 0.0321294, 0.0318429, 0.0315602, 0.0312813, 0.0310061, 0.0307345, 0.0304665, 0.030202, 0.029941, 0.0296833, 0.029429, 0.0291779, 0.0289301, 0.0286854, 0.0284438, 0.0282053, 0.0279698, 0.0277372, 0.0275076, 0.0272807, 0.0270567, 0.0268355, 0.026617, 0.0264011, 0.0261879, 0.0259772, 0.0257691, 0.0255635, 0.0253604, 0.0251597, 0.0249614, 0.0247654, 0.0245717, 0.0243803, 0.0241911, 0.0240042, 0.0238194, 0.0236367, 0.0234561, 0.0232777, 0.0231012, 0.0229268, 0.0227543, 0.0225838, 0.0224152, 0.0222484, 0.0220836, 0.0219206, 0.0217593, 0.0215999, 0.0214422, 0.0212863, 0.021132, 0.0209794, 0.0208285, 0.0206792, 0.0205315, 0.0203854, 0.0202408, 0.0200978, 0.0199563, 0.0198163, 0.0196778, 0.0195407, 0.0194051, 0.0192708, 0.019138, 0.0190065, 0.0188764, 0.0187476, 0.0186202, 0.018494, 0.0183691, 0.0182455, 0.0181232, 0.018002, 0.0178821, 0.0177634, 0.0176458, 0.0175295, 0.0174142, 0.0173002, 0.0171872, 0.0170753, 0.0169646, 0.0168549, 0.0167462, 0.0166387, 0.0165321, 0.0164266, 0.0163221, 0.0162186, 0.0161161, 0.0160145, 0.0159139, 0.0158143, 0.0157156, 0.0156178, 0.0155209, 0.0154249, 0.0153298, 0.0152356, 0.0151423, 0.0150498, 0.0149582, 0.0148674, 0.0147774, 0.0146883, 0.0145999, 0.0145124, 0.0144256, 0.0143396, 0.0142544, 0.0141699, 0.0140862, 0.0140033, 0.013921, 0.0138395, 0.0137587, 0.0136786, 0.0135992, 0.0135205, 0.0134425, 0.0133652, 0.0132885, 0.0132125, 0.0131371, 0.0130624, 0.0129883, 0.0129149, 0.0128421, 0.0127698, 0.0126982, 0.0126272, 0.0125568, 0.012487, 0.0124178, 0.0123491, 0.012281, 0.0122135, 0.0121465, 0.0120801, 0.0120142, 0.0119489, 0.0118841, 0.0118198, 0.0117561, 0.0116928, 0.0116301, 0.0115679, 0.0115061, 0.0114449, 0.0113841, 0.0113239, 0.0112641, 0.0112048, 0.0111459, 0.0110876, 0.0110296, 0.0109722, 0.0109152, 0.0108586, 0.0108024, 0.0107467, 0.0106915, 0.0106366, 0.0105822, 0.0105282, 0.0104746, 0.0104214, 0.0103686, 0.0103163, 0.0102643, 0.0102127, 0.0101615, 0.0101107, 0.0100603, 0.0100102, 0.00996051, 0.0099112, 0.00986225, 0.00981367, 0.00976544, 0.00971757, 0.00967005, 0.00962288, 0.00957605, 0.00952956, 0.00948342, 0.00943761, 0.00939213, 0.00934697, 0.00930215, 0.00925764, 0.00921346, 0.00916959, 0.00912603, 0.00908279, 0.00903985, 0.00899721, 0.00895488, 0.00891285, 0.00887111, 0.00882966, 0.00878851, 0.00874764, 0.00870706, 0.00866676, 0.00862673, 0.00858699, 0.00854752, 0.00850832, 0.00846939, 0.00843073, 0.00839233, 0.0083542, 0.00831632, 0.00827871, 0.00824134, 0.00820423, 0.00816737, 0.00813076, 0.0080944, 0.00805827, 0.00802239, 0.00798675, 0.00795135, 0.00791618, 0.00788125, 0.00784654, 0.00781207, 0.00777782, 0.0077438, 0.00771, 0.00767642, 0.00764306, 0.00760992, 0.00757699, 0.00754428, 0.00751177, 0.00747948, 0.0074474, 0.00741552, 0.00738385, 0.00735238, 0.00732111, 0.00729004, 0.00725917, 0.00722849, 0.00719801, 0.00716772, 0.00713762, 0.00710771, 0.00707799, 0.00704845, 0.0070191, 0.00698994, 0.00696095, 0.00693215, 0.00690352, 0.00687507, 0.0068468, 0.0068187, 0.00679077, 0.00676301, 0.00673543, 0.00670801, 0.00668076, 0.00665368, 0.00662676, 0.00660001, 0.00657341, 0.00654698, 0.0065207, 0.00649459, 0.00646863, 0.00644283, 0.00641718, 0.00639168, 0.00636634, 0.00634114, 0.0063161, 0.0062912, 0.00626645, 0.00624185, 0.00621739, 0.00619308, 0.0061689, 0.00614487, 0.00612098, 0.00609723, 0.00607362, 0.00605014, 0.0060268, 0.0060036, 0.00598052, 0.00595759, 0.00593478, 0.0059121, 0.00588956, 0.00586714, 0.00584485, 0.00582269, 0.00580065, 0.00577874, 0.00575695, 0.00573529, 0.00571375, 0.00569233, 0.00567103, 0.00564985, 0.00562878, 0.00560784, 0.00558701, 0.0055663, 0.0055457, 0.00552522, 0.00550485, 0.00548459, 0.00546445, 0.00544441, 0.00542449, 0.00540467, 0.00538497, 0.00536537]}, "cog": {"N": [1e+17, 1.26385e+17, 1.59731e+17, 2.01876e+17, 2.55141e+17, 3.22459e+17, 4.07539e+17, 5.15068e+17, 6.50968e+17, 8.22724e+17, 1.0398e+18, 1.31415e+18, 1.66088e+18, 2.0991e+18, 2.65295e+18, 3.35292e+18, 4.23759e+18, 5.35567e+18, 6.76875e+18, 8.55467e+18, 1.08118e+19, 1.36645e+19, 1.72698e+19, 2.18264e+19, 2.75853e+19, 3.48637e+19, 4.40624e+19, 5.56881e+19, 7.03814e+19, 8.89513e+19, 1.12421e+20, 1.42083e+20, 1.79571e+20, 2.26951e+20, 2.86832e+20, 3.62512e+20, 4.5816e+20, 5.79044e+20, 7.31824e+20, 9.24915e+20, 1.16895e+21, 1.47738e+21, 1.86718e+21, 2.35983e+21, 2.98247e+21, 3.76939e+21, 4.76394e+21, 6.02089e+21, 7.6095e+21, 9.61725e+21, 1.21547e+22, 1.53617e+22, 1.94149e+22, 2.45375e+22, 3.10117e+22, 3.91941e+22, 4.95354e+22, 6.26052e+22, 7.91234e+22, 1e+23], "W_CO2": [6.93413e-07, 8.76368e-07, 1.1076e-06, 1.39983e-06, 1.76918e-06, 2.23597e-06, 2.82592e-06, 3.57153e-06, 4.51387e-06, 5.70484e-06, 7.21003e-06, 9.11237e-06, 1.15166e-05, 1.45552e-05, 1.83955e-05, 2.32489e-05, 2.93829e-05, 3.71352e-05, 4.69326e-05, 5.93148e-05, 7.49634e-05, 9.47399e-05, 0.000119733, 0.000151318, 0.000191234, 0.000241675, 0.000305415, 0.000385959, 0.00048773, 0.000616316, 0.000778769, 0.000983988, 0.0012432, 0.00157056, 0.0019839, 0.00250568, 0.00316413, 0.00399473, 0.00504196, 0.00636149, 0.0080228, 0.0101123, 0.0127372, 0.0160292, 0.0201499, 0.0252951, 0.0316997, 0.0396416, 0.049443, 0.0614691, 0.0761207, 0.0938191, 0.114982, 0.139993, 0.16916, 0.202689, 0.24067, 0.283109, 0.330009, 0.381482], "W_CH4": [0.00473935, 0.00598063, 0.00754398, 0.00951118, 0.0119837, 0.015087, 0.0189749, 0.0238347, 0.0298926, 0.0374172, 0.0467235, 0.0581718, 0.0721635, 0.0891289, 0.109506, 0.133713, 0.162105, 0.194943, 0.232371, 0.274425, 0.321092, 0.372426, 0.428668, 0.490333, 0.558215, 0.633315, 0.716749, 0.809712, 0.913482, 1.02945, 1.15916, 1.30429, 1.46672, 1.64855, 1.85206, 2.07981, 2.33462, 2.61959, 2.93815, 3.29404, 3.69137, 4.13459, 4.62852, 5.17837, 5.78969, 6.46835, 7.22049, 8.05244, 8.97059, 9.98123, 11.0903, 12.3032, 13.624, 15.0557, 16.5986, 18.2504, 20.0051, 21.8515, 23.773, 25.746], "N_CO2_present": 9.17437e+21, "N_CH4_present": 4.12954e+19}, "planck": {"nu": [400.0, 405.0, 410.0, 415.0, 420.0, 425.0, 430.0, 435.0, 440.0, 445.0, 450.0, 455.0, 460.0, 465.0, 470.0, 475.0, 480.0, 485.0, 490.0, 495.0, 500.0, 505.0, 510.0, 515.0, 520.0, 525.0, 530.0, 535.0, 540.0, 545.0, 550.0, 555.0, 560.0, 565.0, 570.0, 575.0, 580.0, 585.0, 590.0, 595.0, 600.0, 605.0, 610.0, 615.0, 620.0, 625.0, 630.0, 635.0, 640.0, 645.0, 650.0, 655.0, 660.0, 665.0, 670.0, 675.0, 680.0, 685.0, 690.0, 695.0, 700.0, 705.0, 710.0, 715.0, 720.0, 725.0, 730.0, 735.0, 740.0, 745.0, 750.0, 755.0, 760.0, 765.0, 770.0, 775.0, 780.0, 785.0, 790.0, 795.0, 800.0, 805.0, 810.0, 815.0, 820.0, 825.0, 830.0, 835.0, 840.0, 845.0, 850.0, 855.0, 860.0, 865.0, 870.0, 875.0, 880.0, 885.0, 890.0, 895.0, 900.0, 905.0, 910.0, 915.0, 920.0, 925.0, 930.0, 935.0, 940.0, 945.0, 950.0, 955.0, 960.0, 965.0, 970.0, 975.0, 980.0, 985.0, 990.0, 995.0, 1000.0, 1005.0, 1010.0, 1015.0, 1020.0, 1025.0, 1030.0, 1035.0, 1040.0, 1045.0, 1050.0, 1055.0, 1060.0, 1065.0, 1070.0, 1075.0, 1080.0, 1085.0, 1090.0, 1095.0, 1100.0, 1105.0, 1110.0, 1115.0, 1120.0, 1125.0, 1130.0, 1135.0, 1140.0, 1145.0, 1150.0, 1155.0, 1160.0, 1165.0, 1170.0, 1175.0, 1180.0, 1185.0, 1190.0, 1195.0, 1200.0, 1205.0, 1210.0, 1215.0, 1220.0, 1225.0, 1230.0, 1235.0, 1240.0, 1245.0, 1250.0, 1255.0, 1260.0, 1265.0, 1270.0, 1275.0, 1280.0, 1285.0, 1290.0, 1295.0, 1300.0, 1305.0, 1310.0, 1315.0, 1320.0, 1325.0, 1330.0, 1335.0, 1340.0, 1345.0, 1350.0, 1355.0, 1360.0, 1365.0, 1370.0, 1375.0, 1380.0, 1385.0, 1390.0, 1395.0, 1400.0, 1405.0, 1410.0, 1415.0, 1420.0, 1425.0, 1430.0, 1435.0, 1440.0, 1445.0, 1450.0, 1455.0, 1460.0, 1465.0, 1470.0, 1475.0, 1480.0, 1485.0, 1490.0, 1495.0, 1500.0, 1505.0, 1510.0, 1515.0, 1520.0, 1525.0, 1530.0, 1535.0, 1540.0, 1545.0, 1550.0, 1555.0, 1560.0, 1565.0, 1570.0, 1575.0, 1580.0, 1585.0, 1590.0, 1595.0, 1600.0], "B255": [0.0891179, 0.0896371, 0.0901272, 0.0905883, 0.0910207, 0.0914245, 0.0918, 0.0921475, 0.0924672, 0.0927595, 0.0930245, 0.0932627, 0.0934742, 0.0936596, 0.0938191, 0.093953, 0.0940618, 0.0941458, 0.0942054, 0.094241, 0.0942529, 0.0942416, 0.0942075, 0.094151, 0.0940725, 0.0939724, 0.0938512, 0.0937093, 0.0935471, 0.0933651, 0.0931636, 0.0929432, 0.0927042, 0.0924472, 0.0921725, 0.0918806, 0.0915719, 0.0912469, 0.090906, 0.0905496, 0.0901782, 0.0897922, 0.0893921, 0.0889782, 0.088551, 0.0881109, 0.0876584, 0.0871938, 0.0867175, 0.0862301, 0.0857318, 0.085223, 0.0847043, 0.0841759, 0.0836383, 0.0830918, 0.0825368, 0.0819736, 0.0814028, 0.0808245, 0.0802392, 0.0796472, 0.0790489, 0.0784446, 0.0778346, 0.0772192, 0.0765989, 0.0759739, 0.0753445, 0.074711, 0.0740737, 0.073433, 0.0727891, 0.0721422, 0.0714927, 0.0708409, 0.070187, 0.0695312, 0.0688738, 0.0682151, 0.0675553, 0.0668946, 0.0662333, 0.0655716, 0.0649097, 0.0642479, 0.0635862, 0.062925, 0.0622645, 0.0616047, 0.060946, 0.0602884, 0.0596322, 0.0589776, 0.0583246, 0.0576735, 0.0570244, 0.0563775, 0.0557329, 0.0550907, 0.0544511, 0.0538143, 0.0531802, 0.0525492, 0.0519212, 0.0512963, 0.0506748, 0.0500567, 0.0494421, 0.0488311, 0.0482238, 0.0476202, 0.0470205, 0.0464248, 0.045833, 0.0452454, 0.0446619, 0.0440826, 0.0435076, 0.042937, 0.0423708, 0.041809, 0.0412517, 0.0406989, 0.0401508, 0.0396072, 0.0390684, 0.0385342, 0.0380048, 0.0374801, 0.0369602, 0.0364451, 0.0359349, 0.0354295, 0.034929, 0.0344333, 0.0339425, 0.0334567, 0.0329758, 0.0324997, 0.0320286, 0.0315624, 0.0311012, 0.0306449, 0.0301934, 0.0297469, 0.0293053, 0.0288687, 0.0284368, 0.0280099, 0.0275879, 0.0271706, 0.0267583, 0.0263507, 0.025948, 0.02555, 0.0251568, 0.0247683, 0.0243846, 0.0240056, 0.0236312, 0.0232615, 0.0228964, 0.0225359, 0.0221799, 0.0218285, 0.0214816, 0.0211392, 0.0208013, 0.0204677, 0.0201386, 0.0198138, 0.0194933, 0.0191771, 0.0188652, 0.0185575, 0.018254, 0.0179546, 0.0176594, 0.0173682, 0.0170811, 0.016798, 0.0165189, 0.0162437, 0.0159724, 0.015705, 0.0154413, 0.0151815, 0.0149255, 0.0146731, 0.0144244, 0.0141794, 0.0139379, 0.0137, 0.0134657, 0.0132348, 0.0130073, 0.0127833, 0.0125627, 0.0123453, 0.0121313, 0.0119206, 0.011713, 0.0115086, 0.0113074, 0.0111093, 0.0109143, 0.0107223, 0.0105333, 0.0103472, 0.0101641, 0.00998384, 0.00980645, 0.00963188, 0.00946009, 0.00929103, 0.00912469, 0.00896102, 0.00879999, 0.00864156, 0.0084857, 0.00833238, 0.00818155, 0.0080332, 0.00788727, 0.00774375, 0.0076026, 0.00746378, 0.00732726, 0.00719301, 0.007061, 0.0069312, 0.00680358, 0.0066781, 0.00655473, 0.00643345, 0.00631422, 0.00619702, 0.00608181, 0.00596856, 0.00585725], "B288": [0.119543, 0.120555, 0.121533, 0.122477, 0.123387, 0.124264, 0.125107, 0.125917, 0.126693, 0.127436, 0.128145, 0.128821, 0.129464, 0.130074, 0.130652, 0.131197, 0.13171, 0.132191, 0.132641, 0.133059, 0.133445, 0.133801, 0.134127, 0.134422, 0.134687, 0.134922, 0.135129, 0.135306, 0.135455, 0.135576, 0.135669, 0.135734, 0.135773, 0.135785, 0.135771, 0.135731, 0.135665, 0.135575, 0.13546, 0.135321, 0.135158, 0.134972, 0.134763, 0.134532, 0.134278, 0.134004, 0.133708, 0.133391, 0.133054, 0.132698, 0.132322, 0.131927, 0.131514, 0.131083, 0.130634, 0.130168, 0.129686, 0.129187, 0.128672, 0.128142, 0.127597, 0.127037, 0.126463, 0.125875, 0.125274, 0.12466, 0.124034, 0.123395, 0.122745, 0.122084, 0.121411, 0.120728, 0.120035, 0.119332, 0.11862, 0.117899, 0.117169, 0.116431, 0.115684, 0.114931, 0.11417, 0.113402, 0.112627, 0.111847, 0.11106, 0.110268, 0.10947, 0.108668, 0.107861, 0.107049, 0.106234, 0.105415, 0.104592, 0.103766, 0.102937, 0.102106, 0.101272, 0.100436, 0.0995978, 0.0987583, 0.0979174, 0.0970754, 0.0962325, 0.0953889, 0.0945449, 0.0937006, 0.0928563, 0.0920122, 0.0911685, 0.0903254, 0.089483, 0.0886417, 0.0878015, 0.0869626, 0.0861253, 0.0852897, 0.0844559, 0.0836241, 0.0827945, 0.0819673, 0.0811425, 0.0803203, 0.0795009, 0.0786843, 0.0778708, 0.0770605, 0.0762534, 0.0754498, 0.0746496, 0.0738531, 0.0730603, 0.0722713, 0.0714862, 0.0707052, 0.0699283, 0.0691557, 0.0683873, 0.0676233, 0.0668638, 0.0661088, 0.0653584, 0.0646127, 0.0638718, 0.0631356, 0.0624043, 0.061678, 0.0609566, 0.0602403, 0.059529, 0.0588229, 0.0581219, 0.0574262, 0.0567357, 0.0560505, 0.0553706, 0.054696, 0.0540269, 0.0533631, 0.0527048, 0.0520519, 0.0514045, 0.0507626, 0.0501261, 0.0494952, 0.0488699, 0.04825, 0.0476357, 0.047027, 0.0464238, 0.0458262, 0.0452341, 0.0446476, 0.0440667, 0.0434913, 0.0429215, 0.0423572, 0.0417984, 0.0412452, 0.0406974, 0.0401552, 0.0396185, 0.0390873, 0.0385615, 0.0380411, 0.0375262, 0.0370167, 0.0365126, 0.0360138, 0.0355204, 0.0350324, 0.0345496, 0.0340721, 0.0335998, 0.0331328, 0.032671, 0.0322143, 0.0317628, 0.0313164, 0.0308751, 0.0304388, 0.0300076, 0.0295813, 0.0291601, 0.0287437, 0.0283323, 0.0279257, 0.0275239, 0.027127, 0.0267348, 0.0263473, 0.0259646, 0.0255865, 0.025213, 0.0248441, 0.0244798, 0.0241199, 0.0237646, 0.0234137, 0.0230672, 0.0227251, 0.0223873, 0.0220538, 0.0217245, 0.0213995, 0.0210786, 0.0207619, 0.0204493, 0.0201408, 0.0198363, 0.0195358, 0.0192392, 0.0189466, 0.0186578, 0.0183729, 0.0180918, 0.0178144, 0.0175408, 0.0172708, 0.0170045, 0.0167418, 0.0164827], "nu0_CO2": 667.4, "nu0_CH4": 1305.9}}, "scalars": {"nu0_CO2": 667.4, "nu0_CH4": 1305.9, "N_CO2": 9.17437e+21, "N_CH4": 4.12954e+19}, "ir": {"x": [450.0, 454.0, 458.0, 462.0, 466.0, 470.0, 474.0, 478.0, 482.0, 486.0, 490.0, 494.0, 498.0, 502.0, 506.0, 510.0, 514.0, 518.0, 522.0, 526.0, 530.0, 534.0, 538.0, 542.0, 546.0, 550.0, 554.0, 558.0, 562.0, 566.0, 570.0, 574.0, 578.0, 582.0, 586.0, 590.0, 594.0, 598.0, 602.0, 606.0, 610.0, 614.0, 618.0, 622.0, 626.0, 630.0, 634.0, 638.0, 642.0, 646.0, 650.0, 654.0, 658.0, 662.0, 666.0, 670.0, 674.0, 678.0, 682.0, 686.0, 690.0, 694.0, 698.0, 702.0, 706.0, 710.0, 714.0, 718.0, 722.0, 726.0, 730.0, 734.0, 738.0, 742.0, 746.0, 750.0, 754.0, 758.0, 762.0, 766.0, 770.0, 774.0, 778.0, 782.0, 786.0, 790.0, 794.0, 798.0, 802.0, 806.0, 810.0, 814.0, 818.0, 822.0, 826.0, 830.0, 834.0, 838.0, 842.0, 846.0, 850.0, 854.0, 858.0, 862.0, 866.0, 870.0, 874.0, 878.0, 882.0, 886.0, 890.0, 894.0, 898.0, 902.0, 906.0, 910.0, 914.0, 918.0, 922.0, 926.0, 930.0, 934.0, 938.0, 942.0, 946.0, 950.0, 954.0, 958.0, 962.0, 966.0, 970.0, 974.0, 978.0, 982.0, 986.0, 990.0, 994.0, 998.0, 1002.0, 1006.0, 1010.0, 1014.0, 1018.0, 1022.0, 1026.0, 1030.0, 1034.0, 1038.0, 1042.0, 1046.0, 1050.0, 1054.0, 1058.0, 1062.0, 1066.0, 1070.0, 1074.0, 1078.0, 1082.0, 1086.0, 1090.0, 1094.0, 1098.0, 1102.0, 1106.0, 1110.0, 1114.0, 1118.0, 1122.0, 1126.0, 1130.0, 1134.0, 1138.0, 1142.0, 1146.0, 1150.0, 1154.0, 1158.0, 1162.0, 1166.0, 1170.0, 1174.0, 1178.0, 1182.0, 1186.0, 1190.0, 1194.0, 1198.0, 1202.0, 1206.0, 1210.0, 1214.0, 1218.0, 1222.0, 1226.0, 1230.0, 1234.0, 1238.0, 1242.0, 1246.0, 1250.0, 1254.0, 1258.0, 1262.0, 1266.0, 1270.0, 1274.0, 1278.0, 1282.0, 1286.0, 1290.0, 1294.0, 1298.0, 1302.0, 1306.0, 1310.0, 1314.0, 1318.0, 1322.0, 1326.0, 1330.0, 1334.0, 1338.0, 1342.0, 1346.0, 1350.0, 1354.0, 1358.0, 1362.0, 1366.0, 1370.0, 1374.0, 1378.0, 1382.0, 1386.0, 1390.0, 1394.0, 1398.0, 1402.0, 1406.0, 1410.0, 1414.0, 1418.0, 1422.0, 1426.0, 1430.0, 1434.0, 1438.0, 1442.0, 1446.0, 1450.0, 1454.0, 1458.0, 1462.0, 1466.0, 1470.0, 1474.0, 1478.0, 1482.0, 1486.0, 1490.0, 1494.0, 1498.0, 1502.0, 1506.0, 1510.0, 1514.0, 1518.0, 1522.0, 1526.0, 1530.0, 1534.0, 1538.0, 1542.0, 1546.0, 1550.0, 1554.0, 1558.0, 1562.0, 1566.0, 1570.0, 1574.0, 1578.0, 1582.0, 1586.0, 1590.0, 1594.0, 1598.0, 1602.0, 1606.0, 1610.0, 1614.0, 1618.0, 1622.0, 1626.0, 1630.0, 1634.0, 1638.0, 1642.0, 1646.0, 1650.0, 1654.0, 1658.0, 1662.0, 1666.0, 1670.0, 1674.0, 1678.0, 1682.0, 1686.0, 1690.0, 1694.0, 1698.0, 1702.0, 1706.0, 1710.0, 1714.0, 1718.0, 1722.0, 1726.0, 1730.0, 1734.0, 1738.0, 1742.0, 1746.0, 1750.0, 1754.0, 1758.0, 1762.0, 1766.0, 1770.0, 1774.0, 1778.0, 1782.0, 1786.0, 1790.0, 1794.0, 1798.0, 1802.0, 1806.0, 1810.0, 1814.0, 1818.0, 1822.0, 1826.0, 1830.0, 1834.0, 1838.0, 1842.0, 1846.0, 1850.0, 1854.0, 1858.0, 1862.0, 1866.0, 1870.0, 1874.0, 1878.0, 1882.0, 1886.0, 1890.0, 1894.0, 1898.0, 1902.0, 1906.0, 1910.0, 1914.0, 1918.0, 1922.0, 1926.0, 1930.0, 1934.0, 1938.0, 1942.0, 1946.0, 1950.0, 1954.0, 1958.0, 1962.0, 1966.0, 1970.0, 1974.0, 1978.0, 1982.0, 1986.0, 1990.0, 1994.0, 1998.0, 2002.0, 2006.0, 2010.0, 2014.0, 2018.0, 2022.0, 2026.0, 2030.0, 2034.0, 2038.0, 2042.0, 2046.0, 2050.0, 2054.0, 2058.0, 2062.0, 2066.0, 2070.0, 2074.0, 2078.0, 2082.0, 2086.0, 2090.0, 2094.0, 2098.0, 2102.0, 2106.0, 2110.0, 2114.0, 2118.0, 2122.0, 2126.0, 2130.0, 2134.0, 2138.0, 2142.0, 2146.0, 2150.0, 2154.0, 2158.0, 2162.0, 2166.0, 2170.0, 2174.0, 2178.0, 2182.0, 2186.0, 2190.0, 2194.0, 2198.0, 2202.0, 2206.0, 2210.0, 2214.0, 2218.0, 2222.0, 2226.0, 2230.0, 2234.0, 2238.0, 2242.0, 2246.0, 2250.0, 2254.0, 2258.0, 2262.0, 2266.0, 2270.0, 2274.0, 2278.0, 2282.0, 2286.0, 2290.0, 2294.0, 2298.0, 2302.0, 2306.0, 2310.0, 2314.0, 2318.0, 2322.0, 2326.0, 2330.0, 2334.0, 2338.0, 2342.0, 2346.0, 2350.0, 2354.0, 2358.0, 2362.0, 2366.0, 2370.0, 2374.0, 2378.0, 2382.0, 2386.0, 2390.0, 2394.0, 2398.0, 2402.0, 2406.0, 2410.0, 2414.0, 2418.0, 2422.0, 2426.0, 2430.0, 2434.0, 2438.0, 2442.0, 2446.0], "co2": [0.0, 0.0018686, 0.0181254, 0.0143882, 0.0216758, 0.0196203, 0.026067, 0.0205546, 0.0256933, 0.0202743, 0.0151357, 0.0168174, 0.0134539, 0.0174714, 0.0152291, 0.0172845, 0.0139211, 0.0127999, 0.0111182, 0.0150422, 0.0149488, 0.0170977, 0.0187794, 0.0185926, 0.0197137, 0.0153225, 0.0201809, 0.0153225, 0.0207415, 0.0187794, 0.0257867, 0.019994, 0.0251327, 0.026721, 0.0277487, 0.028683, 0.0258801, 0.0400815, 0.0262538, 0.0342888, 0.0227969, 0.0491442, 0.0618507, 0.0521339, 0.0265341, 0.0511996, 0.0553106, 0.0744637, 0.0780141, 0.0924023, 0.123328, 0.0981015, 0.105856, 0.0529748, 0.0924957, 0.23152, 0.156122, 0.0991292, 0.125009, 0.113144, 0.130615, 0.10651, 0.0941774, 0.0826855, 0.0643733, 0.0606361, 0.0279356, 0.0720345, 0.0664287, 0.0377457, 0.0333545, 0.0330742, 0.0327939, 0.0426975, 0.0309253, 0.0326071, 0.0298042, 0.0327005, 0.027375, 0.0272816, 0.0288699, 0.0257867, 0.025413, 0.0239181, 0.0268144, 0.0240115, 0.0270947, 0.0255998, 0.026721, 0.0256933, 0.0259735, 0.0270947, 0.0250392, 0.0270947, 0.0255064, 0.0272816, 0.0244787, 0.0275618, 0.0263473, 0.0261604, 0.0264407, 0.0270013, 0.0263473, 0.0252261, 0.0263473, 0.0253195, 0.0252261, 0.0238246, 0.026067, 0.0241049, 0.0241984, 0.0250392, 0.0238246, 0.0233575, 0.0227035, 0.0238246, 0.0226101, 0.0227035, 0.0219561, 0.0226101, 0.0212086, 0.0214889, 0.021302, 0.0210217, 0.0208349, 0.0203677, 0.0208349, 0.0195269, 0.0208349, 0.0199006, 0.0199006, 0.0192466, 0.0196203, 0.0194334, 0.0184057, 0.0189663, 0.0192466, 0.0192466, 0.0182189, 0.0184057, 0.0183123, 0.0188729, 0.0184057, 0.0191532, 0.0190597, 0.0192466, 0.0188729, 0.0190597, 0.0192466, 0.0184057, 0.0189663, 0.0184057, 0.0183123, 0.0178451, 0.0178451, 0.0174714, 0.017378, 0.018032, 0.017378, 0.0176583, 0.0168174, 0.0172845, 0.0166305, 0.0170043, 0.0170043, 0.0172845, 0.0170043, 0.0171911, 0.017378, 0.0169108, 0.0172845, 0.0164437, 0.0172845, 0.016724, 0.0170043, 0.016724, 0.0163503, 0.0166305, 0.0158831, 0.0158831, 0.0154159, 0.0158831, 0.0153225, 0.0156962, 0.0151357, 0.0153225, 0.0147619, 0.0151357, 0.0153225, 0.0152291, 0.0152291, 0.0151357, 0.0154159, 0.0153225, 0.0156962, 0.0152291, 0.0154159, 0.0155094, 0.0153225, 0.0156028, 0.0155094, 0.0153225, 0.0150422, 0.0152291, 0.0149488, 0.0152291, 0.0151357, 0.0147619, 0.0148554, 0.0147619, 0.0145751, 0.0144817, 0.0146685, 0.0148554, 0.0145751, 0.0145751, 0.0145751, 0.0145751, 0.0148554, 0.0149488, 0.0146685, 0.0148554, 0.0142948, 0.0144817, 0.0145751, 0.0143882, 0.0138276, 0.0142014, 0.0142014, 0.0140145, 0.0141079, 0.0138276, 0.0138276, 0.0137342, 0.0140145, 0.0135473, 0.0135473, 0.0137342, 0.0142014, 0.0138276, 0.0139211, 0.0135473, 0.0134539, 0.0136408, 0.0132671, 0.0131736, 0.0129868, 0.0132671, 0.0133605, 0.0131736, 0.0130802, 0.0130802, 0.0133605, 0.0130802, 0.0128933, 0.0127065, 0.0133605, 0.0129868, 0.0128933, 0.0128933, 0.0129868, 0.0130802, 0.0129868, 0.0127999, 0.0130802, 0.0134539, 0.0127065, 0.0128933, 0.0132671, 0.0134539, 0.0131736, 0.0128933, 0.0134539, 0.0135473, 0.0128933, 0.0126131, 0.0126131, 0.0133605, 0.0136408, 0.0127999, 0.0129868, 0.0127065, 0.0133605, 0.0127999, 0.0124262, 0.0126131, 0.0120525, 0.0123328, 0.0122393, 0.0125196, 0.0123328, 0.0120525, 0.0127999, 0.0121459, 0.0124262, 0.0117722, 0.0122393, 0.0121459, 0.0121459, 0.0115853, 0.0125196, 0.0125196, 0.0124262, 0.0113985, 0.0118656, 0.0118656, 0.0122393, 0.0110247, 0.0114919, 0.0121459, 0.0110247, 0.0110247, 0.0117722, 0.0115853, 0.011305, 0.0109313, 0.0110247, 0.011305, 0.0111182, 0.0104642, 0.0109313, 0.0113985, 0.0108379, 0.0107444, 0.0108379, 0.0109313, 0.0103707, 0.0102773, 0.0102773, 0.0103707, 0.0103707, 0.0108379, 0.0100904, 0.00999701, 0.00999701, 0.00971672, 0.0100904, 0.00981015, 0.00999701, 0.00990358, 0.00990358, 0.00981015, 0.00990358, 0.00952986, 0.00971672, 0.00999701, 0.00971672, 0.00952986, 0.00971672, 0.00990358, 0.00971672, 0.00952986, 0.00952986, 0.00981015, 0.00943643, 0.00971672, 0.009343, 0.00924957, 0.009343, 0.00906271, 0.009343, 0.00924957, 0.009343, 0.00915614, 0.00943643, 0.00943643, 0.00943643, 0.00906271, 0.00915614, 0.00915614, 0.00878242, 0.00915614, 0.00896928, 0.00924957, 0.00850213, 0.00878242, 0.00868899, 0.00906271, 0.00896928, 0.00878242, 0.00887585, 0.00878242, 0.00868899, 0.00850213, 0.00868899, 0.00822184, 0.00887585, 0.00868899, 0.00887585, 0.00859556, 0.00859556, 0.00850213, 0.0084087, 0.00850213, 0.0084087, 0.00868899, 0.00794155, 0.00859556, 0.00831527, 0.00822184, 0.0084087, 0.00831527, 0.00822184, 0.00822184, 0.00822184, 0.00794155, 0.00794155, 0.00850213, 0.00812841, 0.0074744, 0.00803498, 0.00775469, 0.00738097, 0.00728754, 0.00728754, 0.00784812, 0.00738097, 0.00756783, 0.00728754, 0.0074744, 0.00756783, 0.0074744, 0.00710068, 0.00710068, 0.0074744, 0.00691382, 0.00728754, 0.00691382, 0.00710068, 0.00682039, 0.00710068, 0.00700725, 0.00682039, 0.00672696, 0.00682039, 0.00700725, 0.0065401, 0.00672696, 0.00644667, 0.00700725, 0.00672696, 0.00719411, 0.00728754, 0.00822184, 0.00859556, 0.009343, 0.0109313, 0.0126131, 0.0154159, 0.0178451, 0.0217692, 0.0249458, 0.0294305, 0.0331676, 0.0387735, 0.0440055, 0.0537222, 0.0684842, 0.0862359, 0.118376, 0.164997, 0.230585, 0.290007, 0.321399, 0.387454, 0.492283, 0.463506, 0.488732, 0.55759, 0.557964, 0.588422, 0.592253, 0.581508, 0.641023, 0.645975, 0.557497, 0.649993, 0.9343, 0.878335, 0.869086, 0.683254, 0.526758, 0.378205, 0.265715, 0.152571, 0.0526011, 0.0110247, 0.00607295, 0.00513865, 0.00625981, 0.0056058, 0.00588609, 0.00551237, 0.00607295, 0.00532551, 0.00541894, 0.00551237, 0.00495179, 0.00504522, 0.00457807], "ch4": [0.0, 0.00210289, 0.00324992, 0.0113429, 0.0120438, 0.00815667, 0.00490675, 0.00395089, 0.00643612, 0.00446068, 0.00841157, 0.00694592, 0.00656357, 0.00560771, 0.00732826, 0.00790178, 0.00688219, 0.00516164, 0.00783805, 0.00707336, 0.00605378, 0.00471558, 0.00586261, 0.00458813, 0.00745571, 0.00560771, 0.00560771, 0.00605378, 0.00458813, 0.00618123, 0.00458813, 0.0063724, 0.00688219, 0.00828412, 0.00471558, 0.00516164, 0.00579888, 0.00541654, 0.00669102, 0.0061175, 0.0031862, 0.00535282, 0.00726454, 0.00681847, 0.00579888, 0.00465185, 0.00579888, 0.00643612, 0.00618123, 0.00592633, 0.00490675, 0.0063724, 0.0045244, 0.00567144, 0.0063724, 0.00560771, 0.00745571, 0.0063724, 0.0050342, 0.00541654, 0.00599006, 0.00579888, 0.00191172, 0.00694592, 0.0061175, 0.00605378, 0.00458813, 0.00490675, 0.0047793, 0.00528909, 0.00458813, 0.00599006, 0.0050342, 0.00395089, 0.00548026, 0.00433323, 0.00573516, 0.00535282, 0.00579888, 0.0045244, 0.00420578, 0.00465185, 0.00548026, 0.00446068, 0.00420578, 0.00497047, 0.00395089, 0.00490675, 0.00426951, 0.0050342, 0.00446068, 0.00497047, 0.00509792, 0.00528909, 0.00401461, 0.0050342, 0.00458813, 0.0045244, 0.00541654, 0.0047793, 0.00567144, 0.00439696, 0.00471558, 0.00490675, 0.0050342, 0.00465185, 0.00375972, 0.00497047, 0.0047793, 0.00516164, 0.00414206, 0.0050342, 0.00395089, 0.0050342, 0.00420578, 0.00433323, 0.00497047, 0.00433323, 0.00471558, 0.00414206, 0.00535282, 0.00446068, 0.00497047, 0.00439696, 0.00446068, 0.00446068, 0.0047793, 0.00465185, 0.00433323, 0.0045244, 0.00433323, 0.0045244, 0.00446068, 0.00490675, 0.00439696, 0.00497047, 0.00401461, 0.00497047, 0.00497047, 0.00433323, 0.0047793, 0.00465185, 0.00497047, 0.00420578, 0.0047793, 0.00420578, 0.00497047, 0.00439696, 0.00458813, 0.00439696, 0.00433323, 0.0045244, 0.00426951, 0.00458813, 0.0045244, 0.0050342, 0.00414206, 0.00490675, 0.00388716, 0.00446068, 0.00465185, 0.00439696, 0.00490675, 0.00433323, 0.00535282, 0.0047793, 0.00579888, 0.0050342, 0.00541654, 0.00497047, 0.0047793, 0.00465185, 0.00522537, 0.00522537, 0.00414206, 0.0061175, 0.00471558, 0.00573516, 0.00605378, 0.0061175, 0.00579888, 0.00643612, 0.00567144, 0.00860274, 0.00656357, 0.0095586, 0.0129997, 0.00726454, 0.0152938, 0.00873019, 0.0163133, 0.0194358, 0.0182888, 0.0375972, 0.0168231, 0.0361315, 0.0182251, 0.0527635, 0.0360678, 0.0635966, 0.0398275, 0.0535282, 0.0369599, 0.0602192, 0.0595182, 0.0571604, 0.0468371, 0.0474107, 0.0460087, 0.0606015, 0.0478567, 0.0903606, 0.103169, 0.201878, 0.357747, 0.0327541, 0.00497047, 0.0283572, 0.0216024, 0.0377246, 0.0440333, 0.0641701, 0.0740473, 0.0830324, 0.0801648, 0.0688856, 0.0802922, 0.0853902, 0.0582437, 0.0652534, 0.0491949, 0.0468371, 0.0303963, 0.0252984, 0.0190535, 0.0133183, 0.0121713, 0.0095586, 0.00732826, 0.0061175, 0.00694592, 0.00465185, 0.00841157, 0.00528909, 0.00732826, 0.00560771, 0.00605378, 0.00713709, 0.00567144, 0.00579888, 0.00681847, 0.00669102, 0.00643612, 0.0066273, 0.00592633, 0.00535282, 0.00675474, 0.00618123, 0.00465185, 0.00509792, 0.00643612, 0.00541654, 0.00605378, 0.00522537, 0.00745571, 0.00707336, 0.00656357, 0.00618123, 0.00681847, 0.00599006, 0.00573516, 0.00643612, 0.00815667, 0.0111517, 0.00943115, 0.0079655, 0.0063724, 0.00834784, 0.0061175, 0.00528909, 0.0050342, 0.00548026, 0.00541654, 0.00446068, 0.00471558, 0.00439696, 0.00446068, 0.00439696, 0.0050342, 0.00420578, 0.00509792, 0.00497047, 0.00535282, 0.00509792, 0.0047793, 0.00497047, 0.00497047, 0.00573516, 0.00471558, 0.00567144, 0.00548026, 0.00643612, 0.00548026, 0.00471558, 0.00528909, 0.00471558, 0.00592633, 0.00471558, 0.00624495, 0.00599006, 0.00541654, 0.00471558, 0.0061175, 0.00599006, 0.00528909, 0.00528909, 0.00541654, 0.00681847, 0.00465185, 0.00490675, 0.00490675, 0.00624495, 0.00509792, 0.0050342, 0.00541654, 0.00548026, 0.00548026, 0.0047793, 0.00509792, 0.0045244, 0.00541654, 0.00535282, 0.0045244, 0.00490675, 0.00458813, 0.00509792, 0.00490675, 0.00516164, 0.0045244, 0.00490675, 0.00433323, 0.0050342, 0.00401461, 0.0047793, 0.00490675, 0.0050342, 0.00497047, 0.00426951, 0.00497047, 0.00446068, 0.00490675, 0.00388716, 0.00439696, 0.00420578, 0.0047793, 0.00458813, 0.00414206, 0.00433323, 0.00388716, 0.00433323, 0.00388716, 0.00465185, 0.00388716, 0.00433323, 0.00439696, 0.00446068, 0.00433323, 0.00420578, 0.00465185, 0.00395089, 0.00446068, 0.00388716, 0.00439696, 0.00414206, 0.00446068, 0.00420578, 0.00401461, 0.00426951, 0.00395089, 0.00439696, 0.00375972, 0.0045244, 0.00395089, 0.00426951, 0.00375972, 0.00465185, 0.00420578, 0.00420578, 0.00401461, 0.00414206, 0.00433323, 0.00363227, 0.0045244, 0.00369599, 0.00395089, 0.00369599, 0.00433323, 0.00382344, 0.00426951, 0.00426951, 0.00382344, 0.00414206, 0.00375972, 0.00426951, 0.0034411, 0.00439696, 0.00395089, 0.00420578, 0.00356854, 0.00375972, 0.00382344, 0.00363227, 0.00446068, 0.00382344, 0.00401461, 0.0034411, 0.00420578, 0.00375972, 0.00395089, 0.00382344, 0.00395089, 0.00388716, 0.00369599, 0.00433323, 0.00382344, 0.00433323, 0.00369599, 0.00414206, 0.00382344, 0.00414206, 0.00433323, 0.00420578, 0.00382344, 0.0034411, 0.00420578, 0.0031862, 0.00395089, 0.00388716, 0.00439696, 0.00350482, 0.00395089, 0.00382344, 0.00369599, 0.00420578, 0.00363227, 0.00420578, 0.0034411, 0.00446068, 0.00414206, 0.00420578, 0.00401461, 0.00439696, 0.00414206, 0.00375972, 0.00439696, 0.00388716, 0.00490675, 0.00420578, 0.00535282, 0.00458813, 0.00548026, 0.00605378, 0.00649985, 0.00599006, 0.00624495, 0.00790178, 0.00624495, 0.00758316, 0.00669102, 0.00847529, 0.00567144, 0.00707336, 0.0061175, 0.00688219, 0.00720081, 0.00707336, 0.00751943, 0.00592633, 0.00834784, 0.00579888, 0.0066273, 0.00426951, 0.0061175, 0.0047793, 0.00497047, 0.00433323, 0.00388716, 0.00395089, 0.00299503, 0.00465185, 0.00337737, 0.00382344, 0.00299503, 0.00363227, 0.0034411, 0.00401461, 0.00414206, 0.00356854, 0.0045244, 0.00312248]}};</script><script>
+const F = window.FARADAY;
+const TT = document.getElementById('tooltip');
+function sci(v,d=3){ if(v===0)return '0'; const a=Math.abs(v);
+  if(a>=1e4||a<1e-2){const e=Math.floor(Math.log10(a));const m=v/Math.pow(10,e);
+    return m.toFixed(d)+'e'+e;} return v.toFixed(d); }
+function nice(v){return v.toLocaleString('en-US',{maximumSignificantDigits:4});}
+
+class Plot{
+  constructor(cv,cfg){
+    this.cv=cv; this.ctx=cv.getContext('2d'); this.cfg=cfg;
+    this.pad={l:64,r:16,t:14,b:42};
+    this.computeData(); this.home(); this.bind(); this.resize();
+    new ResizeObserver(()=>this.resize()).observe(cv.parentElement);
+  }
+  computeData(){
+    let xs=[],ys=[];
+    for(const s of this.cfg.series) for(const p of s.points){xs.push(p.x);
+      if(this.cfg.ylog){if(p.y>0)ys.push(p.y);}else ys.push(p.y);}
+    this.xmin=Math.min(...xs);this.xmax=Math.max(...xs);
+    this.ymin=Math.min(...ys);this.ymax=Math.max(...ys);
+    if(this.cfg.ylog){this.ymin=Math.max(this.ymin,1e-300);}
+    const py=(this.cfg.ylog?(Math.log10(this.ymax)-Math.log10(this.ymin)):(this.ymax-this.ymin))*0.06||1;
+    if(this.cfg.ylog){this.ymin/=Math.pow(10,py*0.4);this.ymax*=Math.pow(10,py*0.6);}
+    else{this.ymin-=py;this.ymax+=py;}
+    const px=(this.xmax-this.xmin)*0.02||1;this.xmin-=px;this.xmax+=px;
+    if(this.cfg.yminForce!==undefined)this.ymin=this.cfg.yminForce;
+  }
+  home(){this.view={x0:this.xmin,x1:this.xmax,y0:this.ymin,y1:this.ymax};this.draw&&this.draw();}
+  resize(){const r=this.cv.parentElement.getBoundingClientRect();
+    const w=Math.max(280,r.width-32),h=this.cfg.height||320;const dpr=devicePixelRatio||1;
+    this.cv.width=w*dpr;this.cv.height=h*dpr;this.cv.style.height=h+'px';
+    this.W=w;this.H=h;this.ctx.setTransform(dpr,0,0,dpr,0,0);this.draw();}
+  xToPx(x){return this.pad.l+(x-this.view.x0)/(this.view.x1-this.view.x0)*(this.W-this.pad.l-this.pad.r);}
+  yToPx(y){const t=this.cfg.ylog?(Math.log10(y)-Math.log10(this.view.y0))/(Math.log10(this.view.y1)-Math.log10(this.view.y0)):(y-this.view.y0)/(this.view.y1-this.view.y0);
+    return this.H-this.pad.b-t*(this.H-this.pad.t-this.pad.b);}
+  pxToX(px){return this.view.x0+(px-this.pad.l)/(this.W-this.pad.l-this.pad.r)*(this.view.x1-this.view.x0);}
+  pxToY(py){const t=(this.H-this.pad.b-py)/(this.H-this.pad.t-this.pad.b);
+    return this.cfg.ylog?Math.pow(10,Math.log10(this.view.y0)+t*(Math.log10(this.view.y1)-Math.log10(this.view.y0))):this.view.y0+t*(this.view.y1-this.view.y0);}
+  ticks(a,b,n){const sp=(b-a)/n,mag=Math.pow(10,Math.floor(Math.log10(sp))),norm=sp/mag;
+    let st=(norm<1.5?1:norm<3?2:norm<7?5:10)*mag;const out=[];
+    for(let v=Math.ceil(a/st)*st;v<=b;v+=st)out.push(v);return out;}
+  draw(){
+    if(this.W===undefined)return;
+    const c=this.ctx,W=this.W,H=this.H,P=this.pad;c.clearRect(0,0,W,H);
+    // grid + axes
+    c.strokeStyle='#1c2942';c.fillStyle='#7e8ca6';c.lineWidth=1;
+    c.font='11px JetBrains Mono, monospace';
+    const xt=this.ticks(this.view.x0,this.view.x1,7);
+    for(const t of xt){const x=this.xToPx(t);if(x<P.l-1||x>W-P.r+1)continue;
+      c.globalAlpha=.5;c.beginPath();c.moveTo(x,P.t);c.lineTo(x,H-P.b);c.stroke();c.globalAlpha=1;
+      c.textAlign='center';c.fillText(this.cfg.fmtX?this.cfg.fmtX(t):nice(t),x,H-P.b+15);}
+    let yt;
+    if(this.cfg.ylog){yt=[];const a=Math.ceil(Math.log10(this.view.y0)),b=Math.floor(Math.log10(this.view.y1));
+      for(let e=a;e<=b;e++)yt.push(Math.pow(10,e));}
+    else yt=this.ticks(this.view.y0,this.view.y1,5);
+    for(const t of yt){const y=this.yToPx(t);if(y<P.t-1||y>H-P.b+1)continue;
+      c.globalAlpha=.5;c.beginPath();c.moveTo(P.l,y);c.lineTo(W-P.r,y);c.stroke();c.globalAlpha=1;
+      c.textAlign='right';c.fillText(this.cfg.ylog?('1e'+Math.round(Math.log10(t))):(this.cfg.fmtY?this.cfg.fmtY(t):sci(t,2)),P.l-7,y+3.5);}
+    // axis labels
+    c.fillStyle='#9fb0c8';c.textAlign='center';c.font='11px JetBrains Mono, monospace';
+    c.fillText(this.cfg.xlabel,P.l+(W-P.l-P.r)/2,H-6);
+    c.save();c.translate(13,P.t+(H-P.t-P.b)/2);c.rotate(-Math.PI/2);c.fillText(this.cfg.ylabel,0,0);c.restore();
+    // clip to plot area
+    c.save();c.beginPath();c.rect(P.l,P.t,W-P.l-P.r,H-P.t-P.b);c.clip();
+    // annotations (vertical markers)
+    for(const an of (this.cfg.vlines||[])){const x=this.xToPx(an.x);
+      c.strokeStyle=an.color||'#ff5d73';c.setLineDash([5,4]);c.lineWidth=1.3;
+      c.beginPath();c.moveTo(x,P.t);c.lineTo(x,H-P.b);c.stroke();c.setLineDash([]);
+      c.fillStyle=an.color||'#ff5d73';c.textAlign='left';c.font='10px JetBrains Mono, monospace';
+      if(x>P.l&&x<W-P.r)c.fillText(an.label,x+4,P.t+11);}
+    // series
+    const vis={};
+    for(const s of this.cfg.series){
+      const pts=s.points;vis[s.name]=0;
+      const inview=pts.filter(p=>p.x>=this.view.x0&&p.x<=this.view.x1);vis[s.name]=inview.length;
+      const r=inview.length<50?4.5:inview.length<200?2.6:1.6;
+      if(s.type==='stick'){c.strokeStyle=s.color;c.lineWidth=1.4;
+        for(const p of pts){if(this.cfg.ylog&&p.y<=0)continue;const x=this.xToPx(p.x);
+          c.beginPath();c.moveTo(x,this.yToPx(this.view.y0));c.lineTo(x,this.yToPx(p.y));c.stroke();}}
+      else if(s.type==='line'){c.strokeStyle=s.color;c.lineWidth=1.9;c.beginPath();let st=false;
+        for(const p of pts){if(this.cfg.ylog&&p.y<=0){st=false;continue;}const x=this.xToPx(p.x),y=this.yToPx(p.y);
+          if(!st){c.moveTo(x,y);st=true;}else c.lineTo(x,y);}c.stroke();}
+      // markers
+      if(s.type!=='line'||inview.length<60){c.fillStyle=s.color;
+        for(const p of pts){if(this.cfg.ylog&&p.y<=0)continue;const x=this.xToPx(p.x),y=this.yToPx(p.y);
+          if(x<P.l||x>W-P.r)continue;c.beginPath();c.arc(x,y,r,0,7);c.fill();}}
+    }
+    c.restore();
+    // box-zoom selection rectangle
+    if(this.sel){const s=this.sel,x=Math.min(s.x0,s.x1),y=Math.min(s.y0,s.y1),
+        w=Math.abs(s.x1-s.x0),hh=Math.abs(s.y1-s.y0);
+      c.save();c.fillStyle='rgba(122,162,255,.15)';c.strokeStyle='#7aa2ff';c.lineWidth=1;
+      c.setLineDash([4,3]);c.fillRect(x,y,w,hh);c.strokeRect(x,y,w,hh);c.setLineDash([]);c.restore();}
+    // view readout
+    if(this.cfg.readout){let tot=0;for(const k in vis)tot+=vis[k];
+      this.cfg.readout.textContent='view: '+(this.cfg.fmtX?this.cfg.fmtX(this.view.x0):sci(this.view.x0))+
+       ' → '+(this.cfg.fmtX?this.cfg.fmtX(this.view.x1):sci(this.view.x1))+'  ·  '+tot+' pts in view';}
+  }
+  zoomX(mx,f){const dx=this.pxToX(mx);this.view.x0=dx-(dx-this.view.x0)*f;this.view.x1=dx+(this.view.x1-dx)*f;}
+  zoomY(my,f){if(this.cfg.ylog){const ly=Math.log10(this.pxToY(my));
+      this.view.y0=Math.pow(10,ly-(ly-Math.log10(this.view.y0))*f);
+      this.view.y1=Math.pow(10,ly+(Math.log10(this.view.y1)-ly)*f);}
+    else{const dy=this.pxToY(my);this.view.y0=dy-(dy-this.view.y0)*f;this.view.y1=dy+(this.view.y1-dy)*f;}}
+  bind(){
+    const cv=this.cv, self=this;
+    const clampX=px=>Math.max(self.pad.l,Math.min(self.W-self.pad.r,px));
+    const clampY=px=>Math.max(self.pad.t,Math.min(self.H-self.pad.b,px));
+    // wheel: X-axis only (default); Shift+wheel: Y-axis only
+    cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();
+      const mx=e.clientX-r.left,my=e.clientY-r.top,f=e.deltaY<0?0.84:1.19;
+      if(e.shiftKey)self.zoomY(my,f); else self.zoomX(mx,f);
+      self.draw();},{passive:false});
+    // drag: box-zoom (default) — wide+short box => X-only; Shift+drag = pan
+    let mode=null,sx,sy,lx,ly;
+    cv.addEventListener('mousedown',e=>{const r=cv.getBoundingClientRect();
+      sx=clampX(e.clientX-r.left);sy=clampY(e.clientY-r.top);lx=e.clientX;ly=e.clientY;
+      mode=e.shiftKey?'pan':'box';self.dragging=true;
+      if(mode==='box')self.sel={x0:sx,y0:sy,x1:sx,y1:sy};e.preventDefault();});
+    window.addEventListener('mousemove',e=>{
+      if(!mode)return;const r=cv.getBoundingClientRect();
+      if(mode==='box'){self.sel={x0:sx,y0:sy,x1:clampX(e.clientX-r.left),y1:clampY(e.clientY-r.top)};self.draw();return;}
+      const dpxX=(e.clientX-lx)/(self.W-self.pad.l-self.pad.r)*(self.view.x1-self.view.x0);
+      self.view.x0-=dpxX;self.view.x1-=dpxX;
+      if(self.cfg.ylog){const fr=(e.clientY-ly)/(self.H-self.pad.t-self.pad.b);
+        const l0=Math.log10(self.view.y0),l1=Math.log10(self.view.y1),d=(l1-l0)*fr;
+        self.view.y0=Math.pow(10,l0+d);self.view.y1=Math.pow(10,l1+d);}
+      else{const dpxY=(e.clientY-ly)/(self.H-self.pad.t-self.pad.b)*(self.view.y1-self.view.y0);
+        self.view.y0+=dpxY;self.view.y1+=dpxY;}
+      lx=e.clientX;ly=e.clientY;self.draw();});
+    window.addEventListener('mouseup',()=>{
+      if(mode==='box'&&self.sel){const s=self.sel,dx=Math.abs(s.x1-s.x0),dy=Math.abs(s.y1-s.y0);
+        if(dx>6){const xa=self.pxToX(s.x0),xb=self.pxToX(s.x1);
+          self.view.x0=Math.min(xa,xb);self.view.x1=Math.max(xa,xb);}
+        if(dx>6&&dy>6){const ya=self.pxToY(s.y0),yb=self.pxToY(s.y1);
+          self.view.y0=Math.min(ya,yb);self.view.y1=Math.max(ya,yb);}}
+      mode=null;self.dragging=false;self.sel=null;self.draw();});
+    cv.addEventListener('dblclick',()=>self.home());
+    cv.addEventListener('mousemove',e=>{if(!self.dragging)self.hover(e);});
+    cv.addEventListener('mouseleave',()=>{if(!self.dragging)TT.style.display='none';});
+  }
+  hover(e){
+    const r=this.cv.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;
+    let best=null,bd=1e9;
+    for(const s of this.cfg.series)for(const p of s.points){
+      if(this.cfg.ylog&&p.y<=0)continue;const x=this.xToPx(p.x),y=this.yToPx(p.y);
+      if(x<this.pad.l||x>this.W-this.pad.r)continue;
+      const d=(x-mx)**2+(y-my)**2;if(d<bd){bd=d;best={s,p,x,y};}}
+    if(!best||bd>900){TT.style.display='none';return;}
+    const u=this.cfg.units||{};
+    let h='<b style="color:'+best.s.color+'">'+best.s.name+'</b><br>'+
+      '<span class="tk">'+(u.x||'x')+'</span> '+nice(best.p.x)+(u.xu||'')+'<br>'+
+      '<span class="tk">'+(u.y||'y')+'</span> '+sci(best.p.y,4)+(u.yu||'');
+    if(best.p.m)for(const k in best.p.m)h+='<br><span class="tk">'+k+'</span> '+best.p.m[k];
+    TT.innerHTML=h;TT.style.display='block';
+    let tx=e.clientX+14,ty=e.clientY+14;
+    if(tx+TT.offsetWidth>innerWidth)tx=e.clientX-TT.offsetWidth-14;
+    if(ty+TT.offsetHeight>innerHeight)ty=e.clientY-TT.offsetHeight-14;
+    TT.style.left=tx+'px';TT.style.top=ty+'px';
+  }
+  png(name){const a=document.createElement('a');a.download=name+'.png';a.href=this.cv.toDataURL('image/png');a.click();}
+  csv(name){let rows=[['series',this.cfg.units&&this.cfg.units.x||'x',this.cfg.units&&this.cfg.units.y||'y']];
+    for(const s of this.cfg.series)for(const p of s.points){
+      if(p.x>=this.view.x0&&p.x<=this.view.x1)rows.push([s.name,p.x,p.y]);}
+    const csv=rows.map(r=>r.join(',')).join('\n');
+    const a=document.createElement('a');a.download=name+'.csv';
+    a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.click();}
+}
+function mkToolbar(id,plot,name){const t=document.getElementById(id);
+  const b=(lbl,fn)=>{const x=document.createElement('button');x.textContent=lbl;x.onclick=fn;t.appendChild(x);};
+  b('↺ reset zoom',()=>plot.home());b('↓ PNG',()=>plot.png(name));b('↓ CSV',()=>plot.csv(name));}
+
+const ch=F.charts, ir=F.ir, S=F.scalars;
+const CO2C='#f2a83b', CH4C='#34d6c6', ACC='#7aa2ff', MUT='#c9974a', HOT='#ff5d73';
+
+// 1 — line-intensity stick spectrum
+const p1=new Plot(document.getElementById('cv_int'),{height:340,ylog:true,
+ xlabel:'wavenumber  (cm^-1)', ylabel:'line intensity S  (cm / molecule)',
+ units:{x:'v~',xu:' cm⁻¹',y:'S',yu:' cm/molec'}, readout:document.getElementById('ro_int'),
+ series:[
+  {name:'CO₂ ν₂',color:CO2C,type:'stick',points:ch.stick_CO2.nu.map((x,i)=>({x,y:ch.stick_CO2.S[i],
+     m:{branch:ch.stick_CO2.branch[i],'E″':ch.stick_CO2.Elow[i].toFixed(1)+' cm⁻¹',tool:'hitran_get_lines'}}))},
+  {name:'CH₄ ν₄',color:CH4C,type:'stick',points:ch.stick_CH4.nu.map((x,i)=>({x,y:ch.stick_CH4.S[i],
+     m:{branch:ch.stick_CH4.branch[i],'E″':ch.stick_CH4.Elow[i].toFixed(1)+' cm⁻¹',tool:'hitran_get_lines'}}))},
+ ]});
+mkToolbar('tb_int',p1,'hitran_intensity_CO2_CH4');
+
+// 2 — Voigt cross-section, shifted to each band centre
+const p2=new Plot(document.getElementById('cv_sig'),{height:320,ylog:true,
+ xlabel:'wavenumber offset from band centre  (cm^-1)', ylabel:'cross-section sigma  (cm^2 / molecule)',
+ units:{x:'Δv~',xu:' cm⁻¹',y:'σ',yu:' cm²'}, readout:document.getElementById('ro_sig'),
+ series:[
+  {name:'CO₂ ν₂  (centre '+S.nu0_CO2+')',color:CO2C,type:'line',
+   points:ch.sigma_CO2.nu.map((x,i)=>({x:x-S.nu0_CO2,y:ch.sigma_CO2.sigma[i],m:{'v~':x.toFixed(3)+' cm⁻¹',tool:'computed (Voigt)'}}))},
+  {name:'CH₄ ν₄  (centre '+S.nu0_CH4+')',color:CH4C,type:'line',
+   points:ch.sigma_CH4.nu.map((x,i)=>({x:x-S.nu0_CH4,y:ch.sigma_CH4.sigma[i],m:{'v~':x.toFixed(3)+' cm⁻¹',tool:'computed (Voigt)'}}))},
+ ]});
+mkToolbar('tb_sig',p2,'voigt_cross_section');
+
+// 3 — curve of growth (equivalent width vs column), x = log10 N
+const p3=new Plot(document.getElementById('cv_cog'),{height:320,ylog:true,
+ xlabel:'absorber column  N  (molecule cm^-2)', ylabel:'equivalent width  W  (cm^-1)',
+ units:{x:'log₁₀N',xu:'',y:'W',yu:' cm⁻¹'}, readout:document.getElementById('ro_cog'),
+ fmtX:t=>'1e'+t.toFixed(0),
+ vlines:[{x:Math.log10(ch.cog.N_CO2_present),color:CO2C,label:'CO₂ today'},
+         {x:Math.log10(ch.cog.N_CH4_present),color:CH4C,label:'CH₄ today'}],
+ series:[
+  {name:'CO₂ strong line',color:CO2C,type:'line',points:ch.cog.N.map((n,i)=>({x:Math.log10(n),y:ch.cog.W_CO2[i],m:{N:sci(n)+' cm⁻²'}}))},
+  {name:'CH₄ strong line',color:CH4C,type:'line',points:ch.cog.N.map((n,i)=>({x:Math.log10(n),y:ch.cog.W_CH4[i],m:{N:sci(n)+' cm⁻²'}}))},
+ ]});
+mkToolbar('tb_cog',p3,'curve_of_growth');
+
+// 4 — Planck spectral radiance (why band placement matters)
+const p4=new Plot(document.getElementById('cv_pl'),{height:330,
+ xlabel:'wavenumber  (cm^-1)', ylabel:'spectral radiance B  (W m^-2 sr^-1 / cm^-1)',
+ units:{x:'v~',xu:' cm⁻¹',y:'B',yu:' W m⁻² sr⁻¹/cm⁻¹'}, readout:document.getElementById('ro_pl'),
+ vlines:[{x:S.nu0_CO2,color:CO2C,label:'CO₂ 15 µm'},{x:S.nu0_CH4,color:CH4C,label:'CH₄ 7.7 µm'},
+         {x:ch.planck.nu[0],color:'transparent',label:''}],
+ series:[
+  {name:'B(255 K)  emission level',color:ACC,type:'line',points:ch.planck.nu.map((x,i)=>({x,y:ch.planck.B255[i],m:{T:'255 K'}}))},
+  {name:'B(288 K)  surface',color:MUT,type:'line',points:ch.planck.nu.map((x,i)=>({x,y:ch.planck.B288[i],m:{T:'288 K'}}))},
+ ]});
+mkToolbar('tb_pl',p4,'planck_255K_288K');
+
+// 5 — observed NIST IR absorbance (band-position cross-validation)
+const p5=new Plot(document.getElementById('cv_ir'),{height:330,
+ xlabel:'wavenumber  (cm^-1)', ylabel:'absorbance  (relative)',
+ units:{x:'v~',xu:' cm⁻¹',y:'A',yu:''}, readout:document.getElementById('ro_ir'),
+ vlines:[{x:S.nu0_CO2,color:CO2C,label:'CO₂ ν₂'},{x:S.nu0_CH4,color:CH4C,label:'CH₄ ν₄'},{x:2349,color:CO2C,label:'CO₂ ν₃'}],
+ series:[
+  {name:'CO₂ (NIST C124389)',color:CO2C,type:'line',points:ir.x.map((x,i)=>({x,y:ir.co2[i],m:{tool:'nist_get_spectrum'}}))},
+  {name:'CH₄ (NIST C74828)',color:CH4C,type:'line',points:ir.x.map((x,i)=>({x,y:ir.ch4[i],m:{tool:'nist_get_spectrum'}}))},
+ ]});
+mkToolbar('tb_ir',p5,'nist_observed_IR');
+</script><footer></footer></body></html>
